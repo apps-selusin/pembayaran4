@@ -22,10 +22,10 @@ $EW_ROOT_RELATIVE_PATH = "."; // Relative path of app root
 define("EW_UNFORMAT_YEAR", 50, TRUE); // Unformat year
 define("EW_PROJECT_NAME", "pembayaran4_prj", TRUE); // Project name
 define("EW_CONFIG_FILE_FOLDER", EW_PROJECT_NAME, TRUE); // Config file name
-define("EW_PROJECT_ID", "{1437F52B-7E7A-46CA-851B-958195C82267}", TRUE); // Project ID (GUID)
+define("EW_PROJECT_ID", "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}", TRUE); // Project ID (GUID)
 $EW_RELATED_PROJECT_ID = "";
 $EW_RELATED_LANGUAGE_FOLDER = "";
-define("EW_RANDOM_KEY", 'IM1Hr1MpwE39bWjA', TRUE); // Random key for encryption
+define("EW_RANDOM_KEY", 'VPTbV1eB18WJr614', TRUE); // Random key for encryption
 define("EW_PROJECT_STYLESHEET_FILENAME", "phpcss/pembayaran4_prj.css", TRUE); // Project stylesheet file name
 define("EW_CHARSET", "", TRUE); // Project charset
 define("EW_EMAIL_CHARSET", EW_CHARSET, TRUE); // Email charset
@@ -920,7 +920,5 @@ define("EW_MENU_ROOT_GROUP_TITLE_AS_SUBMENU", FALSE, TRUE);
 define("EW_SHOW_RIGHT_MENU", FALSE, TRUE);
 ?>
 <?php
-define("EW_PDF_STYLESHEET_FILENAME", "phpcss/ewpdf.css", TRUE); // export PDF CSS styles
-define("EW_PDF_MEMORY_LIMIT", "128M", TRUE); // Memory limit
-define("EW_PDF_TIME_LIMIT", 120, TRUE); // Time limit
+define("EW_PDF_STYLESHEET_FILENAME", "", TRUE); // Export PDF CSS styles
 ?>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/11/11" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/11/12" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,11 +583,26 @@
   <project>
     <phrase id="bodytitle" value="PEMBAYARAN" />
     <phrase id="footertext" value="&amp;copy;2018 Selaras Solusindo. All rights reserved." />
-    <menu id="2">
-      <phrase id="menutext" value="Home" />
-    </menu>
     <menu id="1">
       <phrase id="menutext" value="Tahun Ajaran" />
+    </menu>
+    <menu id="2">
+      <phrase id="menutext" value="Sekolah" />
+    </menu>
+    <menu id="3">
+      <phrase id="menutext" value="Kelas" />
+    </menu>
+    <menu id="4">
+      <phrase id="menutext" value="Siswa" />
+    </menu>
+    <menu id="5">
+      <phrase id="menutext" value="Jenis Pembayaran Rutin" />
+    </menu>
+    <menu id="6">
+      <phrase id="menutext" value="Pembayaran Rutin" />
+    </menu>
+    <menu id="7">
+      <phrase id="menutext" value="Rincian Pembayaran Rutin Siswa" />
     </menu>
     <table id="t01_tahunajaran">
       <phrase id="tblcaption" value="Tahun Ajaran" />
@@ -617,8 +632,83 @@
         <phrase id="fldtagcaption2" value="T" />
       </field>
     </table>
-    <table id="cf01_home_php">
-      <phrase id="tblcaption" value="Home" />
+    <table id="t02_sekolah">
+      <phrase id="tblcaption" value="Sekolah" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="sekolah">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+    </table>
+    <table id="t03_kelas">
+      <phrase id="tblcaption" value="Kelas" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+      <field id="kelas">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+    </table>
+    <table id="t04_siswa">
+      <phrase id="tblcaption" value="Siswa" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="nis">
+        <phrase id="fldcaption" value="NIS" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t05_rutin">
+      <phrase id="tblcaption" value="Jenis Pembayaran Rutin" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+    </table>
+    <table id="t06_siswarutin">
+      <phrase id="tblcaption" value="Pembayaran Rutin" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="rutin_id">
+        <phrase id="fldcaption" value="rutin id" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+    </table>
+    <table id="t07_siswarutinbayar">
+      <phrase id="tblcaption" value="Rincian Pembayaran Rutin Siswa" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="siswarutin_id">
+        <phrase id="fldcaption" value="siswarutin id" />
+      </field>
+      <field id="tanggal_bayar">
+        <phrase id="fldcaption" value="Tanggal Bayar" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+      <field id="periode">
+        <phrase id="fldcaption" value="Periode" />
+      </field>
     </table>
   </project>
 </ew-language>

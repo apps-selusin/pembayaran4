@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t01_tahunajaraninfo.php" ?>
+<?php include_once "t05_rutininfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t01_tahunajaran_view = NULL; // Initialize page object first
+$t05_rutin_view = NULL; // Initialize page object first
 
-class ct01_tahunajaran_view extends ct01_tahunajaran {
+class ct05_rutin_view extends ct05_rutin {
 
 	// Page ID
 	var $PageID = 'view';
@@ -24,10 +24,10 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
 
 	// Table name
-	var $TableName = 't01_tahunajaran';
+	var $TableName = 't05_rutin';
 
 	// Page object name
-	var $PageObjName = 't01_tahunajaran_view';
+	var $PageObjName = 't05_rutin_view';
 
 	// Page name
 	function PageName() {
@@ -256,10 +256,10 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t01_tahunajaran)
-		if (!isset($GLOBALS["t01_tahunajaran"]) || get_class($GLOBALS["t01_tahunajaran"]) == "ct01_tahunajaran") {
-			$GLOBALS["t01_tahunajaran"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t01_tahunajaran"];
+		// Table object (t05_rutin)
+		if (!isset($GLOBALS["t05_rutin"]) || get_class($GLOBALS["t05_rutin"]) == "ct05_rutin") {
+			$GLOBALS["t05_rutin"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t05_rutin"];
 		}
 		$KeyUrl = "";
 		if (@$_GET["id"] <> "") {
@@ -280,7 +280,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't01_tahunajaran', TRUE);
+			define("EW_TABLE_NAME", 't05_rutin', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -308,12 +308,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->Awal_Bulan->SetVisibility();
-		$this->Awal_Tahun->SetVisibility();
-		$this->Akhir_Bulan->SetVisibility();
-		$this->Akhir_Tahun->SetVisibility();
-		$this->Tahun_Ajaran->SetVisibility();
-		$this->Aktif->SetVisibility();
+		$this->Jenis->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -345,13 +340,13 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t01_tahunajaran;
+		global $EW_EXPORT, $t05_rutin;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t01_tahunajaran);
+				$doc = new $class($t05_rutin);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -417,7 +412,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 				$this->id->setFormValue($_POST["id"]);
 				$this->RecKey["id"] = $this->id->FormValue;
 			} else {
-				$sReturnUrl = "t01_tahunajaranlist.php"; // Return to list
+				$sReturnUrl = "t05_rutinlist.php"; // Return to list
 			}
 
 			// Get action
@@ -427,11 +422,11 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 					if (!$this->LoadRow()) { // Load record based on key
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "t01_tahunajaranlist.php"; // No matching record, return to list
+						$sReturnUrl = "t05_rutinlist.php"; // No matching record, return to list
 					}
 			}
 		} else {
-			$sReturnUrl = "t01_tahunajaranlist.php"; // Not page request, return to list
+			$sReturnUrl = "t05_rutinlist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -564,12 +559,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->Awal_Bulan->setDbValue($rs->fields('Awal_Bulan'));
-		$this->Awal_Tahun->setDbValue($rs->fields('Awal_Tahun'));
-		$this->Akhir_Bulan->setDbValue($rs->fields('Akhir_Bulan'));
-		$this->Akhir_Tahun->setDbValue($rs->fields('Akhir_Tahun'));
-		$this->Tahun_Ajaran->setDbValue($rs->fields('Tahun_Ajaran'));
-		$this->Aktif->setDbValue($rs->fields('Aktif'));
+		$this->Jenis->setDbValue($rs->fields('Jenis'));
 	}
 
 	// Load DbValue from recordset
@@ -577,12 +567,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->Awal_Bulan->DbValue = $row['Awal_Bulan'];
-		$this->Awal_Tahun->DbValue = $row['Awal_Tahun'];
-		$this->Akhir_Bulan->DbValue = $row['Akhir_Bulan'];
-		$this->Akhir_Tahun->DbValue = $row['Akhir_Tahun'];
-		$this->Tahun_Ajaran->DbValue = $row['Tahun_Ajaran'];
-		$this->Aktif->DbValue = $row['Aktif'];
+		$this->Jenis->DbValue = $row['Jenis'];
 	}
 
 	// Render row values based on field settings
@@ -602,12 +587,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 
 		// Common render codes for all row types
 		// id
-		// Awal_Bulan
-		// Awal_Tahun
-		// Akhir_Bulan
-		// Akhir_Tahun
-		// Tahun_Ajaran
-		// Aktif
+		// Jenis
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -615,63 +595,14 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// Awal_Bulan
-		$this->Awal_Bulan->ViewValue = $this->Awal_Bulan->CurrentValue;
-		$this->Awal_Bulan->ViewCustomAttributes = "";
+		// Jenis
+		$this->Jenis->ViewValue = $this->Jenis->CurrentValue;
+		$this->Jenis->ViewCustomAttributes = "";
 
-		// Awal_Tahun
-		$this->Awal_Tahun->ViewValue = $this->Awal_Tahun->CurrentValue;
-		$this->Awal_Tahun->ViewCustomAttributes = "";
-
-		// Akhir_Bulan
-		$this->Akhir_Bulan->ViewValue = $this->Akhir_Bulan->CurrentValue;
-		$this->Akhir_Bulan->ViewCustomAttributes = "";
-
-		// Akhir_Tahun
-		$this->Akhir_Tahun->ViewValue = $this->Akhir_Tahun->CurrentValue;
-		$this->Akhir_Tahun->ViewCustomAttributes = "";
-
-		// Tahun_Ajaran
-		$this->Tahun_Ajaran->ViewValue = $this->Tahun_Ajaran->CurrentValue;
-		$this->Tahun_Ajaran->ViewCustomAttributes = "";
-
-		// Aktif
-		if (strval($this->Aktif->CurrentValue) <> "") {
-			$this->Aktif->ViewValue = $this->Aktif->OptionCaption($this->Aktif->CurrentValue);
-		} else {
-			$this->Aktif->ViewValue = NULL;
-		}
-		$this->Aktif->ViewCustomAttributes = "";
-
-			// Awal_Bulan
-			$this->Awal_Bulan->LinkCustomAttributes = "";
-			$this->Awal_Bulan->HrefValue = "";
-			$this->Awal_Bulan->TooltipValue = "";
-
-			// Awal_Tahun
-			$this->Awal_Tahun->LinkCustomAttributes = "";
-			$this->Awal_Tahun->HrefValue = "";
-			$this->Awal_Tahun->TooltipValue = "";
-
-			// Akhir_Bulan
-			$this->Akhir_Bulan->LinkCustomAttributes = "";
-			$this->Akhir_Bulan->HrefValue = "";
-			$this->Akhir_Bulan->TooltipValue = "";
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->LinkCustomAttributes = "";
-			$this->Akhir_Tahun->HrefValue = "";
-			$this->Akhir_Tahun->TooltipValue = "";
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->LinkCustomAttributes = "";
-			$this->Tahun_Ajaran->HrefValue = "";
-			$this->Tahun_Ajaran->TooltipValue = "";
-
-			// Aktif
-			$this->Aktif->LinkCustomAttributes = "";
-			$this->Aktif->HrefValue = "";
-			$this->Aktif->TooltipValue = "";
+			// Jenis
+			$this->Jenis->LinkCustomAttributes = "";
+			$this->Jenis->HrefValue = "";
+			$this->Jenis->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -684,7 +615,7 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t01_tahunajaranlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t05_rutinlist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -796,29 +727,29 @@ class ct01_tahunajaran_view extends ct01_tahunajaran {
 <?php
 
 // Create page object
-if (!isset($t01_tahunajaran_view)) $t01_tahunajaran_view = new ct01_tahunajaran_view();
+if (!isset($t05_rutin_view)) $t05_rutin_view = new ct05_rutin_view();
 
 // Page init
-$t01_tahunajaran_view->Page_Init();
+$t05_rutin_view->Page_Init();
 
 // Page main
-$t01_tahunajaran_view->Page_Main();
+$t05_rutin_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t01_tahunajaran_view->Page_Render();
+$t05_rutin_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ft01_tahunajaranview = new ew_Form("ft01_tahunajaranview", "view");
+var CurrentForm = ft05_rutinview = new ew_Form("ft05_rutinview", "view");
 
 // Form_CustomValidate event
-ft01_tahunajaranview.Form_CustomValidate = 
+ft05_rutinview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -827,110 +758,53 @@ ft01_tahunajaranview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft01_tahunajaranview.ValidateRequired = true;
+ft05_rutinview.ValidateRequired = true;
 <?php } else { ?>
-ft01_tahunajaranview.ValidateRequired = false; 
+ft05_rutinview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft01_tahunajaranview.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ft01_tahunajaranview.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <div class="ewToolbar">
-<?php if (!$t01_tahunajaran_view->IsModal) { ?>
+<?php if (!$t05_rutin_view->IsModal) { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php $t01_tahunajaran_view->ExportOptions->Render("body") ?>
+<?php $t05_rutin_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($t01_tahunajaran_view->OtherOptions as &$option)
+	foreach ($t05_rutin_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$t01_tahunajaran_view->IsModal) { ?>
+<?php if (!$t05_rutin_view->IsModal) { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
-<?php $t01_tahunajaran_view->ShowPageHeader(); ?>
+<?php $t05_rutin_view->ShowPageHeader(); ?>
 <?php
-$t01_tahunajaran_view->ShowMessage();
+$t05_rutin_view->ShowMessage();
 ?>
-<form name="ft01_tahunajaranview" id="ft01_tahunajaranview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t01_tahunajaran_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t01_tahunajaran_view->Token ?>">
+<form name="ft05_rutinview" id="ft05_rutinview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t05_rutin_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t05_rutin_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t01_tahunajaran">
-<?php if ($t01_tahunajaran_view->IsModal) { ?>
+<input type="hidden" name="t" value="t05_rutin">
+<?php if ($t05_rutin_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($t01_tahunajaran->Awal_Bulan->Visible) { // Awal_Bulan ?>
-	<tr id="r_Awal_Bulan">
-		<td><span id="elh_t01_tahunajaran_Awal_Bulan"><?php echo $t01_tahunajaran->Awal_Bulan->FldCaption() ?></span></td>
-		<td data-name="Awal_Bulan"<?php echo $t01_tahunajaran->Awal_Bulan->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Awal_Bulan">
-<span<?php echo $t01_tahunajaran->Awal_Bulan->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Awal_Bulan->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t01_tahunajaran->Awal_Tahun->Visible) { // Awal_Tahun ?>
-	<tr id="r_Awal_Tahun">
-		<td><span id="elh_t01_tahunajaran_Awal_Tahun"><?php echo $t01_tahunajaran->Awal_Tahun->FldCaption() ?></span></td>
-		<td data-name="Awal_Tahun"<?php echo $t01_tahunajaran->Awal_Tahun->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Awal_Tahun">
-<span<?php echo $t01_tahunajaran->Awal_Tahun->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Awal_Tahun->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t01_tahunajaran->Akhir_Bulan->Visible) { // Akhir_Bulan ?>
-	<tr id="r_Akhir_Bulan">
-		<td><span id="elh_t01_tahunajaran_Akhir_Bulan"><?php echo $t01_tahunajaran->Akhir_Bulan->FldCaption() ?></span></td>
-		<td data-name="Akhir_Bulan"<?php echo $t01_tahunajaran->Akhir_Bulan->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Akhir_Bulan">
-<span<?php echo $t01_tahunajaran->Akhir_Bulan->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Akhir_Bulan->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t01_tahunajaran->Akhir_Tahun->Visible) { // Akhir_Tahun ?>
-	<tr id="r_Akhir_Tahun">
-		<td><span id="elh_t01_tahunajaran_Akhir_Tahun"><?php echo $t01_tahunajaran->Akhir_Tahun->FldCaption() ?></span></td>
-		<td data-name="Akhir_Tahun"<?php echo $t01_tahunajaran->Akhir_Tahun->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Akhir_Tahun">
-<span<?php echo $t01_tahunajaran->Akhir_Tahun->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Akhir_Tahun->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t01_tahunajaran->Tahun_Ajaran->Visible) { // Tahun_Ajaran ?>
-	<tr id="r_Tahun_Ajaran">
-		<td><span id="elh_t01_tahunajaran_Tahun_Ajaran"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?></span></td>
-		<td data-name="Tahun_Ajaran"<?php echo $t01_tahunajaran->Tahun_Ajaran->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Tahun_Ajaran">
-<span<?php echo $t01_tahunajaran->Tahun_Ajaran->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Tahun_Ajaran->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-	<tr id="r_Aktif">
-		<td><span id="elh_t01_tahunajaran_Aktif"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?></span></td>
-		<td data-name="Aktif"<?php echo $t01_tahunajaran->Aktif->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Aktif">
-<span<?php echo $t01_tahunajaran->Aktif->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Aktif->ViewValue ?></span>
+<?php if ($t05_rutin->Jenis->Visible) { // Jenis ?>
+	<tr id="r_Jenis">
+		<td><span id="elh_t05_rutin_Jenis"><?php echo $t05_rutin->Jenis->FldCaption() ?></span></td>
+		<td data-name="Jenis"<?php echo $t05_rutin->Jenis->CellAttributes() ?>>
+<span id="el_t05_rutin_Jenis">
+<span<?php echo $t05_rutin->Jenis->ViewAttributes() ?>>
+<?php echo $t05_rutin->Jenis->ViewValue ?></span>
 </span>
 </td>
 	</tr>
@@ -938,10 +812,10 @@ $t01_tahunajaran_view->ShowMessage();
 </table>
 </form>
 <script type="text/javascript">
-ft01_tahunajaranview.Init();
+ft05_rutinview.Init();
 </script>
 <?php
-$t01_tahunajaran_view->ShowPageFooter();
+$t05_rutin_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -953,5 +827,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t01_tahunajaran_view->Page_Terminate();
+$t05_rutin_view->Page_Terminate();
 ?>

@@ -20,7 +20,7 @@ class cdefault {
 	var $PageID = 'default';
 
 	// Project ID
-	var $ProjectID = "{1437F52B-7E7A-46CA-851B-958195C82267}";
+	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
 
 	// Page object name
 	var $PageObjName = 'default';
@@ -253,7 +253,7 @@ class cdefault {
 		// If session expired, show session expired message
 		if (@$_GET["expired"] == "1")
 			$this->setFailureMessage($Language->Phrase("SessionExpired"));
-		$this->Page_Terminate("cf01_home.php"); // Exit and go to default page
+		$this->Page_Terminate("t01_tahunajaranlist.php"); // Exit and go to default page
 	}
 
 	// Page Load event

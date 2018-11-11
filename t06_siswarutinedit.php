@@ -5,7 +5,9 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t01_tahunajaraninfo.php" ?>
+<?php include_once "t06_siswarutininfo.php" ?>
+<?php include_once "t04_siswainfo.php" ?>
+<?php include_once "t07_siswarutinbayargridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t01_tahunajaran_edit = NULL; // Initialize page object first
+$t06_siswarutin_edit = NULL; // Initialize page object first
 
-class ct01_tahunajaran_edit extends ct01_tahunajaran {
+class ct06_siswarutin_edit extends ct06_siswarutin {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -24,10 +26,10 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
 
 	// Table name
-	var $TableName = 't01_tahunajaran';
+	var $TableName = 't06_siswarutin';
 
 	// Page object name
-	var $PageObjName = 't01_tahunajaran_edit';
+	var $PageObjName = 't06_siswarutin_edit';
 
 	// Page name
 	function PageName() {
@@ -224,11 +226,14 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t01_tahunajaran)
-		if (!isset($GLOBALS["t01_tahunajaran"]) || get_class($GLOBALS["t01_tahunajaran"]) == "ct01_tahunajaran") {
-			$GLOBALS["t01_tahunajaran"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t01_tahunajaran"];
+		// Table object (t06_siswarutin)
+		if (!isset($GLOBALS["t06_siswarutin"]) || get_class($GLOBALS["t06_siswarutin"]) == "ct06_siswarutin") {
+			$GLOBALS["t06_siswarutin"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t06_siswarutin"];
 		}
+
+		// Table object (t04_siswa)
+		if (!isset($GLOBALS['t04_siswa'])) $GLOBALS['t04_siswa'] = new ct04_siswa();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -236,7 +241,7 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't01_tahunajaran', TRUE);
+			define("EW_TABLE_NAME", 't06_siswarutin', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -254,12 +259,9 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->Awal_Bulan->SetVisibility();
-		$this->Awal_Tahun->SetVisibility();
-		$this->Akhir_Bulan->SetVisibility();
-		$this->Akhir_Tahun->SetVisibility();
-		$this->Tahun_Ajaran->SetVisibility();
-		$this->Aktif->SetVisibility();
+		$this->siswa_id->SetVisibility();
+		$this->rutin_id->SetVisibility();
+		$this->Nilai->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -276,6 +278,14 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
+
+			// Process auto fill for detail table 't07_siswarutinbayar'
+			if (@$_POST["grid"] == "ft07_siswarutinbayargrid") {
+				if (!isset($GLOBALS["t07_siswarutinbayar_grid"])) $GLOBALS["t07_siswarutinbayar_grid"] = new ct07_siswarutinbayar_grid;
+				$GLOBALS["t07_siswarutinbayar_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -305,13 +315,13 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t01_tahunajaran;
+		global $EW_EXPORT, $t06_siswarutin;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t01_tahunajaran);
+				$doc = new $class($t06_siswarutin);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -364,17 +374,23 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 			$this->id->setQueryStringValue($_GET["id"]);
 		}
 
+		// Set up master detail parameters
+		$this->SetUpMasterParms();
+
 		// Process form if post back
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
 			$this->LoadFormValues(); // Get form values
+
+			// Set up detail parameters
+			$this->SetUpDetailParms();
 		} else {
 			$this->CurrentAction = "I"; // Default action is display
 		}
 
 		// Check if valid key
 		if ($this->id->CurrentValue == "") {
-			$this->Page_Terminate("t01_tahunajaranlist.php"); // Invalid key, return to list
+			$this->Page_Terminate("t06_siswarutinlist.php"); // Invalid key, return to list
 		}
 
 		// Validate form if post back
@@ -390,12 +406,18 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 			case "I": // Get a record to display
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("t01_tahunajaranlist.php"); // No matching record, return to list
+					$this->Page_Terminate("t06_siswarutinlist.php"); // No matching record, return to list
 				}
+
+				// Set up detail parameters
+				$this->SetUpDetailParms();
 				break;
 			Case "U": // Update
-				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "t01_tahunajaranlist.php")
+				if ($this->getCurrentDetailTable() <> "") // Master/detail edit
+					$sReturnUrl = $this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
+				else
+					$sReturnUrl = $this->getReturnUrl();
+				if (ew_GetPageName($sReturnUrl) == "t06_siswarutinlist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -407,6 +429,9 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Restore form values if update failed
+
+					// Set up detail parameters
+					$this->SetUpDetailParms();
 				}
 		}
 
@@ -467,23 +492,14 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 
 		// Load from form
 		global $objForm;
-		if (!$this->Awal_Bulan->FldIsDetailKey) {
-			$this->Awal_Bulan->setFormValue($objForm->GetValue("x_Awal_Bulan"));
+		if (!$this->siswa_id->FldIsDetailKey) {
+			$this->siswa_id->setFormValue($objForm->GetValue("x_siswa_id"));
 		}
-		if (!$this->Awal_Tahun->FldIsDetailKey) {
-			$this->Awal_Tahun->setFormValue($objForm->GetValue("x_Awal_Tahun"));
+		if (!$this->rutin_id->FldIsDetailKey) {
+			$this->rutin_id->setFormValue($objForm->GetValue("x_rutin_id"));
 		}
-		if (!$this->Akhir_Bulan->FldIsDetailKey) {
-			$this->Akhir_Bulan->setFormValue($objForm->GetValue("x_Akhir_Bulan"));
-		}
-		if (!$this->Akhir_Tahun->FldIsDetailKey) {
-			$this->Akhir_Tahun->setFormValue($objForm->GetValue("x_Akhir_Tahun"));
-		}
-		if (!$this->Tahun_Ajaran->FldIsDetailKey) {
-			$this->Tahun_Ajaran->setFormValue($objForm->GetValue("x_Tahun_Ajaran"));
-		}
-		if (!$this->Aktif->FldIsDetailKey) {
-			$this->Aktif->setFormValue($objForm->GetValue("x_Aktif"));
+		if (!$this->Nilai->FldIsDetailKey) {
+			$this->Nilai->setFormValue($objForm->GetValue("x_Nilai"));
 		}
 		if (!$this->id->FldIsDetailKey)
 			$this->id->setFormValue($objForm->GetValue("x_id"));
@@ -494,12 +510,9 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		global $objForm;
 		$this->LoadRow();
 		$this->id->CurrentValue = $this->id->FormValue;
-		$this->Awal_Bulan->CurrentValue = $this->Awal_Bulan->FormValue;
-		$this->Awal_Tahun->CurrentValue = $this->Awal_Tahun->FormValue;
-		$this->Akhir_Bulan->CurrentValue = $this->Akhir_Bulan->FormValue;
-		$this->Akhir_Tahun->CurrentValue = $this->Akhir_Tahun->FormValue;
-		$this->Tahun_Ajaran->CurrentValue = $this->Tahun_Ajaran->FormValue;
-		$this->Aktif->CurrentValue = $this->Aktif->FormValue;
+		$this->siswa_id->CurrentValue = $this->siswa_id->FormValue;
+		$this->rutin_id->CurrentValue = $this->rutin_id->FormValue;
+		$this->Nilai->CurrentValue = $this->Nilai->FormValue;
 	}
 
 	// Load row based on key values
@@ -532,12 +545,9 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->Awal_Bulan->setDbValue($rs->fields('Awal_Bulan'));
-		$this->Awal_Tahun->setDbValue($rs->fields('Awal_Tahun'));
-		$this->Akhir_Bulan->setDbValue($rs->fields('Akhir_Bulan'));
-		$this->Akhir_Tahun->setDbValue($rs->fields('Akhir_Tahun'));
-		$this->Tahun_Ajaran->setDbValue($rs->fields('Tahun_Ajaran'));
-		$this->Aktif->setDbValue($rs->fields('Aktif'));
+		$this->siswa_id->setDbValue($rs->fields('siswa_id'));
+		$this->rutin_id->setDbValue($rs->fields('rutin_id'));
+		$this->Nilai->setDbValue($rs->fields('Nilai'));
 	}
 
 	// Load DbValue from recordset
@@ -545,12 +555,9 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->Awal_Bulan->DbValue = $row['Awal_Bulan'];
-		$this->Awal_Tahun->DbValue = $row['Awal_Tahun'];
-		$this->Akhir_Bulan->DbValue = $row['Akhir_Bulan'];
-		$this->Akhir_Tahun->DbValue = $row['Akhir_Tahun'];
-		$this->Tahun_Ajaran->DbValue = $row['Tahun_Ajaran'];
-		$this->Aktif->DbValue = $row['Aktif'];
+		$this->siswa_id->DbValue = $row['siswa_id'];
+		$this->rutin_id->DbValue = $row['rutin_id'];
+		$this->Nilai->DbValue = $row['Nilai'];
 	}
 
 	// Render row values based on field settings
@@ -558,18 +565,19 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Call Row_Rendering event
+		// Convert decimal values if posted back
 
+		if ($this->Nilai->FormValue == $this->Nilai->CurrentValue && is_numeric(ew_StrToFloat($this->Nilai->CurrentValue)))
+			$this->Nilai->CurrentValue = ew_StrToFloat($this->Nilai->CurrentValue);
+
+		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// Awal_Bulan
-		// Awal_Tahun
-		// Akhir_Bulan
-		// Akhir_Tahun
-		// Tahun_Ajaran
-		// Aktif
+		// siswa_id
+		// rutin_id
+		// Nilai
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -577,124 +585,106 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// Awal_Bulan
-		$this->Awal_Bulan->ViewValue = $this->Awal_Bulan->CurrentValue;
-		$this->Awal_Bulan->ViewCustomAttributes = "";
+		// siswa_id
+		$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
+		$this->siswa_id->ViewCustomAttributes = "";
 
-		// Awal_Tahun
-		$this->Awal_Tahun->ViewValue = $this->Awal_Tahun->CurrentValue;
-		$this->Awal_Tahun->ViewCustomAttributes = "";
-
-		// Akhir_Bulan
-		$this->Akhir_Bulan->ViewValue = $this->Akhir_Bulan->CurrentValue;
-		$this->Akhir_Bulan->ViewCustomAttributes = "";
-
-		// Akhir_Tahun
-		$this->Akhir_Tahun->ViewValue = $this->Akhir_Tahun->CurrentValue;
-		$this->Akhir_Tahun->ViewCustomAttributes = "";
-
-		// Tahun_Ajaran
-		$this->Tahun_Ajaran->ViewValue = $this->Tahun_Ajaran->CurrentValue;
-		$this->Tahun_Ajaran->ViewCustomAttributes = "";
-
-		// Aktif
-		if (strval($this->Aktif->CurrentValue) <> "") {
-			$this->Aktif->ViewValue = $this->Aktif->OptionCaption($this->Aktif->CurrentValue);
+		// rutin_id
+		if (strval($this->rutin_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_rutin`";
+		$sWhereWrk = "";
+		$this->rutin_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->rutin_id->ViewValue = $this->rutin_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->rutin_id->ViewValue = $this->rutin_id->CurrentValue;
+			}
 		} else {
-			$this->Aktif->ViewValue = NULL;
+			$this->rutin_id->ViewValue = NULL;
 		}
-		$this->Aktif->ViewCustomAttributes = "";
+		$this->rutin_id->ViewCustomAttributes = "";
 
-			// Awal_Bulan
-			$this->Awal_Bulan->LinkCustomAttributes = "";
-			$this->Awal_Bulan->HrefValue = "";
-			$this->Awal_Bulan->TooltipValue = "";
+		// Nilai
+		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
+		$this->Nilai->ViewValue = ew_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
+		$this->Nilai->CellCssStyle .= "text-align: right;";
+		$this->Nilai->ViewCustomAttributes = "";
 
-			// Awal_Tahun
-			$this->Awal_Tahun->LinkCustomAttributes = "";
-			$this->Awal_Tahun->HrefValue = "";
-			$this->Awal_Tahun->TooltipValue = "";
+			// siswa_id
+			$this->siswa_id->LinkCustomAttributes = "";
+			$this->siswa_id->HrefValue = "";
+			$this->siswa_id->TooltipValue = "";
 
-			// Akhir_Bulan
-			$this->Akhir_Bulan->LinkCustomAttributes = "";
-			$this->Akhir_Bulan->HrefValue = "";
-			$this->Akhir_Bulan->TooltipValue = "";
+			// rutin_id
+			$this->rutin_id->LinkCustomAttributes = "";
+			$this->rutin_id->HrefValue = "";
+			$this->rutin_id->TooltipValue = "";
 
-			// Akhir_Tahun
-			$this->Akhir_Tahun->LinkCustomAttributes = "";
-			$this->Akhir_Tahun->HrefValue = "";
-			$this->Akhir_Tahun->TooltipValue = "";
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->LinkCustomAttributes = "";
-			$this->Tahun_Ajaran->HrefValue = "";
-			$this->Tahun_Ajaran->TooltipValue = "";
-
-			// Aktif
-			$this->Aktif->LinkCustomAttributes = "";
-			$this->Aktif->HrefValue = "";
-			$this->Aktif->TooltipValue = "";
+			// Nilai
+			$this->Nilai->LinkCustomAttributes = "";
+			$this->Nilai->HrefValue = "";
+			$this->Nilai->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// Awal_Bulan
-			$this->Awal_Bulan->EditAttrs["class"] = "form-control";
-			$this->Awal_Bulan->EditCustomAttributes = "";
-			$this->Awal_Bulan->EditValue = ew_HtmlEncode($this->Awal_Bulan->CurrentValue);
-			$this->Awal_Bulan->PlaceHolder = ew_RemoveHtml($this->Awal_Bulan->FldCaption());
+			// siswa_id
+			$this->siswa_id->EditAttrs["class"] = "form-control";
+			$this->siswa_id->EditCustomAttributes = "";
+			if ($this->siswa_id->getSessionValue() <> "") {
+				$this->siswa_id->CurrentValue = $this->siswa_id->getSessionValue();
+			$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
+			$this->siswa_id->ViewCustomAttributes = "";
+			} else {
+			$this->siswa_id->EditValue = ew_HtmlEncode($this->siswa_id->CurrentValue);
+			$this->siswa_id->PlaceHolder = ew_RemoveHtml($this->siswa_id->FldCaption());
+			}
 
-			// Awal_Tahun
-			$this->Awal_Tahun->EditAttrs["class"] = "form-control";
-			$this->Awal_Tahun->EditCustomAttributes = "";
-			$this->Awal_Tahun->EditValue = ew_HtmlEncode($this->Awal_Tahun->CurrentValue);
-			$this->Awal_Tahun->PlaceHolder = ew_RemoveHtml($this->Awal_Tahun->FldCaption());
+			// rutin_id
+			$this->rutin_id->EditAttrs["class"] = "form-control";
+			$this->rutin_id->EditCustomAttributes = "";
+			if (trim(strval($this->rutin_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			}
+			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_rutin`";
+			$sWhereWrk = "";
+			$this->rutin_id->LookupFilters = array();
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$this->rutin_id->EditValue = $arwrk;
 
-			// Akhir_Bulan
-			$this->Akhir_Bulan->EditAttrs["class"] = "form-control";
-			$this->Akhir_Bulan->EditCustomAttributes = "";
-			$this->Akhir_Bulan->EditValue = ew_HtmlEncode($this->Akhir_Bulan->CurrentValue);
-			$this->Akhir_Bulan->PlaceHolder = ew_RemoveHtml($this->Akhir_Bulan->FldCaption());
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->EditAttrs["class"] = "form-control";
-			$this->Akhir_Tahun->EditCustomAttributes = "";
-			$this->Akhir_Tahun->EditValue = ew_HtmlEncode($this->Akhir_Tahun->CurrentValue);
-			$this->Akhir_Tahun->PlaceHolder = ew_RemoveHtml($this->Akhir_Tahun->FldCaption());
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->EditAttrs["class"] = "form-control";
-			$this->Tahun_Ajaran->EditCustomAttributes = "";
-			$this->Tahun_Ajaran->EditValue = ew_HtmlEncode($this->Tahun_Ajaran->CurrentValue);
-			$this->Tahun_Ajaran->PlaceHolder = ew_RemoveHtml($this->Tahun_Ajaran->FldCaption());
-
-			// Aktif
-			$this->Aktif->EditCustomAttributes = "";
-			$this->Aktif->EditValue = $this->Aktif->Options(FALSE);
+			// Nilai
+			$this->Nilai->EditAttrs["class"] = "form-control";
+			$this->Nilai->EditCustomAttributes = "";
+			$this->Nilai->EditValue = ew_HtmlEncode($this->Nilai->CurrentValue);
+			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
+			if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) $this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
 
 			// Edit refer script
-			// Awal_Bulan
+			// siswa_id
 
-			$this->Awal_Bulan->LinkCustomAttributes = "";
-			$this->Awal_Bulan->HrefValue = "";
+			$this->siswa_id->LinkCustomAttributes = "";
+			$this->siswa_id->HrefValue = "";
 
-			// Awal_Tahun
-			$this->Awal_Tahun->LinkCustomAttributes = "";
-			$this->Awal_Tahun->HrefValue = "";
+			// rutin_id
+			$this->rutin_id->LinkCustomAttributes = "";
+			$this->rutin_id->HrefValue = "";
 
-			// Akhir_Bulan
-			$this->Akhir_Bulan->LinkCustomAttributes = "";
-			$this->Akhir_Bulan->HrefValue = "";
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->LinkCustomAttributes = "";
-			$this->Akhir_Tahun->HrefValue = "";
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->LinkCustomAttributes = "";
-			$this->Tahun_Ajaran->HrefValue = "";
-
-			// Aktif
-			$this->Aktif->LinkCustomAttributes = "";
-			$this->Aktif->HrefValue = "";
+			// Nilai
+			$this->Nilai->LinkCustomAttributes = "";
+			$this->Nilai->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -717,35 +707,27 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->Awal_Bulan->FldIsDetailKey && !is_null($this->Awal_Bulan->FormValue) && $this->Awal_Bulan->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Awal_Bulan->FldCaption(), $this->Awal_Bulan->ReqErrMsg));
+		if (!$this->siswa_id->FldIsDetailKey && !is_null($this->siswa_id->FormValue) && $this->siswa_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->siswa_id->FldCaption(), $this->siswa_id->ReqErrMsg));
 		}
-		if (!ew_CheckInteger($this->Awal_Bulan->FormValue)) {
-			ew_AddMessage($gsFormError, $this->Awal_Bulan->FldErrMsg());
+		if (!ew_CheckInteger($this->siswa_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->siswa_id->FldErrMsg());
 		}
-		if (!$this->Awal_Tahun->FldIsDetailKey && !is_null($this->Awal_Tahun->FormValue) && $this->Awal_Tahun->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Awal_Tahun->FldCaption(), $this->Awal_Tahun->ReqErrMsg));
+		if (!$this->rutin_id->FldIsDetailKey && !is_null($this->rutin_id->FormValue) && $this->rutin_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->rutin_id->FldCaption(), $this->rutin_id->ReqErrMsg));
 		}
-		if (!ew_CheckInteger($this->Awal_Tahun->FormValue)) {
-			ew_AddMessage($gsFormError, $this->Awal_Tahun->FldErrMsg());
+		if (!$this->Nilai->FldIsDetailKey && !is_null($this->Nilai->FormValue) && $this->Nilai->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->Nilai->FldCaption(), $this->Nilai->ReqErrMsg));
 		}
-		if (!$this->Akhir_Bulan->FldIsDetailKey && !is_null($this->Akhir_Bulan->FormValue) && $this->Akhir_Bulan->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Akhir_Bulan->FldCaption(), $this->Akhir_Bulan->ReqErrMsg));
+		if (!ew_CheckNumber($this->Nilai->FormValue)) {
+			ew_AddMessage($gsFormError, $this->Nilai->FldErrMsg());
 		}
-		if (!ew_CheckInteger($this->Akhir_Bulan->FormValue)) {
-			ew_AddMessage($gsFormError, $this->Akhir_Bulan->FldErrMsg());
-		}
-		if (!$this->Akhir_Tahun->FldIsDetailKey && !is_null($this->Akhir_Tahun->FormValue) && $this->Akhir_Tahun->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Akhir_Tahun->FldCaption(), $this->Akhir_Tahun->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->Akhir_Tahun->FormValue)) {
-			ew_AddMessage($gsFormError, $this->Akhir_Tahun->FldErrMsg());
-		}
-		if (!$this->Tahun_Ajaran->FldIsDetailKey && !is_null($this->Tahun_Ajaran->FormValue) && $this->Tahun_Ajaran->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Tahun_Ajaran->FldCaption(), $this->Tahun_Ajaran->ReqErrMsg));
-		}
-		if ($this->Aktif->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Aktif->FldCaption(), $this->Aktif->ReqErrMsg));
+
+		// Validate detail grid
+		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+		if (in_array("t07_siswarutinbayar", $DetailTblVar) && $GLOBALS["t07_siswarutinbayar"]->DetailEdit) {
+			if (!isset($GLOBALS["t07_siswarutinbayar_grid"])) $GLOBALS["t07_siswarutinbayar_grid"] = new ct07_siswarutinbayar_grid(); // get detail page object
+			$GLOBALS["t07_siswarutinbayar_grid"]->ValidateGridForm();
 		}
 
 		// Return validate result
@@ -778,28 +760,45 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 			$EditRow = FALSE; // Update Failed
 		} else {
 
+			// Begin transaction
+			if ($this->getCurrentDetailTable() <> "")
+				$conn->BeginTrans();
+
 			// Save old values
 			$rsold = &$rs->fields;
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// Awal_Bulan
-			$this->Awal_Bulan->SetDbValueDef($rsnew, $this->Awal_Bulan->CurrentValue, 0, $this->Awal_Bulan->ReadOnly);
+			// siswa_id
+			$this->siswa_id->SetDbValueDef($rsnew, $this->siswa_id->CurrentValue, 0, $this->siswa_id->ReadOnly);
 
-			// Awal_Tahun
-			$this->Awal_Tahun->SetDbValueDef($rsnew, $this->Awal_Tahun->CurrentValue, 0, $this->Awal_Tahun->ReadOnly);
+			// rutin_id
+			$this->rutin_id->SetDbValueDef($rsnew, $this->rutin_id->CurrentValue, 0, $this->rutin_id->ReadOnly);
 
-			// Akhir_Bulan
-			$this->Akhir_Bulan->SetDbValueDef($rsnew, $this->Akhir_Bulan->CurrentValue, 0, $this->Akhir_Bulan->ReadOnly);
+			// Nilai
+			$this->Nilai->SetDbValueDef($rsnew, $this->Nilai->CurrentValue, 0, $this->Nilai->ReadOnly);
 
-			// Akhir_Tahun
-			$this->Akhir_Tahun->SetDbValueDef($rsnew, $this->Akhir_Tahun->CurrentValue, 0, $this->Akhir_Tahun->ReadOnly);
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->SetDbValueDef($rsnew, $this->Tahun_Ajaran->CurrentValue, "", $this->Tahun_Ajaran->ReadOnly);
-
-			// Aktif
-			$this->Aktif->SetDbValueDef($rsnew, $this->Aktif->CurrentValue, "", $this->Aktif->ReadOnly);
+			// Check referential integrity for master table 't04_siswa'
+			$bValidMasterRecord = TRUE;
+			$sMasterFilter = $this->SqlMasterFilter_t04_siswa();
+			$KeyValue = isset($rsnew['siswa_id']) ? $rsnew['siswa_id'] : $rsold['siswa_id'];
+			if (strval($KeyValue) <> "") {
+				$sMasterFilter = str_replace("@id@", ew_AdjustSql($KeyValue), $sMasterFilter);
+			} else {
+				$bValidMasterRecord = FALSE;
+			}
+			if ($bValidMasterRecord) {
+				if (!isset($GLOBALS["t04_siswa"])) $GLOBALS["t04_siswa"] = new ct04_siswa();
+				$rsmaster = $GLOBALS["t04_siswa"]->LoadRs($sMasterFilter);
+				$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
+				$rsmaster->Close();
+			}
+			if (!$bValidMasterRecord) {
+				$sRelatedRecordMsg = str_replace("%t", "t04_siswa", $Language->Phrase("RelatedRecordRequired"));
+				$this->setFailureMessage($sRelatedRecordMsg);
+				$rs->Close();
+				return FALSE;
+			}
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -811,6 +810,24 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 					$EditRow = TRUE; // No field to update
 				$conn->raiseErrorFn = '';
 				if ($EditRow) {
+				}
+
+				// Update detail records
+				$DetailTblVar = explode(",", $this->getCurrentDetailTable());
+				if ($EditRow) {
+					if (in_array("t07_siswarutinbayar", $DetailTblVar) && $GLOBALS["t07_siswarutinbayar"]->DetailEdit) {
+						if (!isset($GLOBALS["t07_siswarutinbayar_grid"])) $GLOBALS["t07_siswarutinbayar_grid"] = new ct07_siswarutinbayar_grid(); // Get detail page object
+						$EditRow = $GLOBALS["t07_siswarutinbayar_grid"]->GridUpdate();
+					}
+				}
+
+				// Commit/Rollback transaction
+				if ($this->getCurrentDetailTable() <> "") {
+					if ($EditRow) {
+						$conn->CommitTrans(); // Commit transaction
+					} else {
+						$conn->RollbackTrans(); // Rollback transaction
+					}
 				}
 			} else {
 				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -833,12 +850,103 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		return $EditRow;
 	}
 
+	// Set up master/detail based on QueryString
+	function SetUpMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t04_siswa") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_id"] <> "") {
+					$GLOBALS["t04_siswa"]->id->setQueryStringValue($_GET["fk_id"]);
+					$this->siswa_id->setQueryStringValue($GLOBALS["t04_siswa"]->id->QueryStringValue);
+					$this->siswa_id->setSessionValue($this->siswa_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["t04_siswa"]->id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t04_siswa") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_id"] <> "") {
+					$GLOBALS["t04_siswa"]->id->setFormValue($_POST["fk_id"]);
+					$this->siswa_id->setFormValue($GLOBALS["t04_siswa"]->id->FormValue);
+					$this->siswa_id->setSessionValue($this->siswa_id->FormValue);
+					if (!is_numeric($GLOBALS["t04_siswa"]->id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+			$this->setSessionWhere($this->GetDetailFilter());
+
+			// Reset start record counter (new master key)
+			$this->StartRec = 1;
+			$this->setStartRecordNumber($this->StartRec);
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "t04_siswa") {
+				if ($this->siswa_id->CurrentValue == "") $this->siswa_id->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
+	// Set up detail parms based on QueryString
+	function SetUpDetailParms() {
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
+			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
+			$this->setCurrentDetailTable($sDetailTblVar);
+		} else {
+			$sDetailTblVar = $this->getCurrentDetailTable();
+		}
+		if ($sDetailTblVar <> "") {
+			$DetailTblVar = explode(",", $sDetailTblVar);
+			if (in_array("t07_siswarutinbayar", $DetailTblVar)) {
+				if (!isset($GLOBALS["t07_siswarutinbayar_grid"]))
+					$GLOBALS["t07_siswarutinbayar_grid"] = new ct07_siswarutinbayar_grid;
+				if ($GLOBALS["t07_siswarutinbayar_grid"]->DetailEdit) {
+					$GLOBALS["t07_siswarutinbayar_grid"]->CurrentMode = "edit";
+					$GLOBALS["t07_siswarutinbayar_grid"]->CurrentAction = "gridedit";
+
+					// Save current master table to detail table
+					$GLOBALS["t07_siswarutinbayar_grid"]->setCurrentMasterTable($this->TableVar);
+					$GLOBALS["t07_siswarutinbayar_grid"]->setStartRecordNumber(1);
+					$GLOBALS["t07_siswarutinbayar_grid"]->siswarutin_id->FldIsDetailKey = TRUE;
+					$GLOBALS["t07_siswarutinbayar_grid"]->siswarutin_id->CurrentValue = $this->id->CurrentValue;
+					$GLOBALS["t07_siswarutinbayar_grid"]->siswarutin_id->setSessionValue($GLOBALS["t07_siswarutinbayar_grid"]->siswarutin_id->CurrentValue);
+				}
+			}
+		}
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t01_tahunajaranlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t06_siswarutinlist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -848,6 +956,18 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_rutin_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_rutin`";
+			$sWhereWrk = "";
+			$this->rutin_id->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -931,29 +1051,29 @@ class ct01_tahunajaran_edit extends ct01_tahunajaran {
 <?php
 
 // Create page object
-if (!isset($t01_tahunajaran_edit)) $t01_tahunajaran_edit = new ct01_tahunajaran_edit();
+if (!isset($t06_siswarutin_edit)) $t06_siswarutin_edit = new ct06_siswarutin_edit();
 
 // Page init
-$t01_tahunajaran_edit->Page_Init();
+$t06_siswarutin_edit->Page_Init();
 
 // Page main
-$t01_tahunajaran_edit->Page_Main();
+$t06_siswarutin_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t01_tahunajaran_edit->Page_Render();
+$t06_siswarutin_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ft01_tahunajaranedit = new ew_Form("ft01_tahunajaranedit", "edit");
+var CurrentForm = ft06_siswarutinedit = new ew_Form("ft06_siswarutinedit", "edit");
 
 // Validate form
-ft01_tahunajaranedit.Validate = function() {
+ft06_siswarutinedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -967,36 +1087,21 @@ ft01_tahunajaranedit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_Awal_Bulan");
+			elm = this.GetElements("x" + infix + "_siswa_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Awal_Bulan->FldCaption(), $t01_tahunajaran->Awal_Bulan->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Awal_Bulan");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->siswa_id->FldCaption(), $t06_siswarutin->siswa_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_siswa_id");
 			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t01_tahunajaran->Awal_Bulan->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_Awal_Tahun");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutin->siswa_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_rutin_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Awal_Tahun->FldCaption(), $t01_tahunajaran->Awal_Tahun->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Awal_Tahun");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t01_tahunajaran->Awal_Tahun->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_Akhir_Bulan");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->rutin_id->FldCaption(), $t06_siswarutin->rutin_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_Nilai");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Akhir_Bulan->FldCaption(), $t01_tahunajaran->Akhir_Bulan->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Akhir_Bulan");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t01_tahunajaran->Akhir_Bulan->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_Akhir_Tahun");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Akhir_Tahun->FldCaption(), $t01_tahunajaran->Akhir_Tahun->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Akhir_Tahun");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t01_tahunajaran->Akhir_Tahun->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_Tahun_Ajaran");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Tahun_Ajaran->FldCaption(), $t01_tahunajaran->Tahun_Ajaran->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Aktif");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t01_tahunajaran->Aktif->FldCaption(), $t01_tahunajaran->Aktif->ReqErrMsg)) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->Nilai->FldCaption(), $t06_siswarutin->Nilai->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_Nilai");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutin->Nilai->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1015,7 +1120,7 @@ ft01_tahunajaranedit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft01_tahunajaranedit.Form_CustomValidate = 
+ft06_siswarutinedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1024,14 +1129,13 @@ ft01_tahunajaranedit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft01_tahunajaranedit.ValidateRequired = true;
+ft06_siswarutinedit.ValidateRequired = true;
 <?php } else { ?>
-ft01_tahunajaranedit.ValidateRequired = false; 
+ft06_siswarutinedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft01_tahunajaranedit.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ft01_tahunajaranedit.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
+ft06_siswarutinedit.Lists["x_rutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_rutin"};
 
 // Form object for search
 </script>
@@ -1039,106 +1143,96 @@ ft01_tahunajaranedit.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahu
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$t01_tahunajaran_edit->IsModal) { ?>
+<?php if (!$t06_siswarutin_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t01_tahunajaran_edit->ShowPageHeader(); ?>
+<?php $t06_siswarutin_edit->ShowPageHeader(); ?>
 <?php
-$t01_tahunajaran_edit->ShowMessage();
+$t06_siswarutin_edit->ShowMessage();
 ?>
-<form name="ft01_tahunajaranedit" id="ft01_tahunajaranedit" class="<?php echo $t01_tahunajaran_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t01_tahunajaran_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t01_tahunajaran_edit->Token ?>">
+<form name="ft06_siswarutinedit" id="ft06_siswarutinedit" class="<?php echo $t06_siswarutin_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t06_siswarutin_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t06_siswarutin_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t01_tahunajaran">
+<input type="hidden" name="t" value="t06_siswarutin">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<?php if ($t01_tahunajaran_edit->IsModal) { ?>
+<?php if ($t06_siswarutin_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($t06_siswarutin->getCurrentMasterTable() == "t04_siswa") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t04_siswa">
+<input type="hidden" name="fk_id" value="<?php echo $t06_siswarutin->siswa_id->getSessionValue() ?>">
+<?php } ?>
 <div>
-<?php if ($t01_tahunajaran->Awal_Bulan->Visible) { // Awal_Bulan ?>
-	<div id="r_Awal_Bulan" class="form-group">
-		<label id="elh_t01_tahunajaran_Awal_Bulan" for="x_Awal_Bulan" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Awal_Bulan->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Awal_Bulan->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Awal_Bulan">
-<input type="text" data-table="t01_tahunajaran" data-field="x_Awal_Bulan" name="x_Awal_Bulan" id="x_Awal_Bulan" size="30" placeholder="<?php echo ew_HtmlEncode($t01_tahunajaran->Awal_Bulan->getPlaceHolder()) ?>" value="<?php echo $t01_tahunajaran->Awal_Bulan->EditValue ?>"<?php echo $t01_tahunajaran->Awal_Bulan->EditAttributes() ?>>
+<?php if ($t06_siswarutin->siswa_id->Visible) { // siswa_id ?>
+	<div id="r_siswa_id" class="form-group">
+		<label id="elh_t06_siswarutin_siswa_id" for="x_siswa_id" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutin->siswa_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t06_siswarutin->siswa_id->CellAttributes() ?>>
+<?php if ($t06_siswarutin->siswa_id->getSessionValue() <> "") { ?>
+<span id="el_t06_siswarutin_siswa_id">
+<span<?php echo $t06_siswarutin->siswa_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t06_siswarutin->siswa_id->ViewValue ?></p></span>
 </span>
-<?php echo $t01_tahunajaran->Awal_Bulan->CustomMsg ?></div></div>
+<input type="hidden" id="x_siswa_id" name="x_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el_t06_siswarutin_siswa_id">
+<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x_siswa_id" id="x_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php echo $t06_siswarutin->siswa_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t01_tahunajaran->Awal_Tahun->Visible) { // Awal_Tahun ?>
-	<div id="r_Awal_Tahun" class="form-group">
-		<label id="elh_t01_tahunajaran_Awal_Tahun" for="x_Awal_Tahun" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Awal_Tahun->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Awal_Tahun->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Awal_Tahun">
-<input type="text" data-table="t01_tahunajaran" data-field="x_Awal_Tahun" name="x_Awal_Tahun" id="x_Awal_Tahun" size="30" placeholder="<?php echo ew_HtmlEncode($t01_tahunajaran->Awal_Tahun->getPlaceHolder()) ?>" value="<?php echo $t01_tahunajaran->Awal_Tahun->EditValue ?>"<?php echo $t01_tahunajaran->Awal_Tahun->EditAttributes() ?>>
+<?php if ($t06_siswarutin->rutin_id->Visible) { // rutin_id ?>
+	<div id="r_rutin_id" class="form-group">
+		<label id="elh_t06_siswarutin_rutin_id" for="x_rutin_id" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutin->rutin_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t06_siswarutin->rutin_id->CellAttributes() ?>>
+<span id="el_t06_siswarutin_rutin_id">
+<select data-table="t06_siswarutin" data-field="x_rutin_id" data-value-separator="<?php echo $t06_siswarutin->rutin_id->DisplayValueSeparatorAttribute() ?>" id="x_rutin_id" name="x_rutin_id"<?php echo $t06_siswarutin->rutin_id->EditAttributes() ?>>
+<?php echo $t06_siswarutin->rutin_id->SelectOptionListHtml("x_rutin_id") ?>
+</select>
+<input type="hidden" name="s_x_rutin_id" id="s_x_rutin_id" value="<?php echo $t06_siswarutin->rutin_id->LookupFilterQuery() ?>">
 </span>
-<?php echo $t01_tahunajaran->Awal_Tahun->CustomMsg ?></div></div>
+<?php echo $t06_siswarutin->rutin_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t01_tahunajaran->Akhir_Bulan->Visible) { // Akhir_Bulan ?>
-	<div id="r_Akhir_Bulan" class="form-group">
-		<label id="elh_t01_tahunajaran_Akhir_Bulan" for="x_Akhir_Bulan" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Akhir_Bulan->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Akhir_Bulan->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Akhir_Bulan">
-<input type="text" data-table="t01_tahunajaran" data-field="x_Akhir_Bulan" name="x_Akhir_Bulan" id="x_Akhir_Bulan" size="30" placeholder="<?php echo ew_HtmlEncode($t01_tahunajaran->Akhir_Bulan->getPlaceHolder()) ?>" value="<?php echo $t01_tahunajaran->Akhir_Bulan->EditValue ?>"<?php echo $t01_tahunajaran->Akhir_Bulan->EditAttributes() ?>>
+<?php if ($t06_siswarutin->Nilai->Visible) { // Nilai ?>
+	<div id="r_Nilai" class="form-group">
+		<label id="elh_t06_siswarutin_Nilai" for="x_Nilai" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutin->Nilai->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t06_siswarutin->Nilai->CellAttributes() ?>>
+<span id="el_t06_siswarutin_Nilai">
+<input type="text" data-table="t06_siswarutin" data-field="x_Nilai" name="x_Nilai" id="x_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->Nilai->EditValue ?>"<?php echo $t06_siswarutin->Nilai->EditAttributes() ?>>
 </span>
-<?php echo $t01_tahunajaran->Akhir_Bulan->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t01_tahunajaran->Akhir_Tahun->Visible) { // Akhir_Tahun ?>
-	<div id="r_Akhir_Tahun" class="form-group">
-		<label id="elh_t01_tahunajaran_Akhir_Tahun" for="x_Akhir_Tahun" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Akhir_Tahun->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Akhir_Tahun->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Akhir_Tahun">
-<input type="text" data-table="t01_tahunajaran" data-field="x_Akhir_Tahun" name="x_Akhir_Tahun" id="x_Akhir_Tahun" size="30" placeholder="<?php echo ew_HtmlEncode($t01_tahunajaran->Akhir_Tahun->getPlaceHolder()) ?>" value="<?php echo $t01_tahunajaran->Akhir_Tahun->EditValue ?>"<?php echo $t01_tahunajaran->Akhir_Tahun->EditAttributes() ?>>
-</span>
-<?php echo $t01_tahunajaran->Akhir_Tahun->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t01_tahunajaran->Tahun_Ajaran->Visible) { // Tahun_Ajaran ?>
-	<div id="r_Tahun_Ajaran" class="form-group">
-		<label id="elh_t01_tahunajaran_Tahun_Ajaran" for="x_Tahun_Ajaran" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Tahun_Ajaran->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Tahun_Ajaran">
-<input type="text" data-table="t01_tahunajaran" data-field="x_Tahun_Ajaran" name="x_Tahun_Ajaran" id="x_Tahun_Ajaran" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t01_tahunajaran->Tahun_Ajaran->getPlaceHolder()) ?>" value="<?php echo $t01_tahunajaran->Tahun_Ajaran->EditValue ?>"<?php echo $t01_tahunajaran->Tahun_Ajaran->EditAttributes() ?>>
-</span>
-<?php echo $t01_tahunajaran->Tahun_Ajaran->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-	<div id="r_Aktif" class="form-group">
-		<label id="elh_t01_tahunajaran_Aktif" class="col-sm-2 control-label ewLabel"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t01_tahunajaran->Aktif->CellAttributes() ?>>
-<span id="el_t01_tahunajaran_Aktif">
-<div id="tp_x_Aktif" class="ewTemplate"><input type="radio" data-table="t01_tahunajaran" data-field="x_Aktif" data-value-separator="<?php echo $t01_tahunajaran->Aktif->DisplayValueSeparatorAttribute() ?>" name="x_Aktif" id="x_Aktif" value="{value}"<?php echo $t01_tahunajaran->Aktif->EditAttributes() ?>></div>
-<div id="dsl_x_Aktif" data-repeatcolumn="5" class="ewItemList" style="display: none;"><div>
-<?php echo $t01_tahunajaran->Aktif->RadioButtonListHtml(FALSE, "x_Aktif") ?>
-</div></div>
-</span>
-<?php echo $t01_tahunajaran->Aktif->CustomMsg ?></div></div>
+<?php echo $t06_siswarutin->Nilai->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<input type="hidden" data-table="t01_tahunajaran" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t01_tahunajaran->id->CurrentValue) ?>">
-<?php if (!$t01_tahunajaran_edit->IsModal) { ?>
+<input type="hidden" data-table="t06_siswarutin" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->id->CurrentValue) ?>">
+<?php
+	if (in_array("t07_siswarutinbayar", explode(",", $t06_siswarutin->getCurrentDetailTable())) && $t07_siswarutinbayar->DetailEdit) {
+?>
+<?php if ($t06_siswarutin->getCurrentDetailTable() <> "") { ?>
+<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t07_siswarutinbayar", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "t07_siswarutinbayargrid.php" ?>
+<?php } ?>
+<?php if (!$t06_siswarutin_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t01_tahunajaran_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t06_siswarutin_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft01_tahunajaranedit.Init();
+ft06_siswarutinedit.Init();
 </script>
 <?php
-$t01_tahunajaran_edit->ShowPageFooter();
+$t06_siswarutin_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1150,5 +1244,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t01_tahunajaran_edit->Page_Terminate();
+$t06_siswarutin_edit->Page_Terminate();
 ?>

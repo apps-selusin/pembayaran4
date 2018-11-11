@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2018/11/11" author="e.World Technology Ltd.">
-  <project id="{1437F52B-7E7A-46CA-851B-958195C82267}" file="" name="pembayaran4_prj" product="PHPMaker" version="13.0" datetime="2018/11/11 12:13:49" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
-    <table id="t01_tahunajaran" name="t01_tahunajaran" caption="Tahun Ajaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="cf01_home_php" name="cf01_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-  </project>
-</configuration>

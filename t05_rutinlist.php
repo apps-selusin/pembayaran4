@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t01_tahunajaraninfo.php" ?>
+<?php include_once "t05_rutininfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -13,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t01_tahunajaran_list = NULL; // Initialize page object first
+$t05_rutin_list = NULL; // Initialize page object first
 
-class ct01_tahunajaran_list extends ct01_tahunajaran {
+class ct05_rutin_list extends ct05_rutin {
 
 	// Page ID
 	var $PageID = 'list';
@@ -24,13 +24,13 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
 
 	// Table name
-	var $TableName = 't01_tahunajaran';
+	var $TableName = 't05_rutin';
 
 	// Page object name
-	var $PageObjName = 't01_tahunajaran_list';
+	var $PageObjName = 't05_rutin_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ft01_tahunajaranlist';
+	var $FormName = 'ft05_rutinlist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -264,10 +264,10 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t01_tahunajaran)
-		if (!isset($GLOBALS["t01_tahunajaran"]) || get_class($GLOBALS["t01_tahunajaran"]) == "ct01_tahunajaran") {
-			$GLOBALS["t01_tahunajaran"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t01_tahunajaran"];
+		// Table object (t05_rutin)
+		if (!isset($GLOBALS["t05_rutin"]) || get_class($GLOBALS["t05_rutin"]) == "ct05_rutin") {
+			$GLOBALS["t05_rutin"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t05_rutin"];
 		}
 
 		// Initialize URLs
@@ -278,12 +278,12 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "t01_tahunajaranadd.php";
+		$this->AddUrl = "t05_rutinadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "t01_tahunajarandelete.php";
-		$this->MultiUpdateUrl = "t01_tahunajaranupdate.php";
+		$this->MultiDeleteUrl = "t05_rutindelete.php";
+		$this->MultiUpdateUrl = "t05_rutinupdate.php";
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -291,7 +291,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't01_tahunajaran', TRUE);
+			define("EW_TABLE_NAME", 't05_rutin', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -322,7 +322,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ft01_tahunajaranlistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption ft05_rutinlistsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -333,6 +333,9 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
+
+		// Create form object
+		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 
 		// Get grid add count
@@ -342,12 +345,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Set up list options
 		$this->SetupListOptions();
-		$this->Awal_Bulan->SetVisibility();
-		$this->Awal_Tahun->SetVisibility();
-		$this->Akhir_Bulan->SetVisibility();
-		$this->Akhir_Tahun->SetVisibility();
-		$this->Tahun_Ajaran->SetVisibility();
-		$this->Aktif->SetVisibility();
+		$this->Jenis->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -408,13 +406,13 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t01_tahunajaran;
+		global $EW_EXPORT, $t05_rutin;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t01_tahunajaran);
+				$doc = new $class($t05_rutin);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -507,6 +505,55 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
+			// Check QueryString parameters
+			if (@$_GET["a"] <> "") {
+				$this->CurrentAction = $_GET["a"];
+
+				// Clear inline mode
+				if ($this->CurrentAction == "cancel")
+					$this->ClearInlineMode();
+
+				// Switch to grid edit mode
+				if ($this->CurrentAction == "gridedit")
+					$this->GridEditMode();
+
+				// Switch to grid add mode
+				if ($this->CurrentAction == "gridadd")
+					$this->GridAddMode();
+			} else {
+				if (@$_POST["a_list"] <> "") {
+					$this->CurrentAction = $_POST["a_list"]; // Get action
+
+					// Grid Update
+					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
+						if ($this->ValidateGridForm()) {
+							$bGridUpdate = $this->GridUpdate();
+						} else {
+							$bGridUpdate = FALSE;
+							$this->setFailureMessage($gsFormError);
+						}
+						if (!$bGridUpdate) {
+							$this->EventCancelled = TRUE;
+							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
+						}
+					}
+
+					// Grid Insert
+					if ($this->CurrentAction == "gridinsert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridadd") {
+						if ($this->ValidateGridForm()) {
+							$bGridInsert = $this->GridInsert();
+						} else {
+							$bGridInsert = FALSE;
+							$this->setFailureMessage($gsFormError);
+						}
+						if (!$bGridInsert) {
+							$this->EventCancelled = TRUE;
+							$this->CurrentAction = "gridadd"; // Stay in Grid Add mode
+						}
+					}
+				}
+			}
+
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -530,20 +577,22 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 					$option->HideAllOptions();
 			}
 
+			// Show grid delete link for grid add / grid edit
+			if ($this->AllowAddDeleteRow) {
+				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
+					$item = $this->ListOptions->GetItem("griddelete");
+					if ($item) $item->Visible = TRUE;
+				}
+			}
+
 			// Get default search criteria
 			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-			ew_AddFilter($this->DefaultSearchWhere, $this->AdvancedSearchWhere(TRUE));
 
 			// Get basic search values
 			$this->LoadBasicSearchValues();
 
-			// Get and validate search values for advanced search
-			$this->LoadSearchValues(); // Get search values
-
 			// Process filter list
 			$this->ProcessFilterList();
-			if (!$this->ValidateSearch())
-				$this->setFailureMessage($gsSearchError);
 
 			// Restore search parms from Session if not searching / reset / export
 			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
@@ -558,10 +607,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			// Get basic search criteria
 			if ($gsSearchError == "")
 				$sSrchBasic = $this->BasicSearchWhere();
-
-			// Get search criteria for advanced search
-			if ($gsSearchError == "")
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
 		}
 
 		// Restore display records
@@ -581,11 +626,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			$this->BasicSearch->LoadDefault();
 			if ($this->BasicSearch->Keyword != "")
 				$sSrchBasic = $this->BasicSearchWhere();
-
-			// Load advanced search from default
-			if ($this->LoadAdvancedSearchDefault()) {
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
-			}
 		}
 
 		// Build search criteria
@@ -628,6 +668,125 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->SetupSearchOptions();
 	}
 
+	//  Exit inline mode
+	function ClearInlineMode() {
+		$this->LastAction = $this->CurrentAction; // Save last action
+		$this->CurrentAction = ""; // Clear action
+		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
+	}
+
+	// Switch to Grid Add mode
+	function GridAddMode() {
+		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
+	}
+
+	// Switch to Grid Edit mode
+	function GridEditMode() {
+		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
+	}
+
+	// Perform update to grid
+	function GridUpdate() {
+		global $Language, $objForm, $gsFormError;
+		$bGridUpdate = TRUE;
+
+		// Get old recordset
+		$this->CurrentFilter = $this->BuildKeyFilter();
+		if ($this->CurrentFilter == "")
+			$this->CurrentFilter = "0=1";
+		$sSql = $this->SQL();
+		$conn = &$this->Connection();
+		if ($rs = $conn->Execute($sSql)) {
+			$rsold = $rs->GetRows();
+			$rs->Close();
+		}
+
+		// Call Grid Updating event
+		if (!$this->Grid_Updating($rsold)) {
+			if ($this->getFailureMessage() == "")
+				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
+			return FALSE;
+		}
+
+		// Begin transaction
+		$conn->BeginTrans();
+		$sKey = "";
+
+		// Update row index and get row key
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+
+		// Update all rows based on key
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+			$objForm->Index = $rowindex;
+			$rowkey = strval($objForm->GetValue($this->FormKeyName));
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+
+			// Load all values and keys
+			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
+				$this->LoadFormValues(); // Get form values
+				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
+				} else {
+					$bGridUpdate = TRUE;
+				}
+
+				// Skip empty row
+				if ($rowaction == "insert" && $this->EmptyRow()) {
+
+					// No action required
+				// Validate form and insert/update/delete record
+
+				} elseif ($bGridUpdate) {
+					if ($rowaction == "delete") {
+						$this->CurrentFilter = $this->KeyFilter();
+						$bGridUpdate = $this->DeleteRows(); // Delete this row
+					} else if (!$this->ValidateForm()) {
+						$bGridUpdate = FALSE; // Form error, reset action
+						$this->setFailureMessage($gsFormError);
+					} else {
+						if ($rowaction == "insert") {
+							$bGridUpdate = $this->AddRow(); // Insert this row
+						} else {
+							if ($rowkey <> "") {
+								$this->SendEmail = FALSE; // Do not send email on update success
+								$bGridUpdate = $this->EditRow(); // Update this row
+							}
+						} // End update
+					}
+				}
+				if ($bGridUpdate) {
+					if ($sKey <> "") $sKey .= ", ";
+					$sKey .= $rowkey;
+				} else {
+					break;
+				}
+			}
+		}
+		if ($bGridUpdate) {
+			$conn->CommitTrans(); // Commit transaction
+
+			// Get new recordset
+			if ($rs = $conn->Execute($sSql)) {
+				$rsnew = $rs->GetRows();
+				$rs->Close();
+			}
+
+			// Call Grid_Updated event
+			$this->Grid_Updated($rsold, $rsnew);
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
+			$this->ClearInlineMode(); // Clear inline edit mode
+		} else {
+			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->getFailureMessage() == "")
+				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
+		}
+		return $bGridUpdate;
+	}
+
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -666,13 +825,180 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		return TRUE;
 	}
 
+	// Perform Grid Add
+	function GridInsert() {
+		global $Language, $objForm, $gsFormError;
+		$rowindex = 1;
+		$bGridInsert = FALSE;
+		$conn = &$this->Connection();
+
+		// Call Grid Inserting event
+		if (!$this->Grid_Inserting()) {
+			if ($this->getFailureMessage() == "") {
+				$this->setFailureMessage($Language->Phrase("GridAddCancelled")); // Set grid add cancelled message
+			}
+			return FALSE;
+		}
+
+		// Begin transaction
+		$conn->BeginTrans();
+
+		// Init key filter
+		$sWrkFilter = "";
+		$addcnt = 0;
+		$sKey = "";
+
+		// Get row count
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+
+		// Insert all rows
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+
+			// Load current row values
+			$objForm->Index = $rowindex;
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+			if ($rowaction <> "" && $rowaction <> "insert")
+				continue; // Skip
+			$this->LoadFormValues(); // Get form values
+			if (!$this->EmptyRow()) {
+				$addcnt++;
+				$this->SendEmail = FALSE; // Do not send email on insert success
+
+				// Validate form
+				if (!$this->ValidateForm()) {
+					$bGridInsert = FALSE; // Form error, reset action
+					$this->setFailureMessage($gsFormError);
+				} else {
+					$bGridInsert = $this->AddRow($this->OldRecordset); // Insert this row
+				}
+				if ($bGridInsert) {
+					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+					$sKey .= $this->id->CurrentValue;
+
+					// Add filter for this record
+					$sFilter = $this->KeyFilter();
+					if ($sWrkFilter <> "") $sWrkFilter .= " OR ";
+					$sWrkFilter .= $sFilter;
+				} else {
+					break;
+				}
+			}
+		}
+		if ($addcnt == 0) { // No record inserted
+			$this->setFailureMessage($Language->Phrase("NoAddRecord"));
+			$bGridInsert = FALSE;
+		}
+		if ($bGridInsert) {
+			$conn->CommitTrans(); // Commit transaction
+
+			// Get new recordset
+			$this->CurrentFilter = $sWrkFilter;
+			$sSql = $this->SQL();
+			if ($rs = $conn->Execute($sSql)) {
+				$rsnew = $rs->GetRows();
+				$rs->Close();
+			}
+
+			// Call Grid_Inserted event
+			$this->Grid_Inserted($rsnew);
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
+			$this->ClearInlineMode(); // Clear grid add mode
+		} else {
+			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->getFailureMessage() == "") {
+				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
+			}
+		}
+		return $bGridInsert;
+	}
+
+	// Check if empty row
+	function EmptyRow() {
+		global $objForm;
+		if ($objForm->HasValue("x_Jenis") && $objForm->HasValue("o_Jenis") && $this->Jenis->CurrentValue <> $this->Jenis->OldValue)
+			return FALSE;
+		return TRUE;
+	}
+
+	// Validate grid form
+	function ValidateGridForm() {
+		global $objForm;
+
+		// Get row count
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+
+		// Validate all records
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+
+			// Load current row values
+			$objForm->Index = $rowindex;
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
+				$this->LoadFormValues(); // Get form values
+				if ($rowaction == "insert" && $this->EmptyRow()) {
+
+					// Ignore
+				} else if (!$this->ValidateForm()) {
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	// Get all form values of the grid
+	function GetGridFormValues() {
+		global $objForm;
+
+		// Get row count
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+		$rows = array();
+
+		// Loop through all records
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+
+			// Load current row values
+			$objForm->Index = $rowindex;
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
+				$this->LoadFormValues(); // Get form values
+				if ($rowaction == "insert" && $this->EmptyRow()) {
+
+					// Ignore
+				} else {
+					$rows[] = $this->GetFieldValues("FormValue"); // Return row as array
+				}
+			}
+		}
+		return $rows; // Return as array of array
+	}
+
+	// Restore form values for current row
+	function RestoreCurrentRowFormValues($idx) {
+		global $objForm;
+
+		// Get row based on current index
+		$objForm->Index = $idx;
+		$this->LoadFormValues(); // Load form values
+	}
+
 	// Get list of filters
 	function GetFilterList() {
 		global $UserProfile;
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft01_tahunajaranlistsrch") : "";
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft05_rutinlistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}
@@ -680,12 +1006,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Initialize
 		$sFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->Awal_Bulan->AdvancedSearch->ToJSON(), ","); // Field Awal_Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Awal_Tahun->AdvancedSearch->ToJSON(), ","); // Field Awal_Tahun
-		$sFilterList = ew_Concat($sFilterList, $this->Akhir_Bulan->AdvancedSearch->ToJSON(), ","); // Field Akhir_Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Akhir_Tahun->AdvancedSearch->ToJSON(), ","); // Field Akhir_Tahun
-		$sFilterList = ew_Concat($sFilterList, $this->Tahun_Ajaran->AdvancedSearch->ToJSON(), ","); // Field Tahun_Ajaran
-		$sFilterList = ew_Concat($sFilterList, $this->Aktif->AdvancedSearch->ToJSON(), ","); // Field Aktif
+		$sFilterList = ew_Concat($sFilterList, $this->Jenis->AdvancedSearch->ToJSON(), ","); // Field Jenis
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -708,7 +1029,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		global $UserProfile;
 		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
 			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft01_tahunajaranlistsrch", $filters);
+			$UserProfile->SetSearchFilters(CurrentUserName(), "ft05_rutinlistsrch", $filters);
 
 			// Clean output buffer
 			if (!EW_DEBUG_ENABLED && ob_get_length())
@@ -738,137 +1059,21 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
 		$this->id->AdvancedSearch->Save();
 
-		// Field Awal_Bulan
-		$this->Awal_Bulan->AdvancedSearch->SearchValue = @$filter["x_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator = @$filter["z_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchCondition = @$filter["v_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->Save();
-
-		// Field Awal_Tahun
-		$this->Awal_Tahun->AdvancedSearch->SearchValue = @$filter["x_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator = @$filter["z_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchCondition = @$filter["v_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchValue2 = @$filter["y_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator2 = @$filter["w_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->Save();
-
-		// Field Akhir_Bulan
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue = @$filter["x_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator = @$filter["z_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchCondition = @$filter["v_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->Save();
-
-		// Field Akhir_Tahun
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue = @$filter["x_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator = @$filter["z_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchCondition = @$filter["v_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue2 = @$filter["y_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator2 = @$filter["w_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->Save();
-
-		// Field Tahun_Ajaran
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue = @$filter["x_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator = @$filter["z_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchCondition = @$filter["v_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue2 = @$filter["y_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator2 = @$filter["w_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->Save();
-
-		// Field Aktif
-		$this->Aktif->AdvancedSearch->SearchValue = @$filter["x_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchOperator = @$filter["z_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchCondition = @$filter["v_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchValue2 = @$filter["y_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchOperator2 = @$filter["w_Aktif"];
-		$this->Aktif->AdvancedSearch->Save();
+		// Field Jenis
+		$this->Jenis->AdvancedSearch->SearchValue = @$filter["x_Jenis"];
+		$this->Jenis->AdvancedSearch->SearchOperator = @$filter["z_Jenis"];
+		$this->Jenis->AdvancedSearch->SearchCondition = @$filter["v_Jenis"];
+		$this->Jenis->AdvancedSearch->SearchValue2 = @$filter["y_Jenis"];
+		$this->Jenis->AdvancedSearch->SearchOperator2 = @$filter["w_Jenis"];
+		$this->Jenis->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Advanced search WHERE clause based on QueryString
-	function AdvancedSearchWhere($Default = FALSE) {
-		global $Security;
-		$sWhere = "";
-		$this->BuildSearchSql($sWhere, $this->id, $Default, FALSE); // id
-		$this->BuildSearchSql($sWhere, $this->Awal_Bulan, $Default, FALSE); // Awal_Bulan
-		$this->BuildSearchSql($sWhere, $this->Awal_Tahun, $Default, FALSE); // Awal_Tahun
-		$this->BuildSearchSql($sWhere, $this->Akhir_Bulan, $Default, FALSE); // Akhir_Bulan
-		$this->BuildSearchSql($sWhere, $this->Akhir_Tahun, $Default, FALSE); // Akhir_Tahun
-		$this->BuildSearchSql($sWhere, $this->Tahun_Ajaran, $Default, FALSE); // Tahun_Ajaran
-		$this->BuildSearchSql($sWhere, $this->Aktif, $Default, FALSE); // Aktif
-
-		// Set up search parm
-		if (!$Default && $sWhere <> "") {
-			$this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->id->AdvancedSearch->Save(); // id
-			$this->Awal_Bulan->AdvancedSearch->Save(); // Awal_Bulan
-			$this->Awal_Tahun->AdvancedSearch->Save(); // Awal_Tahun
-			$this->Akhir_Bulan->AdvancedSearch->Save(); // Akhir_Bulan
-			$this->Akhir_Tahun->AdvancedSearch->Save(); // Akhir_Tahun
-			$this->Tahun_Ajaran->AdvancedSearch->Save(); // Tahun_Ajaran
-			$this->Aktif->AdvancedSearch->Save(); // Aktif
-		}
-		return $sWhere;
-	}
-
-	// Build search SQL
-	function BuildSearchSql(&$Where, &$Fld, $Default, $MultiValue) {
-		$FldParm = substr($Fld->FldVar, 2);
-		$FldVal = ($Default) ? $Fld->AdvancedSearch->SearchValueDefault : $Fld->AdvancedSearch->SearchValue; // @$_GET["x_$FldParm"]
-		$FldOpr = ($Default) ? $Fld->AdvancedSearch->SearchOperatorDefault : $Fld->AdvancedSearch->SearchOperator; // @$_GET["z_$FldParm"]
-		$FldCond = ($Default) ? $Fld->AdvancedSearch->SearchConditionDefault : $Fld->AdvancedSearch->SearchCondition; // @$_GET["v_$FldParm"]
-		$FldVal2 = ($Default) ? $Fld->AdvancedSearch->SearchValue2Default : $Fld->AdvancedSearch->SearchValue2; // @$_GET["y_$FldParm"]
-		$FldOpr2 = ($Default) ? $Fld->AdvancedSearch->SearchOperator2Default : $Fld->AdvancedSearch->SearchOperator2; // @$_GET["w_$FldParm"]
-		$sWrk = "";
-
-		//$FldVal = ew_StripSlashes($FldVal);
-		if (is_array($FldVal)) $FldVal = implode(",", $FldVal);
-
-		//$FldVal2 = ew_StripSlashes($FldVal2);
-		if (is_array($FldVal2)) $FldVal2 = implode(",", $FldVal2);
-		$FldOpr = strtoupper(trim($FldOpr));
-		if ($FldOpr == "") $FldOpr = "=";
-		$FldOpr2 = strtoupper(trim($FldOpr2));
-		if ($FldOpr2 == "") $FldOpr2 = "=";
-		if (EW_SEARCH_MULTI_VALUE_OPTION == 1)
-			$MultiValue = FALSE;
-		if ($MultiValue) {
-			$sWrk1 = ($FldVal <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr, $FldVal, $this->DBID) : ""; // Field value 1
-			$sWrk2 = ($FldVal2 <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr2, $FldVal2, $this->DBID) : ""; // Field value 2
-			$sWrk = $sWrk1; // Build final SQL
-			if ($sWrk2 <> "")
-				$sWrk = ($sWrk <> "") ? "($sWrk) $FldCond ($sWrk2)" : $sWrk2;
-		} else {
-			$FldVal = $this->ConvertSearchValue($Fld, $FldVal);
-			$FldVal2 = $this->ConvertSearchValue($Fld, $FldVal2);
-			$sWrk = ew_GetSearchSql($Fld, $FldVal, $FldOpr, $FldCond, $FldVal2, $FldOpr2, $this->DBID);
-		}
-		ew_AddFilter($Where, $sWrk);
-	}
-
-	// Convert search value
-	function ConvertSearchValue(&$Fld, $FldVal) {
-		if ($FldVal == EW_NULL_VALUE || $FldVal == EW_NOT_NULL_VALUE)
-			return $FldVal;
-		$Value = $FldVal;
-		if ($Fld->FldDataType == EW_DATATYPE_BOOLEAN) {
-			if ($FldVal <> "") $Value = ($FldVal == "1" || strtolower(strval($FldVal)) == "y" || strtolower(strval($FldVal)) == "t") ? $Fld->TrueValue : $Fld->FalseValue;
-		} elseif ($Fld->FldDataType == EW_DATATYPE_DATE || $Fld->FldDataType == EW_DATATYPE_TIME) {
-			if ($FldVal <> "") $Value = ew_UnFormatDateTime($FldVal, $Fld->FldDateTimeFormat);
-		}
-		return $Value;
 	}
 
 	// Return basic search SQL
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->Tahun_Ajaran, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->Jenis, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -994,20 +1199,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Check basic search
 		if ($this->BasicSearch->IssetSession())
 			return TRUE;
-		if ($this->id->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Awal_Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Awal_Tahun->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Akhir_Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Akhir_Tahun->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Tahun_Ajaran->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Aktif->AdvancedSearch->IssetSession())
-			return TRUE;
 		return FALSE;
 	}
 
@@ -1020,9 +1211,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Clear basic search parameters
 		$this->ResetBasicSearchParms();
-
-		// Clear advanced search parameters
-		$this->ResetAdvancedSearchParms();
 	}
 
 	// Load advanced search default values
@@ -1035,32 +1223,12 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->BasicSearch->UnsetSession();
 	}
 
-	// Clear all advanced search parameters
-	function ResetAdvancedSearchParms() {
-		$this->id->AdvancedSearch->UnsetSession();
-		$this->Awal_Bulan->AdvancedSearch->UnsetSession();
-		$this->Awal_Tahun->AdvancedSearch->UnsetSession();
-		$this->Akhir_Bulan->AdvancedSearch->UnsetSession();
-		$this->Akhir_Tahun->AdvancedSearch->UnsetSession();
-		$this->Tahun_Ajaran->AdvancedSearch->UnsetSession();
-		$this->Aktif->AdvancedSearch->UnsetSession();
-	}
-
 	// Restore all search parameters
 	function RestoreSearchParms() {
 		$this->RestoreSearch = TRUE;
 
 		// Restore basic search values
 		$this->BasicSearch->Load();
-
-		// Restore advanced search values
-		$this->id->AdvancedSearch->Load();
-		$this->Awal_Bulan->AdvancedSearch->Load();
-		$this->Awal_Tahun->AdvancedSearch->Load();
-		$this->Akhir_Bulan->AdvancedSearch->Load();
-		$this->Akhir_Tahun->AdvancedSearch->Load();
-		$this->Tahun_Ajaran->AdvancedSearch->Load();
-		$this->Aktif->AdvancedSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -1073,12 +1241,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->Awal_Bulan, $bCtrl); // Awal_Bulan
-			$this->UpdateSort($this->Awal_Tahun, $bCtrl); // Awal_Tahun
-			$this->UpdateSort($this->Akhir_Bulan, $bCtrl); // Akhir_Bulan
-			$this->UpdateSort($this->Akhir_Tahun, $bCtrl); // Akhir_Tahun
-			$this->UpdateSort($this->Tahun_Ajaran, $bCtrl); // Tahun_Ajaran
-			$this->UpdateSort($this->Aktif, $bCtrl); // Aktif
+			$this->UpdateSort($this->Jenis, $bCtrl); // Jenis
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1111,12 +1274,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->Awal_Bulan->setSort("");
-				$this->Awal_Tahun->setSort("");
-				$this->Akhir_Bulan->setSort("");
-				$this->Akhir_Tahun->setSort("");
-				$this->Tahun_Ajaran->setSort("");
-				$this->Aktif->setSort("");
+				$this->Jenis->setSort("");
 			}
 
 			// Reset start position
@@ -1129,29 +1287,19 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	function SetupListOptions() {
 		global $Security, $Language;
 
+		// "griddelete"
+		if ($this->AllowAddDeleteRow) {
+			$item = &$this->ListOptions->Add("griddelete");
+			$item->CssStyle = "white-space: nowrap;";
+			$item->OnLeft = TRUE;
+			$item->Visible = FALSE; // Default hidden
+		}
+
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
-
-		// "view"
-		$item = &$this->ListOptions->Add("view");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
-
-		// "edit"
-		$item = &$this->ListOptions->Add("edit");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
-
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
 
 		// "delete"
 		$item = &$this->ListOptions->Add("delete");
@@ -1176,6 +1324,14 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
+
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
 		$this->ListOptions->UseDropDownButton = FALSE;
@@ -1197,32 +1353,37 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
 
-		// "view"
-		$oListOpt = &$this->ListOptions->Items["view"];
-		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
+		// Set up row action and key
+		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
+			$objForm->Index = $this->RowIndex;
+			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
+			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
+			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+			if ($this->RowAction <> "")
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
+			if ($this->RowAction == "delete") {
+				$rowkey = $objForm->GetValue($this->FormKeyName);
+				$this->SetupKeyValues($rowkey);
+			}
+			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
 		}
 
-		// "edit"
-		$oListOpt = &$this->ListOptions->Items["edit"];
-		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
+		// "delete"
+		if ($this->AllowAddDeleteRow) {
+			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
+				$option = &$this->ListOptions;
+				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
+				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
+				$oListOpt = &$option->Items["griddelete"];
+				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+			}
 		}
 
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
 
 		// "delete"
 		$oListOpt = &$this->ListOptions->Items["delete"];
@@ -1263,6 +1424,9 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
+		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
+			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->id->CurrentValue . "\">";
+		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1274,12 +1438,15 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
+		$item = &$option->Add("gridadd");
+		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
+		$item->Visible = ($this->GridAddUrl <> "");
 
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
-		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
+		// Add grid edit
+		$option = $options["addedit"];
+		$item = &$option->Add("gridedit");
+		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
+		$item->Visible = ($this->GridEditUrl <> "");
 		$option = $options["action"];
 
 		// Set up options default
@@ -1298,10 +1465,10 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft01_tahunajaranlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft05_rutinlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
 		$item->Visible = TRUE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft01_tahunajaranlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft05_rutinlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
 		$item->Visible = TRUE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1317,6 +1484,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 
 			// Set up list action buttons
@@ -1325,7 +1493,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft01_tahunajaranlist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft05_rutinlist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1338,6 +1506,56 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 				$option = &$options["action"];
 				$option->HideAllOptions();
 			}
+		} else { // Grid add/edit mode
+
+			// Hide all options first
+			foreach ($options as &$option)
+				$option->HideAllOptions();
+			if ($this->CurrentAction == "gridadd") {
+				if ($this->AllowAddDeleteRow) {
+
+					// Add add blank row
+					$option = &$options["addedit"];
+					$option->UseDropDownButton = FALSE;
+					$option->UseImageAndText = TRUE;
+					$item = &$option->Add("addblankrow");
+					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
+					$item->Visible = FALSE;
+				}
+				$option = &$options["action"];
+				$option->UseDropDownButton = FALSE;
+				$option->UseImageAndText = TRUE;
+
+				// Add grid insert
+				$item = &$option->Add("gridinsert");
+				$item->Body = "<a class=\"ewAction ewGridInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridInsertLink") . "</a>";
+
+				// Add grid cancel
+				$item = &$option->Add("gridcancel");
+				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
+				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
+			}
+			if ($this->CurrentAction == "gridedit") {
+				if ($this->AllowAddDeleteRow) {
+
+					// Add add blank row
+					$option = &$options["addedit"];
+					$option->UseDropDownButton = FALSE;
+					$option->UseImageAndText = TRUE;
+					$item = &$option->Add("addblankrow");
+					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
+					$item->Visible = FALSE;
+				}
+				$option = &$options["action"];
+				$option->UseDropDownButton = FALSE;
+				$option->UseImageAndText = TRUE;
+					$item = &$option->Add("gridsave");
+					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
+					$item = &$option->Add("gridcancel");
+					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
+					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
+			}
+		}
 	}
 
 	// Process list action
@@ -1429,7 +1647,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft01_tahunajaranlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
+		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft05_rutinlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
 		// Show all button
@@ -1497,6 +1715,12 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		}
 	}
 
+	// Load default values
+	function LoadDefaultValues() {
+		$this->Jenis->CurrentValue = NULL;
+		$this->Jenis->OldValue = $this->Jenis->CurrentValue;
+	}
+
 	// Load basic search values
 	function LoadBasicSearchValues() {
 		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
@@ -1504,46 +1728,25 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
 	}
 
-	// Load search values for validation
-	function LoadSearchValues() {
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
 		global $objForm;
+		if (!$this->Jenis->FldIsDetailKey) {
+			$this->Jenis->setFormValue($objForm->GetValue("x_Jenis"));
+		}
+		$this->Jenis->setOldValue($objForm->GetValue("o_Jenis"));
+		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->setFormValue($objForm->GetValue("x_id"));
+	}
 
-		// Load search values
-		// id
-
-		$this->id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_id"]);
-		if ($this->id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->id->AdvancedSearch->SearchOperator = @$_GET["z_id"];
-
-		// Awal_Bulan
-		$this->Awal_Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Awal_Bulan"]);
-		if ($this->Awal_Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Awal_Bulan"];
-
-		// Awal_Tahun
-		$this->Awal_Tahun->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Awal_Tahun"]);
-		if ($this->Awal_Tahun->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator = @$_GET["z_Awal_Tahun"];
-
-		// Akhir_Bulan
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Akhir_Bulan"]);
-		if ($this->Akhir_Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Akhir_Bulan"];
-
-		// Akhir_Tahun
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Akhir_Tahun"]);
-		if ($this->Akhir_Tahun->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator = @$_GET["z_Akhir_Tahun"];
-
-		// Tahun_Ajaran
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Tahun_Ajaran"]);
-		if ($this->Tahun_Ajaran->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator = @$_GET["z_Tahun_Ajaran"];
-
-		// Aktif
-		$this->Aktif->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Aktif"]);
-		if ($this->Aktif->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Aktif->AdvancedSearch->SearchOperator = @$_GET["z_Aktif"];
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->CurrentValue = $this->id->FormValue;
+		$this->Jenis->CurrentValue = $this->Jenis->FormValue;
 	}
 
 	// Load recordset
@@ -1602,12 +1805,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->Awal_Bulan->setDbValue($rs->fields('Awal_Bulan'));
-		$this->Awal_Tahun->setDbValue($rs->fields('Awal_Tahun'));
-		$this->Akhir_Bulan->setDbValue($rs->fields('Akhir_Bulan'));
-		$this->Akhir_Tahun->setDbValue($rs->fields('Akhir_Tahun'));
-		$this->Tahun_Ajaran->setDbValue($rs->fields('Tahun_Ajaran'));
-		$this->Aktif->setDbValue($rs->fields('Aktif'));
+		$this->Jenis->setDbValue($rs->fields('Jenis'));
 	}
 
 	// Load DbValue from recordset
@@ -1615,12 +1813,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->Awal_Bulan->DbValue = $row['Awal_Bulan'];
-		$this->Awal_Tahun->DbValue = $row['Awal_Tahun'];
-		$this->Akhir_Bulan->DbValue = $row['Akhir_Bulan'];
-		$this->Akhir_Tahun->DbValue = $row['Akhir_Tahun'];
-		$this->Tahun_Ajaran->DbValue = $row['Tahun_Ajaran'];
-		$this->Aktif->DbValue = $row['Aktif'];
+		$this->Jenis->DbValue = $row['Jenis'];
 	}
 
 	// Load old record
@@ -1663,12 +1856,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Common render codes for all row types
 		// id
-		// Awal_Bulan
-		// Awal_Tahun
-		// Akhir_Bulan
-		// Akhir_Tahun
-		// Tahun_Ajaran
-		// Aktif
+		// Jenis
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1676,98 +1864,40 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// Awal_Bulan
-		$this->Awal_Bulan->ViewValue = $this->Awal_Bulan->CurrentValue;
-		$this->Awal_Bulan->ViewCustomAttributes = "";
+		// Jenis
+		$this->Jenis->ViewValue = $this->Jenis->CurrentValue;
+		$this->Jenis->ViewCustomAttributes = "";
 
-		// Awal_Tahun
-		$this->Awal_Tahun->ViewValue = $this->Awal_Tahun->CurrentValue;
-		$this->Awal_Tahun->ViewCustomAttributes = "";
+			// Jenis
+			$this->Jenis->LinkCustomAttributes = "";
+			$this->Jenis->HrefValue = "";
+			$this->Jenis->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-		// Akhir_Bulan
-		$this->Akhir_Bulan->ViewValue = $this->Akhir_Bulan->CurrentValue;
-		$this->Akhir_Bulan->ViewCustomAttributes = "";
+			// Jenis
+			$this->Jenis->EditAttrs["class"] = "form-control";
+			$this->Jenis->EditCustomAttributes = "";
+			$this->Jenis->EditValue = ew_HtmlEncode($this->Jenis->CurrentValue);
+			$this->Jenis->PlaceHolder = ew_RemoveHtml($this->Jenis->FldCaption());
 
-		// Akhir_Tahun
-		$this->Akhir_Tahun->ViewValue = $this->Akhir_Tahun->CurrentValue;
-		$this->Akhir_Tahun->ViewCustomAttributes = "";
+			// Add refer script
+			// Jenis
 
-		// Tahun_Ajaran
-		$this->Tahun_Ajaran->ViewValue = $this->Tahun_Ajaran->CurrentValue;
-		$this->Tahun_Ajaran->ViewCustomAttributes = "";
+			$this->Jenis->LinkCustomAttributes = "";
+			$this->Jenis->HrefValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-		// Aktif
-		if (strval($this->Aktif->CurrentValue) <> "") {
-			$this->Aktif->ViewValue = $this->Aktif->OptionCaption($this->Aktif->CurrentValue);
-		} else {
-			$this->Aktif->ViewValue = NULL;
-		}
-		$this->Aktif->ViewCustomAttributes = "";
+			// Jenis
+			$this->Jenis->EditAttrs["class"] = "form-control";
+			$this->Jenis->EditCustomAttributes = "";
+			$this->Jenis->EditValue = ew_HtmlEncode($this->Jenis->CurrentValue);
+			$this->Jenis->PlaceHolder = ew_RemoveHtml($this->Jenis->FldCaption());
 
-			// Awal_Bulan
-			$this->Awal_Bulan->LinkCustomAttributes = "";
-			$this->Awal_Bulan->HrefValue = "";
-			$this->Awal_Bulan->TooltipValue = "";
+			// Edit refer script
+			// Jenis
 
-			// Awal_Tahun
-			$this->Awal_Tahun->LinkCustomAttributes = "";
-			$this->Awal_Tahun->HrefValue = "";
-			$this->Awal_Tahun->TooltipValue = "";
-
-			// Akhir_Bulan
-			$this->Akhir_Bulan->LinkCustomAttributes = "";
-			$this->Akhir_Bulan->HrefValue = "";
-			$this->Akhir_Bulan->TooltipValue = "";
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->LinkCustomAttributes = "";
-			$this->Akhir_Tahun->HrefValue = "";
-			$this->Akhir_Tahun->TooltipValue = "";
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->LinkCustomAttributes = "";
-			$this->Tahun_Ajaran->HrefValue = "";
-			$this->Tahun_Ajaran->TooltipValue = "";
-
-			// Aktif
-			$this->Aktif->LinkCustomAttributes = "";
-			$this->Aktif->HrefValue = "";
-			$this->Aktif->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
-
-			// Awal_Bulan
-			$this->Awal_Bulan->EditAttrs["class"] = "form-control";
-			$this->Awal_Bulan->EditCustomAttributes = "";
-			$this->Awal_Bulan->EditValue = ew_HtmlEncode($this->Awal_Bulan->AdvancedSearch->SearchValue);
-			$this->Awal_Bulan->PlaceHolder = ew_RemoveHtml($this->Awal_Bulan->FldCaption());
-
-			// Awal_Tahun
-			$this->Awal_Tahun->EditAttrs["class"] = "form-control";
-			$this->Awal_Tahun->EditCustomAttributes = "";
-			$this->Awal_Tahun->EditValue = ew_HtmlEncode($this->Awal_Tahun->AdvancedSearch->SearchValue);
-			$this->Awal_Tahun->PlaceHolder = ew_RemoveHtml($this->Awal_Tahun->FldCaption());
-
-			// Akhir_Bulan
-			$this->Akhir_Bulan->EditAttrs["class"] = "form-control";
-			$this->Akhir_Bulan->EditCustomAttributes = "";
-			$this->Akhir_Bulan->EditValue = ew_HtmlEncode($this->Akhir_Bulan->AdvancedSearch->SearchValue);
-			$this->Akhir_Bulan->PlaceHolder = ew_RemoveHtml($this->Akhir_Bulan->FldCaption());
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->EditAttrs["class"] = "form-control";
-			$this->Akhir_Tahun->EditCustomAttributes = "";
-			$this->Akhir_Tahun->EditValue = ew_HtmlEncode($this->Akhir_Tahun->AdvancedSearch->SearchValue);
-			$this->Akhir_Tahun->PlaceHolder = ew_RemoveHtml($this->Akhir_Tahun->FldCaption());
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->EditAttrs["class"] = "form-control";
-			$this->Tahun_Ajaran->EditCustomAttributes = "";
-			$this->Tahun_Ajaran->EditValue = ew_HtmlEncode($this->Tahun_Ajaran->AdvancedSearch->SearchValue);
-			$this->Tahun_Ajaran->PlaceHolder = ew_RemoveHtml($this->Tahun_Ajaran->FldCaption());
-
-			// Aktif
-			$this->Aktif->EditCustomAttributes = "";
-			$this->Aktif->EditValue = $this->Aktif->Options(FALSE);
+			$this->Jenis->LinkCustomAttributes = "";
+			$this->Jenis->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1780,38 +1910,208 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			$this->Row_Rendered();
 	}
 
-	// Validate search
-	function ValidateSearch() {
-		global $gsSearchError;
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
 
-		// Initialize
-		$gsSearchError = "";
+		// Initialize form error message
+		$gsFormError = "";
 
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
-			return TRUE;
+			return ($gsFormError == "");
+		if (!$this->Jenis->FldIsDetailKey && !is_null($this->Jenis->FormValue) && $this->Jenis->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->Jenis->FldCaption(), $this->Jenis->ReqErrMsg));
+		}
 
 		// Return validate result
-		$ValidateSearch = ($gsSearchError == "");
+		$ValidateForm = ($gsFormError == "");
 
 		// Call Form_CustomValidate event
 		$sFormCustomError = "";
-		$ValidateSearch = $ValidateSearch && $this->Form_CustomValidate($sFormCustomError);
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
 		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsSearchError, $sFormCustomError);
+			ew_AddMessage($gsFormError, $sFormCustomError);
 		}
-		return $ValidateSearch;
+		return $ValidateForm;
 	}
 
-	// Load advanced search
-	function LoadAdvancedSearch() {
-		$this->id->AdvancedSearch->Load();
-		$this->Awal_Bulan->AdvancedSearch->Load();
-		$this->Awal_Tahun->AdvancedSearch->Load();
-		$this->Akhir_Bulan->AdvancedSearch->Load();
-		$this->Akhir_Tahun->AdvancedSearch->Load();
-		$this->Tahun_Ajaran->AdvancedSearch->Load();
-		$this->Aktif->AdvancedSearch->Load();
+	//
+	// Delete records based on current filter
+	//
+	function DeleteRows() {
+		global $Language, $Security;
+		$DeleteRows = TRUE;
+		$sSql = $this->SQL();
+		$conn = &$this->Connection();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE) {
+			return FALSE;
+		} elseif ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
+			$rs->Close();
+			return FALSE;
+
+		//} else {
+		//	$this->LoadRowValues($rs); // Load row values
+
+		}
+		$rows = ($rs) ? $rs->GetRows() : array();
+
+		// Clone old rows
+		$rsold = $rows;
+		if ($rs)
+			$rs->Close();
+
+		// Call row deleting event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$DeleteRows = $this->Row_Deleting($row);
+				if (!$DeleteRows) break;
+			}
+		}
+		if ($DeleteRows) {
+			$sKey = "";
+			foreach ($rsold as $row) {
+				$sThisKey = "";
+				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+				$sThisKey .= $row['id'];
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				$DeleteRows = $this->Delete($row); // Delete
+				$conn->raiseErrorFn = '';
+				if ($DeleteRows === FALSE)
+					break;
+				if ($sKey <> "") $sKey .= ", ";
+				$sKey .= $sThisKey;
+			}
+		} else {
+
+			// Set up error message
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
+			}
+		}
+		if ($DeleteRows) {
+		} else {
+		}
+
+		// Call Row Deleted event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$this->Row_Deleted($row);
+			}
+		}
+		return $DeleteRows;
+	}
+
+	// Update record based on key values
+	function EditRow() {
+		global $Security, $Language;
+		$sFilter = $this->KeyFilter();
+		$sFilter = $this->ApplyUserIDFilters($sFilter);
+		$conn = &$this->Connection();
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE)
+			return FALSE;
+		if ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
+			$EditRow = FALSE; // Update Failed
+		} else {
+
+			// Save old values
+			$rsold = &$rs->fields;
+			$this->LoadDbValues($rsold);
+			$rsnew = array();
+
+			// Jenis
+			$this->Jenis->SetDbValueDef($rsnew, $this->Jenis->CurrentValue, "", $this->Jenis->ReadOnly);
+
+			// Call Row Updating event
+			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
+			if ($bUpdateRow) {
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				if (count($rsnew) > 0)
+					$EditRow = $this->Update($rsnew, "", $rsold);
+				else
+					$EditRow = TRUE; // No field to update
+				$conn->raiseErrorFn = '';
+				if ($EditRow) {
+				}
+			} else {
+				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+					// Use the message, do nothing
+				} elseif ($this->CancelMessage <> "") {
+					$this->setFailureMessage($this->CancelMessage);
+					$this->CancelMessage = "";
+				} else {
+					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
+				}
+				$EditRow = FALSE;
+			}
+		}
+
+		// Call Row_Updated event
+		if ($EditRow)
+			$this->Row_Updated($rsold, $rsnew);
+		$rs->Close();
+		return $EditRow;
+	}
+
+	// Add record
+	function AddRow($rsold = NULL) {
+		global $Language, $Security;
+		$conn = &$this->Connection();
+
+		// Load db values from rsold
+		if ($rsold) {
+			$this->LoadDbValues($rsold);
+		}
+		$rsnew = array();
+
+		// Jenis
+		$this->Jenis->SetDbValueDef($rsnew, $this->Jenis->CurrentValue, "", FALSE);
+
+		// Call Row Inserting event
+		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
+		if ($bInsertRow) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$AddRow = $this->Insert($rsnew);
+			$conn->raiseErrorFn = '';
+			if ($AddRow) {
+			}
+		} else {
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+			}
+			$AddRow = FALSE;
+		}
+		if ($AddRow) {
+
+			// Call Row Inserted event
+			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+			$this->Row_Inserted($rs, $rsnew);
+		}
+		return $AddRow;
 	}
 
 	// Set up Breadcrumb
@@ -1827,26 +2127,16 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	function SetupLookupFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Setup AutoSuggest filters of a field
 	function SetupAutoSuggestFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Page Load event
@@ -1973,65 +2263,71 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 <?php
 
 // Create page object
-if (!isset($t01_tahunajaran_list)) $t01_tahunajaran_list = new ct01_tahunajaran_list();
+if (!isset($t05_rutin_list)) $t05_rutin_list = new ct05_rutin_list();
 
 // Page init
-$t01_tahunajaran_list->Page_Init();
+$t05_rutin_list->Page_Init();
 
 // Page main
-$t01_tahunajaran_list->Page_Main();
+$t05_rutin_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t01_tahunajaran_list->Page_Render();
+$t05_rutin_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ft01_tahunajaranlist = new ew_Form("ft01_tahunajaranlist", "list");
-ft01_tahunajaranlist.FormKeyCountName = '<?php echo $t01_tahunajaran_list->FormKeyCountName ?>';
+var CurrentForm = ft05_rutinlist = new ew_Form("ft05_rutinlist", "list");
+ft05_rutinlist.FormKeyCountName = '<?php echo $t05_rutin_list->FormKeyCountName ?>';
 
-// Form_CustomValidate event
-ft01_tahunajaranlist.Form_CustomValidate = 
- function(fobj) { // DO NOT CHANGE THIS LINE!
-
- 	// Your custom validation code here, return false if invalid. 
- 	return true;
- }
-
-// Use JavaScript validation or not
-<?php if (EW_CLIENT_VALIDATE) { ?>
-ft01_tahunajaranlist.ValidateRequired = true;
-<?php } else { ?>
-ft01_tahunajaranlist.ValidateRequired = false; 
-<?php } ?>
-
-// Dynamic selection lists
-ft01_tahunajaranlist.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ft01_tahunajaranlist.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
-
-// Form object for search
-var CurrentSearchForm = ft01_tahunajaranlistsrch = new ew_Form("ft01_tahunajaranlistsrch");
-
-// Validate function for search
-ft01_tahunajaranlistsrch.Validate = function(fobj) {
+// Validate form
+ft05_rutinlist.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
-	fobj = fobj || this.Form;
-	var infix = "";
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
+		if (checkrow) {
+			addcnt++;
+			elm = this.GetElements("x" + infix + "_Jenis");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t05_rutin->Jenis->FldCaption(), $t05_rutin->Jenis->ReqErrMsg)) ?>");
 
-	// Fire Form_CustomValidate event
-	if (!this.Form_CustomValidate(fobj))
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+		} // End Grid Add checking
+	}
+	if (gridinsert && addcnt == 0) { // No row added
+		ew_Alert(ewLanguage.Phrase("NoAddRecord"));
 		return false;
+	}
+	return true;
+}
+
+// Check empty row
+ft05_rutinlist.EmptyRow = function(infix) {
+	var fobj = this.Form;
+	if (ew_ValueChanged(fobj, infix, "Jenis", false)) return false;
 	return true;
 }
 
 // Form_CustomValidate event
-ft01_tahunajaranlistsrch.Form_CustomValidate = 
+ft05_rutinlist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -2040,14 +2336,15 @@ ft01_tahunajaranlistsrch.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft01_tahunajaranlistsrch.ValidateRequired = true; // Use JavaScript validation
+ft05_rutinlist.ValidateRequired = true;
 <?php } else { ?>
-ft01_tahunajaranlistsrch.ValidateRequired = false; // No JavaScript validation
+ft05_rutinlist.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft01_tahunajaranlistsrch.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ft01_tahunajaranlistsrch.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
+// Form object for search
+
+var CurrentSearchForm = ft05_rutinlistsrch = new ew_Form("ft05_rutinlistsrch");
 </script>
 <script type="text/javascript">
 
@@ -2055,87 +2352,70 @@ ft01_tahunajaranlistsrch.Lists["x_Aktif"].Options = <?php echo json_encode($t01_
 </script>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
-<?php if ($t01_tahunajaran_list->TotalRecs > 0 && $t01_tahunajaran_list->ExportOptions->Visible()) { ?>
-<?php $t01_tahunajaran_list->ExportOptions->Render("body") ?>
+<?php if ($t05_rutin_list->TotalRecs > 0 && $t05_rutin_list->ExportOptions->Visible()) { ?>
+<?php $t05_rutin_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t01_tahunajaran_list->SearchOptions->Visible()) { ?>
-<?php $t01_tahunajaran_list->SearchOptions->Render("body") ?>
+<?php if ($t05_rutin_list->SearchOptions->Visible()) { ?>
+<?php $t05_rutin_list->SearchOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t01_tahunajaran_list->FilterOptions->Visible()) { ?>
-<?php $t01_tahunajaran_list->FilterOptions->Render("body") ?>
+<?php if ($t05_rutin_list->FilterOptions->Visible()) { ?>
+<?php $t05_rutin_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php
-	$bSelectLimit = $t01_tahunajaran_list->UseSelectLimit;
+if ($t05_rutin->CurrentAction == "gridadd") {
+	$t05_rutin->CurrentFilter = "0=1";
+	$t05_rutin_list->StartRec = 1;
+	$t05_rutin_list->DisplayRecs = $t05_rutin->GridAddRowCount;
+	$t05_rutin_list->TotalRecs = $t05_rutin_list->DisplayRecs;
+	$t05_rutin_list->StopRec = $t05_rutin_list->DisplayRecs;
+} else {
+	$bSelectLimit = $t05_rutin_list->UseSelectLimit;
 	if ($bSelectLimit) {
-		if ($t01_tahunajaran_list->TotalRecs <= 0)
-			$t01_tahunajaran_list->TotalRecs = $t01_tahunajaran->SelectRecordCount();
+		if ($t05_rutin_list->TotalRecs <= 0)
+			$t05_rutin_list->TotalRecs = $t05_rutin->SelectRecordCount();
 	} else {
-		if (!$t01_tahunajaran_list->Recordset && ($t01_tahunajaran_list->Recordset = $t01_tahunajaran_list->LoadRecordset()))
-			$t01_tahunajaran_list->TotalRecs = $t01_tahunajaran_list->Recordset->RecordCount();
+		if (!$t05_rutin_list->Recordset && ($t05_rutin_list->Recordset = $t05_rutin_list->LoadRecordset()))
+			$t05_rutin_list->TotalRecs = $t05_rutin_list->Recordset->RecordCount();
 	}
-	$t01_tahunajaran_list->StartRec = 1;
-	if ($t01_tahunajaran_list->DisplayRecs <= 0 || ($t01_tahunajaran->Export <> "" && $t01_tahunajaran->ExportAll)) // Display all records
-		$t01_tahunajaran_list->DisplayRecs = $t01_tahunajaran_list->TotalRecs;
-	if (!($t01_tahunajaran->Export <> "" && $t01_tahunajaran->ExportAll))
-		$t01_tahunajaran_list->SetUpStartRec(); // Set up start record position
+	$t05_rutin_list->StartRec = 1;
+	if ($t05_rutin_list->DisplayRecs <= 0 || ($t05_rutin->Export <> "" && $t05_rutin->ExportAll)) // Display all records
+		$t05_rutin_list->DisplayRecs = $t05_rutin_list->TotalRecs;
+	if (!($t05_rutin->Export <> "" && $t05_rutin->ExportAll))
+		$t05_rutin_list->SetUpStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$t01_tahunajaran_list->Recordset = $t01_tahunajaran_list->LoadRecordset($t01_tahunajaran_list->StartRec-1, $t01_tahunajaran_list->DisplayRecs);
+		$t05_rutin_list->Recordset = $t05_rutin_list->LoadRecordset($t05_rutin_list->StartRec-1, $t05_rutin_list->DisplayRecs);
 
 	// Set no record found message
-	if ($t01_tahunajaran->CurrentAction == "" && $t01_tahunajaran_list->TotalRecs == 0) {
-		if ($t01_tahunajaran_list->SearchWhere == "0=101")
-			$t01_tahunajaran_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+	if ($t05_rutin->CurrentAction == "" && $t05_rutin_list->TotalRecs == 0) {
+		if ($t05_rutin_list->SearchWhere == "0=101")
+			$t05_rutin_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$t01_tahunajaran_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$t05_rutin_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-$t01_tahunajaran_list->RenderOtherOptions();
+}
+$t05_rutin_list->RenderOtherOptions();
 ?>
-<?php if ($t01_tahunajaran->Export == "" && $t01_tahunajaran->CurrentAction == "") { ?>
-<form name="ft01_tahunajaranlistsrch" id="ft01_tahunajaranlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t01_tahunajaran_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft01_tahunajaranlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<?php if ($t05_rutin->Export == "" && $t05_rutin->CurrentAction == "") { ?>
+<form name="ft05_rutinlistsrch" id="ft05_rutinlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
+<?php $SearchPanelClass = ($t05_rutin_list->SearchWhere <> "") ? " in" : " in"; ?>
+<div id="ft05_rutinlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t01_tahunajaran">
+<input type="hidden" name="t" value="t05_rutin">
 	<div class="ewBasicSearch">
-<?php
-if ($gsSearchError == "")
-	$t01_tahunajaran_list->LoadAdvancedSearch(); // Load advanced search
-
-// Render for search
-$t01_tahunajaran->RowType = EW_ROWTYPE_SEARCH;
-
-// Render row
-$t01_tahunajaran->ResetAttrs();
-$t01_tahunajaran_list->RenderRow();
-?>
 <div id="xsr_1" class="ewRow">
-<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-	<div id="xsc_Aktif" class="ewCell form-group">
-		<label class="ewSearchCaption ewLabel"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?></label>
-		<span class="ewSearchOperator"><?php echo $Language->Phrase("=") ?><input type="hidden" name="z_Aktif" id="z_Aktif" value="="></span>
-		<span class="ewSearchField">
-<div id="tp_x_Aktif" class="ewTemplate"><input type="radio" data-table="t01_tahunajaran" data-field="x_Aktif" data-value-separator="<?php echo $t01_tahunajaran->Aktif->DisplayValueSeparatorAttribute() ?>" name="x_Aktif" id="x_Aktif" value="{value}"<?php echo $t01_tahunajaran->Aktif->EditAttributes() ?>></div>
-<div id="dsl_x_Aktif" data-repeatcolumn="5" class="ewItemList" style="display: none;"><div>
-<?php echo $t01_tahunajaran->Aktif->RadioButtonListHtml(FALSE, "x_Aktif") ?>
-</div></div>
-</span>
-	</div>
-<?php } ?>
-</div>
-<div id="xsr_2" class="ewRow">
 	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t01_tahunajaran_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t01_tahunajaran_list->BasicSearch->getType()) ?>">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t05_rutin_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
+	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t05_rutin_list->BasicSearch->getType()) ?>">
 	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t01_tahunajaran_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
+		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t05_rutin_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
+			<li<?php if ($t05_rutin_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
+			<li<?php if ($t05_rutin_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
+			<li<?php if ($t05_rutin_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
+			<li<?php if ($t05_rutin_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
 		</ul>
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
 	</div>
@@ -2145,217 +2425,256 @@ $t01_tahunajaran_list->RenderRow();
 </div>
 </form>
 <?php } ?>
-<?php $t01_tahunajaran_list->ShowPageHeader(); ?>
+<?php $t05_rutin_list->ShowPageHeader(); ?>
 <?php
-$t01_tahunajaran_list->ShowMessage();
+$t05_rutin_list->ShowMessage();
 ?>
-<?php if ($t01_tahunajaran_list->TotalRecs > 0 || $t01_tahunajaran->CurrentAction <> "") { ?>
-<div class="panel panel-default ewGrid t01_tahunajaran">
-<form name="ft01_tahunajaranlist" id="ft01_tahunajaranlist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t01_tahunajaran_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t01_tahunajaran_list->Token ?>">
+<?php if ($t05_rutin_list->TotalRecs > 0 || $t05_rutin->CurrentAction <> "") { ?>
+<div class="panel panel-default ewGrid t05_rutin">
+<form name="ft05_rutinlist" id="ft05_rutinlist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t05_rutin_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t05_rutin_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t01_tahunajaran">
-<div id="gmp_t01_tahunajaran" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
-<?php if ($t01_tahunajaran_list->TotalRecs > 0 || $t01_tahunajaran->CurrentAction == "gridedit") { ?>
-<table id="tbl_t01_tahunajaranlist" class="table ewTable">
-<?php echo $t01_tahunajaran->TableCustomInnerHtml ?>
+<input type="hidden" name="t" value="t05_rutin">
+<div id="gmp_t05_rutin" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
+<?php if ($t05_rutin_list->TotalRecs > 0 || $t05_rutin->CurrentAction == "gridedit") { ?>
+<table id="tbl_t05_rutinlist" class="table ewTable">
+<?php echo $t05_rutin->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$t01_tahunajaran_list->RowType = EW_ROWTYPE_HEADER;
+$t05_rutin_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$t01_tahunajaran_list->RenderListOptions();
+$t05_rutin_list->RenderListOptions();
 
 // Render list options (header, left)
-$t01_tahunajaran_list->ListOptions->Render("header", "left");
+$t05_rutin_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($t01_tahunajaran->Awal_Bulan->Visible) { // Awal_Bulan ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Awal_Bulan) == "") { ?>
-		<th data-name="Awal_Bulan"><div id="elh_t01_tahunajaran_Awal_Bulan" class="t01_tahunajaran_Awal_Bulan"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Awal_Bulan->FldCaption() ?></div></div></th>
+<?php if ($t05_rutin->Jenis->Visible) { // Jenis ?>
+	<?php if ($t05_rutin->SortUrl($t05_rutin->Jenis) == "") { ?>
+		<th data-name="Jenis"><div id="elh_t05_rutin_Jenis" class="t05_rutin_Jenis"><div class="ewTableHeaderCaption"><?php echo $t05_rutin->Jenis->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="Awal_Bulan"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Awal_Bulan) ?>',2);"><div id="elh_t01_tahunajaran_Awal_Bulan" class="t01_tahunajaran_Awal_Bulan">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Awal_Bulan->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Awal_Bulan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Awal_Bulan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t01_tahunajaran->Awal_Tahun->Visible) { // Awal_Tahun ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Awal_Tahun) == "") { ?>
-		<th data-name="Awal_Tahun"><div id="elh_t01_tahunajaran_Awal_Tahun" class="t01_tahunajaran_Awal_Tahun"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Awal_Tahun->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Awal_Tahun"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Awal_Tahun) ?>',2);"><div id="elh_t01_tahunajaran_Awal_Tahun" class="t01_tahunajaran_Awal_Tahun">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Awal_Tahun->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Awal_Tahun->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Awal_Tahun->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t01_tahunajaran->Akhir_Bulan->Visible) { // Akhir_Bulan ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Akhir_Bulan) == "") { ?>
-		<th data-name="Akhir_Bulan"><div id="elh_t01_tahunajaran_Akhir_Bulan" class="t01_tahunajaran_Akhir_Bulan"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Akhir_Bulan->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Akhir_Bulan"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Akhir_Bulan) ?>',2);"><div id="elh_t01_tahunajaran_Akhir_Bulan" class="t01_tahunajaran_Akhir_Bulan">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Akhir_Bulan->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Akhir_Bulan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Akhir_Bulan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t01_tahunajaran->Akhir_Tahun->Visible) { // Akhir_Tahun ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Akhir_Tahun) == "") { ?>
-		<th data-name="Akhir_Tahun"><div id="elh_t01_tahunajaran_Akhir_Tahun" class="t01_tahunajaran_Akhir_Tahun"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Akhir_Tahun->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Akhir_Tahun"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Akhir_Tahun) ?>',2);"><div id="elh_t01_tahunajaran_Akhir_Tahun" class="t01_tahunajaran_Akhir_Tahun">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Akhir_Tahun->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Akhir_Tahun->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Akhir_Tahun->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t01_tahunajaran->Tahun_Ajaran->Visible) { // Tahun_Ajaran ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Tahun_Ajaran) == "") { ?>
-		<th data-name="Tahun_Ajaran"><div id="elh_t01_tahunajaran_Tahun_Ajaran" class="t01_tahunajaran_Tahun_Ajaran"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Tahun_Ajaran"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Tahun_Ajaran) ?>',2);"><div id="elh_t01_tahunajaran_Tahun_Ajaran" class="t01_tahunajaran_Tahun_Ajaran">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Tahun_Ajaran->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Tahun_Ajaran->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-	<?php if ($t01_tahunajaran->SortUrl($t01_tahunajaran->Aktif) == "") { ?>
-		<th data-name="Aktif"><div id="elh_t01_tahunajaran_Aktif" class="t01_tahunajaran_Aktif"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Aktif"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Aktif) ?>',2);"><div id="elh_t01_tahunajaran_Aktif" class="t01_tahunajaran_Aktif">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Aktif->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Aktif->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Jenis"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t05_rutin->SortUrl($t05_rutin->Jenis) ?>',2);"><div id="elh_t05_rutin_Jenis" class="t05_rutin_Jenis">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t05_rutin->Jenis->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t05_rutin->Jenis->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t05_rutin->Jenis->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
 <?php
 
 // Render list options (header, right)
-$t01_tahunajaran_list->ListOptions->Render("header", "right");
+$t05_rutin_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($t01_tahunajaran->ExportAll && $t01_tahunajaran->Export <> "") {
-	$t01_tahunajaran_list->StopRec = $t01_tahunajaran_list->TotalRecs;
+if ($t05_rutin->ExportAll && $t05_rutin->Export <> "") {
+	$t05_rutin_list->StopRec = $t05_rutin_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($t01_tahunajaran_list->TotalRecs > $t01_tahunajaran_list->StartRec + $t01_tahunajaran_list->DisplayRecs - 1)
-		$t01_tahunajaran_list->StopRec = $t01_tahunajaran_list->StartRec + $t01_tahunajaran_list->DisplayRecs - 1;
+	if ($t05_rutin_list->TotalRecs > $t05_rutin_list->StartRec + $t05_rutin_list->DisplayRecs - 1)
+		$t05_rutin_list->StopRec = $t05_rutin_list->StartRec + $t05_rutin_list->DisplayRecs - 1;
 	else
-		$t01_tahunajaran_list->StopRec = $t01_tahunajaran_list->TotalRecs;
+		$t05_rutin_list->StopRec = $t05_rutin_list->TotalRecs;
 }
-$t01_tahunajaran_list->RecCnt = $t01_tahunajaran_list->StartRec - 1;
-if ($t01_tahunajaran_list->Recordset && !$t01_tahunajaran_list->Recordset->EOF) {
-	$t01_tahunajaran_list->Recordset->MoveFirst();
-	$bSelectLimit = $t01_tahunajaran_list->UseSelectLimit;
-	if (!$bSelectLimit && $t01_tahunajaran_list->StartRec > 1)
-		$t01_tahunajaran_list->Recordset->Move($t01_tahunajaran_list->StartRec - 1);
-} elseif (!$t01_tahunajaran->AllowAddDeleteRow && $t01_tahunajaran_list->StopRec == 0) {
-	$t01_tahunajaran_list->StopRec = $t01_tahunajaran->GridAddRowCount;
+
+// Restore number of post back records
+if ($objForm) {
+	$objForm->Index = -1;
+	if ($objForm->HasValue($t05_rutin_list->FormKeyCountName) && ($t05_rutin->CurrentAction == "gridadd" || $t05_rutin->CurrentAction == "gridedit" || $t05_rutin->CurrentAction == "F")) {
+		$t05_rutin_list->KeyCount = $objForm->GetValue($t05_rutin_list->FormKeyCountName);
+		$t05_rutin_list->StopRec = $t05_rutin_list->StartRec + $t05_rutin_list->KeyCount - 1;
+	}
+}
+$t05_rutin_list->RecCnt = $t05_rutin_list->StartRec - 1;
+if ($t05_rutin_list->Recordset && !$t05_rutin_list->Recordset->EOF) {
+	$t05_rutin_list->Recordset->MoveFirst();
+	$bSelectLimit = $t05_rutin_list->UseSelectLimit;
+	if (!$bSelectLimit && $t05_rutin_list->StartRec > 1)
+		$t05_rutin_list->Recordset->Move($t05_rutin_list->StartRec - 1);
+} elseif (!$t05_rutin->AllowAddDeleteRow && $t05_rutin_list->StopRec == 0) {
+	$t05_rutin_list->StopRec = $t05_rutin->GridAddRowCount;
 }
 
 // Initialize aggregate
-$t01_tahunajaran->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$t01_tahunajaran->ResetAttrs();
-$t01_tahunajaran_list->RenderRow();
-while ($t01_tahunajaran_list->RecCnt < $t01_tahunajaran_list->StopRec) {
-	$t01_tahunajaran_list->RecCnt++;
-	if (intval($t01_tahunajaran_list->RecCnt) >= intval($t01_tahunajaran_list->StartRec)) {
-		$t01_tahunajaran_list->RowCnt++;
+$t05_rutin->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$t05_rutin->ResetAttrs();
+$t05_rutin_list->RenderRow();
+if ($t05_rutin->CurrentAction == "gridadd")
+	$t05_rutin_list->RowIndex = 0;
+if ($t05_rutin->CurrentAction == "gridedit")
+	$t05_rutin_list->RowIndex = 0;
+while ($t05_rutin_list->RecCnt < $t05_rutin_list->StopRec) {
+	$t05_rutin_list->RecCnt++;
+	if (intval($t05_rutin_list->RecCnt) >= intval($t05_rutin_list->StartRec)) {
+		$t05_rutin_list->RowCnt++;
+		if ($t05_rutin->CurrentAction == "gridadd" || $t05_rutin->CurrentAction == "gridedit" || $t05_rutin->CurrentAction == "F") {
+			$t05_rutin_list->RowIndex++;
+			$objForm->Index = $t05_rutin_list->RowIndex;
+			if ($objForm->HasValue($t05_rutin_list->FormActionName))
+				$t05_rutin_list->RowAction = strval($objForm->GetValue($t05_rutin_list->FormActionName));
+			elseif ($t05_rutin->CurrentAction == "gridadd")
+				$t05_rutin_list->RowAction = "insert";
+			else
+				$t05_rutin_list->RowAction = "";
+		}
 
 		// Set up key count
-		$t01_tahunajaran_list->KeyCount = $t01_tahunajaran_list->RowIndex;
+		$t05_rutin_list->KeyCount = $t05_rutin_list->RowIndex;
 
 		// Init row class and style
-		$t01_tahunajaran->ResetAttrs();
-		$t01_tahunajaran->CssClass = "";
-		if ($t01_tahunajaran->CurrentAction == "gridadd") {
+		$t05_rutin->ResetAttrs();
+		$t05_rutin->CssClass = "";
+		if ($t05_rutin->CurrentAction == "gridadd") {
+			$t05_rutin_list->LoadDefaultValues(); // Load default values
 		} else {
-			$t01_tahunajaran_list->LoadRowValues($t01_tahunajaran_list->Recordset); // Load row values
+			$t05_rutin_list->LoadRowValues($t05_rutin_list->Recordset); // Load row values
 		}
-		$t01_tahunajaran->RowType = EW_ROWTYPE_VIEW; // Render view
+		$t05_rutin->RowType = EW_ROWTYPE_VIEW; // Render view
+		if ($t05_rutin->CurrentAction == "gridadd") // Grid add
+			$t05_rutin->RowType = EW_ROWTYPE_ADD; // Render add
+		if ($t05_rutin->CurrentAction == "gridadd" && $t05_rutin->EventCancelled && !$objForm->HasValue("k_blankrow")) // Insert failed
+			$t05_rutin_list->RestoreCurrentRowFormValues($t05_rutin_list->RowIndex); // Restore form values
+		if ($t05_rutin->CurrentAction == "gridedit") { // Grid edit
+			if ($t05_rutin->EventCancelled) {
+				$t05_rutin_list->RestoreCurrentRowFormValues($t05_rutin_list->RowIndex); // Restore form values
+			}
+			if ($t05_rutin_list->RowAction == "insert")
+				$t05_rutin->RowType = EW_ROWTYPE_ADD; // Render add
+			else
+				$t05_rutin->RowType = EW_ROWTYPE_EDIT; // Render edit
+		}
+		if ($t05_rutin->CurrentAction == "gridedit" && ($t05_rutin->RowType == EW_ROWTYPE_EDIT || $t05_rutin->RowType == EW_ROWTYPE_ADD) && $t05_rutin->EventCancelled) // Update failed
+			$t05_rutin_list->RestoreCurrentRowFormValues($t05_rutin_list->RowIndex); // Restore form values
+		if ($t05_rutin->RowType == EW_ROWTYPE_EDIT) // Edit row
+			$t05_rutin_list->EditRowCnt++;
 
 		// Set up row id / data-rowindex
-		$t01_tahunajaran->RowAttrs = array_merge($t01_tahunajaran->RowAttrs, array('data-rowindex'=>$t01_tahunajaran_list->RowCnt, 'id'=>'r' . $t01_tahunajaran_list->RowCnt . '_t01_tahunajaran', 'data-rowtype'=>$t01_tahunajaran->RowType));
+		$t05_rutin->RowAttrs = array_merge($t05_rutin->RowAttrs, array('data-rowindex'=>$t05_rutin_list->RowCnt, 'id'=>'r' . $t05_rutin_list->RowCnt . '_t05_rutin', 'data-rowtype'=>$t05_rutin->RowType));
 
 		// Render row
-		$t01_tahunajaran_list->RenderRow();
+		$t05_rutin_list->RenderRow();
 
 		// Render list options
-		$t01_tahunajaran_list->RenderListOptions();
+		$t05_rutin_list->RenderListOptions();
+
+		// Skip delete row / empty row for confirm page
+		if ($t05_rutin_list->RowAction <> "delete" && $t05_rutin_list->RowAction <> "insertdelete" && !($t05_rutin_list->RowAction == "insert" && $t05_rutin->CurrentAction == "F" && $t05_rutin_list->EmptyRow())) {
 ?>
-	<tr<?php echo $t01_tahunajaran->RowAttributes() ?>>
+	<tr<?php echo $t05_rutin->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$t01_tahunajaran_list->ListOptions->Render("body", "left", $t01_tahunajaran_list->RowCnt);
+$t05_rutin_list->ListOptions->Render("body", "left", $t05_rutin_list->RowCnt);
 ?>
-	<?php if ($t01_tahunajaran->Awal_Bulan->Visible) { // Awal_Bulan ?>
-		<td data-name="Awal_Bulan"<?php echo $t01_tahunajaran->Awal_Bulan->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Awal_Bulan" class="t01_tahunajaran_Awal_Bulan">
-<span<?php echo $t01_tahunajaran->Awal_Bulan->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Awal_Bulan->ListViewValue() ?></span>
+	<?php if ($t05_rutin->Jenis->Visible) { // Jenis ?>
+		<td data-name="Jenis"<?php echo $t05_rutin->Jenis->CellAttributes() ?>>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t05_rutin_list->RowCnt ?>_t05_rutin_Jenis" class="form-group t05_rutin_Jenis">
+<input type="text" data-table="t05_rutin" data-field="x_Jenis" name="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" id="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t05_rutin->Jenis->getPlaceHolder()) ?>" value="<?php echo $t05_rutin->Jenis->EditValue ?>"<?php echo $t05_rutin->Jenis->EditAttributes() ?>>
 </span>
-<a id="<?php echo $t01_tahunajaran_list->PageObjName . "_row_" . $t01_tahunajaran_list->RowCnt ?>"></a></td>
+<input type="hidden" data-table="t05_rutin" data-field="x_Jenis" name="o<?php echo $t05_rutin_list->RowIndex ?>_Jenis" id="o<?php echo $t05_rutin_list->RowIndex ?>_Jenis" value="<?php echo ew_HtmlEncode($t05_rutin->Jenis->OldValue) ?>">
+<?php } ?>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t05_rutin_list->RowCnt ?>_t05_rutin_Jenis" class="form-group t05_rutin_Jenis">
+<input type="text" data-table="t05_rutin" data-field="x_Jenis" name="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" id="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t05_rutin->Jenis->getPlaceHolder()) ?>" value="<?php echo $t05_rutin->Jenis->EditValue ?>"<?php echo $t05_rutin->Jenis->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t05_rutin_list->RowCnt ?>_t05_rutin_Jenis" class="t05_rutin_Jenis">
+<span<?php echo $t05_rutin->Jenis->ViewAttributes() ?>>
+<?php echo $t05_rutin->Jenis->ListViewValue() ?></span>
+</span>
+<?php } ?>
+<a id="<?php echo $t05_rutin_list->PageObjName . "_row_" . $t05_rutin_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($t01_tahunajaran->Awal_Tahun->Visible) { // Awal_Tahun ?>
-		<td data-name="Awal_Tahun"<?php echo $t01_tahunajaran->Awal_Tahun->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Awal_Tahun" class="t01_tahunajaran_Awal_Tahun">
-<span<?php echo $t01_tahunajaran->Awal_Tahun->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Awal_Tahun->ListViewValue() ?></span>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<input type="hidden" data-table="t05_rutin" data-field="x_id" name="x<?php echo $t05_rutin_list->RowIndex ?>_id" id="x<?php echo $t05_rutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t05_rutin->id->CurrentValue) ?>">
+<input type="hidden" data-table="t05_rutin" data-field="x_id" name="o<?php echo $t05_rutin_list->RowIndex ?>_id" id="o<?php echo $t05_rutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t05_rutin->id->OldValue) ?>">
+<?php } ?>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_EDIT || $t05_rutin->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t05_rutin" data-field="x_id" name="x<?php echo $t05_rutin_list->RowIndex ?>_id" id="x<?php echo $t05_rutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t05_rutin->id->CurrentValue) ?>">
+<?php } ?>
+<?php
+
+// Render list options (body, right)
+$t05_rutin_list->ListOptions->Render("body", "right", $t05_rutin_list->RowCnt);
+?>
+	</tr>
+<?php if ($t05_rutin->RowType == EW_ROWTYPE_ADD || $t05_rutin->RowType == EW_ROWTYPE_EDIT) { ?>
+<script type="text/javascript">
+ft05_rutinlist.UpdateOpts(<?php echo $t05_rutin_list->RowIndex ?>);
+</script>
+<?php } ?>
+<?php
+	}
+	} // End delete row checking
+	if ($t05_rutin->CurrentAction <> "gridadd")
+		if (!$t05_rutin_list->Recordset->EOF) $t05_rutin_list->Recordset->MoveNext();
+}
+?>
+<?php
+	if ($t05_rutin->CurrentAction == "gridadd" || $t05_rutin->CurrentAction == "gridedit") {
+		$t05_rutin_list->RowIndex = '$rowindex$';
+		$t05_rutin_list->LoadDefaultValues();
+
+		// Set row properties
+		$t05_rutin->ResetAttrs();
+		$t05_rutin->RowAttrs = array_merge($t05_rutin->RowAttrs, array('data-rowindex'=>$t05_rutin_list->RowIndex, 'id'=>'r0_t05_rutin', 'data-rowtype'=>EW_ROWTYPE_ADD));
+		ew_AppendClass($t05_rutin->RowAttrs["class"], "ewTemplate");
+		$t05_rutin->RowType = EW_ROWTYPE_ADD;
+
+		// Render row
+		$t05_rutin_list->RenderRow();
+
+		// Render list options
+		$t05_rutin_list->RenderListOptions();
+		$t05_rutin_list->StartRowCnt = 0;
+?>
+	<tr<?php echo $t05_rutin->RowAttributes() ?>>
+<?php
+
+// Render list options (body, left)
+$t05_rutin_list->ListOptions->Render("body", "left", $t05_rutin_list->RowIndex);
+?>
+	<?php if ($t05_rutin->Jenis->Visible) { // Jenis ?>
+		<td data-name="Jenis">
+<span id="el$rowindex$_t05_rutin_Jenis" class="form-group t05_rutin_Jenis">
+<input type="text" data-table="t05_rutin" data-field="x_Jenis" name="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" id="x<?php echo $t05_rutin_list->RowIndex ?>_Jenis" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t05_rutin->Jenis->getPlaceHolder()) ?>" value="<?php echo $t05_rutin->Jenis->EditValue ?>"<?php echo $t05_rutin->Jenis->EditAttributes() ?>>
 </span>
-</td>
-	<?php } ?>
-	<?php if ($t01_tahunajaran->Akhir_Bulan->Visible) { // Akhir_Bulan ?>
-		<td data-name="Akhir_Bulan"<?php echo $t01_tahunajaran->Akhir_Bulan->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Akhir_Bulan" class="t01_tahunajaran_Akhir_Bulan">
-<span<?php echo $t01_tahunajaran->Akhir_Bulan->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Akhir_Bulan->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t01_tahunajaran->Akhir_Tahun->Visible) { // Akhir_Tahun ?>
-		<td data-name="Akhir_Tahun"<?php echo $t01_tahunajaran->Akhir_Tahun->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Akhir_Tahun" class="t01_tahunajaran_Akhir_Tahun">
-<span<?php echo $t01_tahunajaran->Akhir_Tahun->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Akhir_Tahun->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t01_tahunajaran->Tahun_Ajaran->Visible) { // Tahun_Ajaran ?>
-		<td data-name="Tahun_Ajaran"<?php echo $t01_tahunajaran->Tahun_Ajaran->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Tahun_Ajaran" class="t01_tahunajaran_Tahun_Ajaran">
-<span<?php echo $t01_tahunajaran->Tahun_Ajaran->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Tahun_Ajaran->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-		<td data-name="Aktif"<?php echo $t01_tahunajaran->Aktif->CellAttributes() ?>>
-<span id="el<?php echo $t01_tahunajaran_list->RowCnt ?>_t01_tahunajaran_Aktif" class="t01_tahunajaran_Aktif">
-<span<?php echo $t01_tahunajaran->Aktif->ViewAttributes() ?>>
-<?php echo $t01_tahunajaran->Aktif->ListViewValue() ?></span>
-</span>
+<input type="hidden" data-table="t05_rutin" data-field="x_Jenis" name="o<?php echo $t05_rutin_list->RowIndex ?>_Jenis" id="o<?php echo $t05_rutin_list->RowIndex ?>_Jenis" value="<?php echo ew_HtmlEncode($t05_rutin->Jenis->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$t01_tahunajaran_list->ListOptions->Render("body", "right", $t01_tahunajaran_list->RowCnt);
+$t05_rutin_list->ListOptions->Render("body", "right", $t05_rutin_list->RowCnt);
 ?>
+<script type="text/javascript">
+ft05_rutinlist.UpdateOpts(<?php echo $t05_rutin_list->RowIndex ?>);
+</script>
 	</tr>
 <?php
-	}
-	if ($t01_tahunajaran->CurrentAction <> "gridadd")
-		$t01_tahunajaran_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($t01_tahunajaran->CurrentAction == "") { ?>
+<?php if ($t05_rutin->CurrentAction == "gridadd") { ?>
+<input type="hidden" name="a_list" id="a_list" value="gridinsert">
+<input type="hidden" name="<?php echo $t05_rutin_list->FormKeyCountName ?>" id="<?php echo $t05_rutin_list->FormKeyCountName ?>" value="<?php echo $t05_rutin_list->KeyCount ?>">
+<?php echo $t05_rutin_list->MultiSelectKey ?>
+<?php } ?>
+<?php if ($t05_rutin->CurrentAction == "gridedit") { ?>
+<input type="hidden" name="a_list" id="a_list" value="gridupdate">
+<input type="hidden" name="<?php echo $t05_rutin_list->FormKeyCountName ?>" id="<?php echo $t05_rutin_list->FormKeyCountName ?>" value="<?php echo $t05_rutin_list->KeyCount ?>">
+<?php echo $t05_rutin_list->MultiSelectKey ?>
+<?php } ?>
+<?php if ($t05_rutin->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2363,60 +2682,60 @@ $t01_tahunajaran_list->ListOptions->Render("body", "right", $t01_tahunajaran_lis
 <?php
 
 // Close recordset
-if ($t01_tahunajaran_list->Recordset)
-	$t01_tahunajaran_list->Recordset->Close();
+if ($t05_rutin_list->Recordset)
+	$t05_rutin_list->Recordset->Close();
 ?>
 <div class="panel-footer ewGridLowerPanel">
-<?php if ($t01_tahunajaran->CurrentAction <> "gridadd" && $t01_tahunajaran->CurrentAction <> "gridedit") { ?>
+<?php if ($t05_rutin->CurrentAction <> "gridadd" && $t05_rutin->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t01_tahunajaran_list->Pager)) $t01_tahunajaran_list->Pager = new cPrevNextPager($t01_tahunajaran_list->StartRec, $t01_tahunajaran_list->DisplayRecs, $t01_tahunajaran_list->TotalRecs) ?>
-<?php if ($t01_tahunajaran_list->Pager->RecordCount > 0 && $t01_tahunajaran_list->Pager->Visible) { ?>
+<?php if (!isset($t05_rutin_list->Pager)) $t05_rutin_list->Pager = new cPrevNextPager($t05_rutin_list->StartRec, $t05_rutin_list->DisplayRecs, $t05_rutin_list->TotalRecs) ?>
+<?php if ($t05_rutin_list->Pager->RecordCount > 0 && $t05_rutin_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t01_tahunajaran_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t01_tahunajaran_list->PageUrl() ?>start=<?php echo $t01_tahunajaran_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t05_rutin_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t05_rutin_list->PageUrl() ?>start=<?php echo $t05_rutin_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t01_tahunajaran_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t01_tahunajaran_list->PageUrl() ?>start=<?php echo $t01_tahunajaran_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t05_rutin_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t05_rutin_list->PageUrl() ?>start=<?php echo $t05_rutin_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t01_tahunajaran_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t05_rutin_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t01_tahunajaran_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t01_tahunajaran_list->PageUrl() ?>start=<?php echo $t01_tahunajaran_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t05_rutin_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t05_rutin_list->PageUrl() ?>start=<?php echo $t05_rutin_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t01_tahunajaran_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t01_tahunajaran_list->PageUrl() ?>start=<?php echo $t01_tahunajaran_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t05_rutin_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t05_rutin_list->PageUrl() ?>start=<?php echo $t05_rutin_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t01_tahunajaran_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t05_rutin_list->Pager->PageCount ?></span>
 </div>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t01_tahunajaran_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t01_tahunajaran_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t01_tahunajaran_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t05_rutin_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t05_rutin_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t05_rutin_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
 </form>
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t01_tahunajaran_list->OtherOptions as &$option)
+	foreach ($t05_rutin_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2424,10 +2743,10 @@ if ($t01_tahunajaran_list->Recordset)
 </div>
 </div>
 <?php } ?>
-<?php if ($t01_tahunajaran_list->TotalRecs == 0 && $t01_tahunajaran->CurrentAction == "") { // Show other options ?>
+<?php if ($t05_rutin_list->TotalRecs == 0 && $t05_rutin->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t01_tahunajaran_list->OtherOptions as &$option) {
+	foreach ($t05_rutin_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2436,12 +2755,12 @@ if ($t01_tahunajaran_list->Recordset)
 <div class="clearfix"></div>
 <?php } ?>
 <script type="text/javascript">
-ft01_tahunajaranlistsrch.FilterList = <?php echo $t01_tahunajaran_list->GetFilterList() ?>;
-ft01_tahunajaranlistsrch.Init();
-ft01_tahunajaranlist.Init();
+ft05_rutinlistsrch.FilterList = <?php echo $t05_rutin_list->GetFilterList() ?>;
+ft05_rutinlistsrch.Init();
+ft05_rutinlist.Init();
 </script>
 <?php
-$t01_tahunajaran_list->ShowPageFooter();
+$t05_rutin_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -2453,5 +2772,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t01_tahunajaran_list->Page_Terminate();
+$t05_rutin_list->Page_Terminate();
 ?>

@@ -117,7 +117,7 @@ class cewupload {
 	var $PageID = "upload";
 
 	// Project ID
-	var $ProjectID = "{1437F52B-7E7A-46CA-851B-958195C82267}";
+	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
 
 	// Page object name
 	var $PageObjName = "upload";
