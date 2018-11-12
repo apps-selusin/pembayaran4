@@ -43,6 +43,20 @@ function f_buat_rincian_pembayaran($rsold, $rsnew) {
 		)";
 	Conn()->Execute($q);
 	*/
+	$abulan = array("",
+		"Januari",
+		"Februari",
+		"Maret",
+		"April",
+		"Mei",
+		"Juni",
+		"Juli",
+		"Agustus",
+		"September",
+		"Oktober",
+		"November",
+		"Desember"
+		);
 
 	// simpan data di tabel rincian pembayaran rutin t07_siswarutinbayar
 	while ($awal != $akhir) {
@@ -56,15 +70,33 @@ function f_buat_rincian_pembayaran($rsold, $rsnew) {
 				siswarutin_id,
 				Bulan,
 				Tahun,
-				Nilai
+				Nilai,
+				Periode_Tahun_Bulan,
+				Periode_Text
 			) values (
 			".$rsnew["id"].",
 			".$bulan.",
 			".$tahun.",
-			".$rsnew["Nilai"]."
+			".$rsnew["Nilai"].",
+			'".$tahun.substr("00".$bulan, -2)."',
+			'".$abulan[$bulan]." ".$tahun."'
 			)";
 		Conn()->Execute($q);
 		$awal = $bulan.$tahun;
 	}
+
+	// simpan data di tabel t06_siswarutintemp
+	$q = "insert into
+		t06_siswarutintemp (
+			siswa_id,
+			rutin_id,
+			siswarutin_id
+		) values (
+		".$rsnew["siswa_id"].",
+		".$rsnew["rutin_id"].",
+		".$rsnew["id"]."
+		)
+		";
+	Conn()->Execute($q);
 }
 ?>

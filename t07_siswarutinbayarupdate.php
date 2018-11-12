@@ -557,12 +557,13 @@ class ct07_siswarutinbayar_update extends ct07_siswarutinbayar {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswarutin_id->setDbValue($rs->fields('siswarutin_id'));
-		$this->Bulan->setDbValue($rs->fields('Bulan'));
-		$this->Tahun->setDbValue($rs->fields('Tahun'));
+		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
 		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
 		$this->Nilai_Bayar->setDbValue($rs->fields('Nilai_Bayar'));
-		$this->Periode->setDbValue($rs->fields('Periode'));
+		$this->Bulan->setDbValue($rs->fields('Bulan'));
+		$this->Tahun->setDbValue($rs->fields('Tahun'));
+		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
 	}
 
 	// Load DbValue from recordset
@@ -571,12 +572,13 @@ class ct07_siswarutinbayar_update extends ct07_siswarutinbayar {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->siswarutin_id->DbValue = $row['siswarutin_id'];
-		$this->Bulan->DbValue = $row['Bulan'];
-		$this->Tahun->DbValue = $row['Tahun'];
+		$this->Periode_Tahun_Bulan->DbValue = $row['Periode_Tahun_Bulan'];
 		$this->Nilai->DbValue = $row['Nilai'];
 		$this->Tanggal_Bayar->DbValue = $row['Tanggal_Bayar'];
 		$this->Nilai_Bayar->DbValue = $row['Nilai_Bayar'];
-		$this->Periode->DbValue = $row['Periode'];
+		$this->Bulan->DbValue = $row['Bulan'];
+		$this->Tahun->DbValue = $row['Tahun'];
+		$this->Periode_Text->DbValue = $row['Periode_Text'];
 	}
 
 	// Render row values based on field settings
@@ -591,12 +593,13 @@ class ct07_siswarutinbayar_update extends ct07_siswarutinbayar {
 		// Common render codes for all row types
 		// id
 		// siswarutin_id
-		// Bulan
-		// Tahun
+		// Periode_Tahun_Bulan
 		// Nilai
 		// Tanggal_Bayar
 		// Nilai_Bayar
-		// Periode
+		// Bulan
+		// Tahun
+		// Periode_Text
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -607,6 +610,48 @@ class ct07_siswarutinbayar_update extends ct07_siswarutinbayar {
 		// siswarutin_id
 		$this->siswarutin_id->ViewValue = $this->siswarutin_id->CurrentValue;
 		$this->siswarutin_id->ViewCustomAttributes = "";
+
+		// Periode_Tahun_Bulan
+		if (strval($this->Periode_Tahun_Bulan->CurrentValue) <> "") {
+			$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Tahun_Bulan->CurrentValue, EW_DATATYPE_STRING, "");
+		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Periode_Tahun_Bulan->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Periode_Tahun_Bulan, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->CurrentValue;
+			}
+		} else {
+			$this->Periode_Tahun_Bulan->ViewValue = NULL;
+		}
+		$this->Periode_Tahun_Bulan->ViewCustomAttributes = "";
+
+		// Nilai
+		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
+		$this->Nilai->ViewValue = ew_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
+		$this->Nilai->CellCssStyle .= "text-align: right;";
+		$this->Nilai->ViewCustomAttributes = "";
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
+		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
+		$this->Tanggal_Bayar->ViewCustomAttributes = "";
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
+		$this->Nilai_Bayar->ViewValue = ew_FormatNumber($this->Nilai_Bayar->ViewValue, 2, -2, -2, -2);
+		$this->Nilai_Bayar->CellCssStyle .= "text-align: right;";
+		$this->Nilai_Bayar->ViewCustomAttributes = "";
 
 		// Bulan
 		if (strval($this->Bulan->CurrentValue) <> "") {
@@ -658,26 +703,30 @@ class ct07_siswarutinbayar_update extends ct07_siswarutinbayar {
 		}
 		$this->Tahun->ViewCustomAttributes = "";
 
-		// Nilai
-		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
-		$this->Nilai->ViewValue = ew_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
-		$this->Nilai->CellCssStyle .= "text-align: right;";
-		$this->Nilai->ViewCustomAttributes = "";
-
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
-		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
-		$this->Tanggal_Bayar->ViewCustomAttributes = "";
-
-		// Nilai_Bayar
-		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
-		$this->Nilai_Bayar->ViewValue = ew_FormatNumber($this->Nilai_Bayar->ViewValue, 2, -2, -2, -2);
-		$this->Nilai_Bayar->CellCssStyle .= "text-align: right;";
-		$this->Nilai_Bayar->ViewCustomAttributes = "";
-
-		// Periode
-		$this->Periode->ViewValue = $this->Periode->CurrentValue;
-		$this->Periode->ViewCustomAttributes = "";
+		// Periode_Text
+		if (strval($this->Periode_Text->CurrentValue) <> "") {
+			$sFilterWrk = "`Periode_Text`" . ew_SearchString("=", $this->Periode_Text->CurrentValue, EW_DATATYPE_STRING, "");
+		$sSqlWrk = "SELECT `Periode_Text`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Periode_Text->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Periode_Text, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Periode_Text->ViewValue = $this->Periode_Text->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
+			}
+		} else {
+			$this->Periode_Text->ViewValue = NULL;
+		}
+		$this->Periode_Text->ViewCustomAttributes = "";
 
 			// Tanggal_Bayar
 			$this->Tanggal_Bayar->LinkCustomAttributes = "";
@@ -1031,6 +1080,11 @@ $t07_siswarutinbayar_update->ShowMessage();
 		<div class="col-sm-10"><div<?php echo $t07_siswarutinbayar->Tanggal_Bayar->CellAttributes() ?>>
 <span id="el_t07_siswarutinbayar_Tanggal_Bayar">
 <input type="text" data-table="t07_siswarutinbayar" data-field="x_Tanggal_Bayar" data-format="7" name="x_Tanggal_Bayar" id="x_Tanggal_Bayar" placeholder="<?php echo ew_HtmlEncode($t07_siswarutinbayar->Tanggal_Bayar->getPlaceHolder()) ?>" value="<?php echo $t07_siswarutinbayar->Tanggal_Bayar->EditValue ?>"<?php echo $t07_siswarutinbayar->Tanggal_Bayar->EditAttributes() ?>>
+<?php if (!$t07_siswarutinbayar->Tanggal_Bayar->ReadOnly && !$t07_siswarutinbayar->Tanggal_Bayar->Disabled && !isset($t07_siswarutinbayar->Tanggal_Bayar->EditAttrs["readonly"]) && !isset($t07_siswarutinbayar->Tanggal_Bayar->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateCalendar("ft07_siswarutinbayarupdate", "x_Tanggal_Bayar", 7);
+</script>
+<?php } ?>
 </span>
 <?php echo $t07_siswarutinbayar->Tanggal_Bayar->CustomMsg ?></div></div>
 	</div>

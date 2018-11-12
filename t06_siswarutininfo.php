@@ -1140,6 +1140,10 @@ class ct06_siswarutin extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// buat rincian pembayaran PER PERIODE di tabel t07_siswarutinbayar
+		// dan
+		// buat rincian INPUT PEMBAYARAN di tabel t06_siswarutintemp
+
 		f_buat_rincian_pembayaran($rsold, $rsnew);
 	}
 
