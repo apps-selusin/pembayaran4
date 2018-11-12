@@ -40,6 +40,9 @@ ft04_siswagrid.Validate = function() {
 		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
 		if (checkrow) {
 			addcnt++;
+			elm = this.GetElements("x" + infix + "_sekolah_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t04_siswa->sekolah_id->FldCaption(), $t04_siswa->sekolah_id->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_kelas_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t04_siswa->kelas_id->FldCaption(), $t04_siswa->kelas_id->ReqErrMsg)) ?>");
@@ -61,6 +64,7 @@ ft04_siswagrid.Validate = function() {
 // Check empty row
 ft04_siswagrid.EmptyRow = function(infix) {
 	var fobj = this.Form;
+	if (ew_ValueChanged(fobj, infix, "sekolah_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "kelas_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "NIS", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "Nama", false)) return false;
@@ -83,7 +87,8 @@ ft04_siswagrid.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-ft04_siswagrid.Lists["x_kelas_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kelas","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t03_kelas"};
+ft04_siswagrid.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":["x_kelas_id"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
+ft04_siswagrid.Lists["x_kelas_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kelas","","",""],"ParentFields":["x_sekolah_id"],"ChildFields":[],"FilterFields":["x_sekolah_id"],"Options":[],"Template":"","LinkTable":"t03_kelas"};
 
 // Form object for search
 </script>
@@ -155,6 +160,15 @@ $t04_siswa_grid->RenderListOptions();
 // Render list options (header, left)
 $t04_siswa_grid->ListOptions->Render("header", "left");
 ?>
+<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+	<?php if ($t04_siswa->SortUrl($t04_siswa->sekolah_id) == "") { ?>
+		<th data-name="sekolah_id"><div id="elh_t04_siswa_sekolah_id" class="t04_siswa_sekolah_id"><div class="ewTableHeaderCaption"><?php echo $t04_siswa->sekolah_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="sekolah_id"><div><div id="elh_t04_siswa_sekolah_id" class="t04_siswa_sekolah_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t04_siswa->sekolah_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t04_siswa->sekolah_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t04_siswa->sekolah_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 	<?php if ($t04_siswa->SortUrl($t04_siswa->kelas_id) == "") { ?>
 		<th data-name="kelas_id"><div id="elh_t04_siswa_kelas_id" class="t04_siswa_kelas_id"><div class="ewTableHeaderCaption"><?php echo $t04_siswa->kelas_id->FldCaption() ?></div></div></th>
@@ -291,6 +305,65 @@ while ($t04_siswa_grid->RecCnt < $t04_siswa_grid->StopRec) {
 // Render list options (body, left)
 $t04_siswa_grid->ListOptions->Render("body", "left", $t04_siswa_grid->RowCnt);
 ?>
+	<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<td data-name="sekolah_id"<?php echo $t04_siswa->sekolah_id->CellAttributes() ?>>
+<?php if ($t04_siswa->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<?php if ($t04_siswa->sekolah_id->getSessionValue() <> "") { ?>
+<span id="el<?php echo $t04_siswa_grid->RowCnt ?>_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t04_siswa->sekolah_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el<?php echo $t04_siswa_grid->RowCnt ?>_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<?php $t04_siswa->sekolah_id->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t04_siswa->sekolah_id->EditAttrs["onchange"]; ?>
+<select data-table="t04_siswa" data-field="x_sekolah_id" data-value-separator="<?php echo $t04_siswa->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id"<?php echo $t04_siswa->sekolah_id->EditAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->SelectOptionListHtml("x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo $t04_siswa->sekolah_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->OldValue) ?>">
+<?php } ?>
+<?php if ($t04_siswa->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($t04_siswa->sekolah_id->getSessionValue() <> "") { ?>
+<span id="el<?php echo $t04_siswa_grid->RowCnt ?>_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t04_siswa->sekolah_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el<?php echo $t04_siswa_grid->RowCnt ?>_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<?php $t04_siswa->sekolah_id->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t04_siswa->sekolah_id->EditAttrs["onchange"]; ?>
+<select data-table="t04_siswa" data-field="x_sekolah_id" data-value-separator="<?php echo $t04_siswa->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id"<?php echo $t04_siswa->sekolah_id->EditAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->SelectOptionListHtml("x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo $t04_siswa->sekolah_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($t04_siswa->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t04_siswa_grid->RowCnt ?>_t04_siswa_sekolah_id" class="t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->ListViewValue() ?></span>
+</span>
+<?php if ($t04_siswa->CurrentAction <> "F") { ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->FormValue) ?>">
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="ft04_siswagrid$x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="ft04_siswagrid$x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->FormValue) ?>">
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="ft04_siswagrid$o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="ft04_siswagrid$o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+<a id="<?php echo $t04_siswa_grid->PageObjName . "_row_" . $t04_siswa_grid->RowCnt ?>"></a></td>
+	<?php } ?>
+<?php if ($t04_siswa->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->CurrentValue) ?>">
+<input type="hidden" data-table="t04_siswa" data-field="x_id" name="o<?php echo $t04_siswa_grid->RowIndex ?>_id" id="o<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->OldValue) ?>">
+<?php } ?>
+<?php if ($t04_siswa->RowType == EW_ROWTYPE_EDIT || $t04_siswa->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->CurrentValue) ?>">
+<?php } ?>
 	<?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 		<td data-name="kelas_id"<?php echo $t04_siswa->kelas_id->CellAttributes() ?>>
 <?php if ($t04_siswa->RowType == EW_ROWTYPE_ADD) { // Add record ?>
@@ -339,15 +412,8 @@ $t04_siswa_grid->ListOptions->Render("body", "left", $t04_siswa_grid->RowCnt);
 <input type="hidden" data-table="t04_siswa" data-field="x_kelas_id" name="ft04_siswagrid$o<?php echo $t04_siswa_grid->RowIndex ?>_kelas_id" id="ft04_siswagrid$o<?php echo $t04_siswa_grid->RowIndex ?>_kelas_id" value="<?php echo ew_HtmlEncode($t04_siswa->kelas_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
-<a id="<?php echo $t04_siswa_grid->PageObjName . "_row_" . $t04_siswa_grid->RowCnt ?>"></a></td>
+</td>
 	<?php } ?>
-<?php if ($t04_siswa->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t04_siswa" data-field="x_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->CurrentValue) ?>">
-<input type="hidden" data-table="t04_siswa" data-field="x_id" name="o<?php echo $t04_siswa_grid->RowIndex ?>_id" id="o<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->OldValue) ?>">
-<?php } ?>
-<?php if ($t04_siswa->RowType == EW_ROWTYPE_EDIT || $t04_siswa->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t04_siswa" data-field="x_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t04_siswa->NIS->Visible) { // NIS ?>
 		<td data-name="NIS"<?php echo $t04_siswa->NIS->CellAttributes() ?>>
 <?php if ($t04_siswa->RowType == EW_ROWTYPE_ADD) { // Add record ?>
@@ -446,6 +512,34 @@ ft04_siswagrid.UpdateOpts(<?php echo $t04_siswa_grid->RowIndex ?>);
 // Render list options (body, left)
 $t04_siswa_grid->ListOptions->Render("body", "left", $t04_siswa_grid->RowIndex);
 ?>
+	<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<td data-name="sekolah_id">
+<?php if ($t04_siswa->CurrentAction <> "F") { ?>
+<?php if ($t04_siswa->sekolah_id->getSessionValue() <> "") { ?>
+<span id="el$rowindex$_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t04_siswa->sekolah_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el$rowindex$_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<?php $t04_siswa->sekolah_id->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t04_siswa->sekolah_id->EditAttrs["onchange"]; ?>
+<select data-table="t04_siswa" data-field="x_sekolah_id" data-value-separator="<?php echo $t04_siswa->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id"<?php echo $t04_siswa->sekolah_id->EditAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->SelectOptionListHtml("x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="s_x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo $t04_siswa->sekolah_id->LookupFilterQuery() ?>">
+</span>
+<?php } ?>
+<?php } else { ?>
+<span id="el$rowindex$_t04_siswa_sekolah_id" class="form-group t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t04_siswa->sekolah_id->ViewValue ?></p></span>
+</span>
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="x<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="t04_siswa" data-field="x_sekolah_id" name="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" id="o<?php echo $t04_siswa_grid->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t04_siswa->sekolah_id->OldValue) ?>">
+</td>
+	<?php } ?>
 	<?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 		<td data-name="kelas_id">
 <?php if ($t04_siswa->CurrentAction <> "F") { ?>

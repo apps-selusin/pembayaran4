@@ -5,8 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t04_siswainfo.php" ?>
-<?php include_once "t06_siswarutingridcls.php" ?>
+<?php include_once "t99_audittrailinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -14,9 +13,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t04_siswa_view = NULL; // Initialize page object first
+$t99_audittrail_view = NULL; // Initialize page object first
 
-class ct04_siswa_view extends ct04_siswa {
+class ct99_audittrail_view extends ct99_audittrail {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +24,10 @@ class ct04_siswa_view extends ct04_siswa {
 	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
-	var $TableName = 't04_siswa';
+	var $TableName = 't99_audittrail';
 
 	// Page object name
-	var $PageObjName = 't04_siswa_view';
+	var $PageObjName = 't99_audittrail_view';
 
 	// Page name
 	function PageName() {
@@ -257,10 +256,10 @@ class ct04_siswa_view extends ct04_siswa {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t04_siswa)
-		if (!isset($GLOBALS["t04_siswa"]) || get_class($GLOBALS["t04_siswa"]) == "ct04_siswa") {
-			$GLOBALS["t04_siswa"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t04_siswa"];
+		// Table object (t99_audittrail)
+		if (!isset($GLOBALS["t99_audittrail"]) || get_class($GLOBALS["t99_audittrail"]) == "ct99_audittrail") {
+			$GLOBALS["t99_audittrail"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t99_audittrail"];
 		}
 		$KeyUrl = "";
 		if (@$_GET["id"] <> "") {
@@ -281,7 +280,7 @@ class ct04_siswa_view extends ct04_siswa {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't04_siswa', TRUE);
+			define("EW_TABLE_NAME", 't99_audittrail', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -309,10 +308,17 @@ class ct04_siswa_view extends ct04_siswa {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->sekolah_id->SetVisibility();
-		$this->kelas_id->SetVisibility();
-		$this->NIS->SetVisibility();
-		$this->Nama->SetVisibility();
+		$this->id->SetVisibility();
+		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->datetime->SetVisibility();
+		$this->script->SetVisibility();
+		$this->user->SetVisibility();
+		$this->action->SetVisibility();
+		$this->_table->SetVisibility();
+		$this->_field->SetVisibility();
+		$this->keyvalue->SetVisibility();
+		$this->oldvalue->SetVisibility();
+		$this->newvalue->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -344,13 +350,13 @@ class ct04_siswa_view extends ct04_siswa {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t04_siswa;
+		global $EW_EXPORT, $t99_audittrail;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t04_siswa);
+				$doc = new $class($t99_audittrail);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -433,7 +439,7 @@ class ct04_siswa_view extends ct04_siswa {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("t04_siswalist.php"); // Return to list page
+						$this->Page_Terminate("t99_audittraillist.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetUpStartRec(); // Set up start record position
 
@@ -457,13 +463,13 @@ class ct04_siswa_view extends ct04_siswa {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "t04_siswalist.php"; // No matching record, return to list
+						$sReturnUrl = "t99_audittraillist.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
 			}
 		} else {
-			$sReturnUrl = "t04_siswalist.php"; // Not page request, return to list
+			$sReturnUrl = "t99_audittraillist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -476,9 +482,6 @@ class ct04_siswa_view extends ct04_siswa {
 		$this->RowType = EW_ROWTYPE_VIEW;
 		$this->ResetAttrs();
 		$this->RenderRow();
-
-		// Set up detail parameters
-		$this->SetUpDetailParms();
 	}
 
 	// Set up other options
@@ -521,81 +524,6 @@ class ct04_siswa_view extends ct04_siswa {
 		else
 			$item->Body = "<a class=\"ewAction ewDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewPageDeleteLink")) . "\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
 		$item->Visible = ($this->DeleteUrl <> "");
-		$option = &$options["detail"];
-		$DetailTableLink = "";
-		$DetailViewTblVar = "";
-		$DetailCopyTblVar = "";
-		$DetailEditTblVar = "";
-
-		// "detail_t06_siswarutin"
-		$item = &$option->Add("detail_t06_siswarutin");
-		$body = $Language->Phrase("ViewPageDetailLink") . $Language->TablePhrase("t06_siswarutin", "TblCaption");
-		$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t06_siswarutinlist.php?" . EW_TABLE_SHOW_MASTER . "=t04_siswa&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
-		$links = "";
-		if ($GLOBALS["t06_siswarutin_grid"] && $GLOBALS["t06_siswarutin_grid"]->DetailView) {
-			$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=t06_siswarutin")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
-			if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
-			$DetailViewTblVar .= "t06_siswarutin";
-		}
-		if ($GLOBALS["t06_siswarutin_grid"] && $GLOBALS["t06_siswarutin_grid"]->DetailEdit) {
-			$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=t06_siswarutin")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
-			if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
-			$DetailEditTblVar .= "t06_siswarutin";
-		}
-		if ($GLOBALS["t06_siswarutin_grid"] && $GLOBALS["t06_siswarutin_grid"]->DetailAdd) {
-			$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=t06_siswarutin")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
-			if ($DetailCopyTblVar <> "") $DetailCopyTblVar .= ",";
-			$DetailCopyTblVar .= "t06_siswarutin";
-		}
-		if ($links <> "") {
-			$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
-			$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
-		}
-		$body = "<div class=\"btn-group\">" . $body . "</div>";
-		$item->Body = $body;
-		$item->Visible = TRUE;
-		if ($item->Visible) {
-			if ($DetailTableLink <> "") $DetailTableLink .= ",";
-			$DetailTableLink .= "t06_siswarutin";
-		}
-		if ($this->ShowMultipleDetails) $item->Visible = FALSE;
-
-		// Multiple details
-		if ($this->ShowMultipleDetails) {
-			$body = $Language->Phrase("MultipleMasterDetails");
-			$body = "<div class=\"btn-group\">";
-			$links = "";
-			if ($DetailViewTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailViewTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
-			}
-			if ($DetailEditTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailEditTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
-			}
-			if ($DetailCopyTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailCopyTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
-			}
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewMasterDetail\" title=\"" . ew_HtmlTitle($Language->Phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->Phrase("MultipleMasterDetails") . "<b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu ewMenu\">". $links . "</ul>";
-			}
-			$body .= "</div>";
-
-			// Multiple details
-			$oListOpt = &$option->Add("details");
-			$oListOpt->Body = $body;
-		}
-
-		// Set up detail default
-		$option = &$options["detail"];
-		$options["detail"]->DropDownButtonPhrase = $Language->Phrase("ButtonDetails");
-		$option->UseImageAndText = TRUE;
-		$ar = explode(",", $DetailTableLink);
-		$cnt = count($ar);
-		$option->UseDropDownButton = ($cnt > 1);
-		$option->UseButtonGroup = TRUE;
-		$item = &$option->Add($option->GroupOptionName);
-		$item->Body = "";
-		$item->Visible = FALSE;
 
 		// Set up action default
 		$option = &$options["action"];
@@ -701,10 +629,15 @@ class ct04_siswa_view extends ct04_siswa {
 		$this->Row_Selected($row);
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->sekolah_id->setDbValue($rs->fields('sekolah_id'));
-		$this->kelas_id->setDbValue($rs->fields('kelas_id'));
-		$this->NIS->setDbValue($rs->fields('NIS'));
-		$this->Nama->setDbValue($rs->fields('Nama'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->script->setDbValue($rs->fields('script'));
+		$this->user->setDbValue($rs->fields('user'));
+		$this->action->setDbValue($rs->fields('action'));
+		$this->_table->setDbValue($rs->fields('table'));
+		$this->_field->setDbValue($rs->fields('field'));
+		$this->keyvalue->setDbValue($rs->fields('keyvalue'));
+		$this->oldvalue->setDbValue($rs->fields('oldvalue'));
+		$this->newvalue->setDbValue($rs->fields('newvalue'));
 	}
 
 	// Load DbValue from recordset
@@ -712,10 +645,15 @@ class ct04_siswa_view extends ct04_siswa {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->sekolah_id->DbValue = $row['sekolah_id'];
-		$this->kelas_id->DbValue = $row['kelas_id'];
-		$this->NIS->DbValue = $row['NIS'];
-		$this->Nama->DbValue = $row['Nama'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->script->DbValue = $row['script'];
+		$this->user->DbValue = $row['user'];
+		$this->action->DbValue = $row['action'];
+		$this->_table->DbValue = $row['table'];
+		$this->_field->DbValue = $row['field'];
+		$this->keyvalue->DbValue = $row['keyvalue'];
+		$this->oldvalue->DbValue = $row['oldvalue'];
+		$this->newvalue->DbValue = $row['newvalue'];
 	}
 
 	// Render row values based on field settings
@@ -735,10 +673,15 @@ class ct04_siswa_view extends ct04_siswa {
 
 		// Common render codes for all row types
 		// id
-		// sekolah_id
-		// kelas_id
-		// NIS
-		// Nama
+		// datetime
+		// script
+		// user
+		// action
+		// table
+		// field
+		// keyvalue
+		// oldvalue
+		// newvalue
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -746,79 +689,92 @@ class ct04_siswa_view extends ct04_siswa {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// sekolah_id
-		if (strval($this->sekolah_id->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
-		$sWhereWrk = "";
-		$this->sekolah_id->LookupFilters = array();
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
-			}
-		} else {
-			$this->sekolah_id->ViewValue = NULL;
-		}
-		$this->sekolah_id->ViewCustomAttributes = "";
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewValue = ew_FormatDateTime($this->datetime->ViewValue, 0);
+		$this->datetime->ViewCustomAttributes = "";
 
-		// kelas_id
-		if (strval($this->kelas_id->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->kelas_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kelas` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t03_kelas`";
-		$sWhereWrk = "";
-		$this->kelas_id->LookupFilters = array();
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->kelas_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->kelas_id->ViewValue = $this->kelas_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->kelas_id->ViewValue = $this->kelas_id->CurrentValue;
-			}
-		} else {
-			$this->kelas_id->ViewValue = NULL;
-		}
-		$this->kelas_id->ViewCustomAttributes = "";
+		// script
+		$this->script->ViewValue = $this->script->CurrentValue;
+		$this->script->ViewCustomAttributes = "";
 
-		// NIS
-		$this->NIS->ViewValue = $this->NIS->CurrentValue;
-		$this->NIS->ViewCustomAttributes = "";
+		// user
+		$this->user->ViewValue = $this->user->CurrentValue;
+		$this->user->ViewCustomAttributes = "";
 
-		// Nama
-		$this->Nama->ViewValue = $this->Nama->CurrentValue;
-		$this->Nama->ViewCustomAttributes = "";
+		// action
+		$this->action->ViewValue = $this->action->CurrentValue;
+		$this->action->ViewCustomAttributes = "";
 
-			// sekolah_id
-			$this->sekolah_id->LinkCustomAttributes = "";
-			$this->sekolah_id->HrefValue = "";
-			$this->sekolah_id->TooltipValue = "";
+		// table
+		$this->_table->ViewValue = $this->_table->CurrentValue;
+		$this->_table->ViewCustomAttributes = "";
 
-			// kelas_id
-			$this->kelas_id->LinkCustomAttributes = "";
-			$this->kelas_id->HrefValue = "";
-			$this->kelas_id->TooltipValue = "";
+		// field
+		$this->_field->ViewValue = $this->_field->CurrentValue;
+		$this->_field->ViewCustomAttributes = "";
 
-			// NIS
-			$this->NIS->LinkCustomAttributes = "";
-			$this->NIS->HrefValue = "";
-			$this->NIS->TooltipValue = "";
+		// keyvalue
+		$this->keyvalue->ViewValue = $this->keyvalue->CurrentValue;
+		$this->keyvalue->ViewCustomAttributes = "";
 
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-			$this->Nama->TooltipValue = "";
+		// oldvalue
+		$this->oldvalue->ViewValue = $this->oldvalue->CurrentValue;
+		$this->oldvalue->ViewCustomAttributes = "";
+
+		// newvalue
+		$this->newvalue->ViewValue = $this->newvalue->CurrentValue;
+		$this->newvalue->ViewCustomAttributes = "";
+
+			// id
+			$this->id->LinkCustomAttributes = "";
+			$this->id->HrefValue = "";
+			$this->id->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// script
+			$this->script->LinkCustomAttributes = "";
+			$this->script->HrefValue = "";
+			$this->script->TooltipValue = "";
+
+			// user
+			$this->user->LinkCustomAttributes = "";
+			$this->user->HrefValue = "";
+			$this->user->TooltipValue = "";
+
+			// action
+			$this->action->LinkCustomAttributes = "";
+			$this->action->HrefValue = "";
+			$this->action->TooltipValue = "";
+
+			// table
+			$this->_table->LinkCustomAttributes = "";
+			$this->_table->HrefValue = "";
+			$this->_table->TooltipValue = "";
+
+			// field
+			$this->_field->LinkCustomAttributes = "";
+			$this->_field->HrefValue = "";
+			$this->_field->TooltipValue = "";
+
+			// keyvalue
+			$this->keyvalue->LinkCustomAttributes = "";
+			$this->keyvalue->HrefValue = "";
+			$this->keyvalue->TooltipValue = "";
+
+			// oldvalue
+			$this->oldvalue->LinkCustomAttributes = "";
+			$this->oldvalue->HrefValue = "";
+			$this->oldvalue->TooltipValue = "";
+
+			// newvalue
+			$this->newvalue->LinkCustomAttributes = "";
+			$this->newvalue->HrefValue = "";
+			$this->newvalue->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -826,41 +782,12 @@ class ct04_siswa_view extends ct04_siswa {
 			$this->Row_Rendered();
 	}
 
-	// Set up detail parms based on QueryString
-	function SetUpDetailParms() {
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
-			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
-			$this->setCurrentDetailTable($sDetailTblVar);
-		} else {
-			$sDetailTblVar = $this->getCurrentDetailTable();
-		}
-		if ($sDetailTblVar <> "") {
-			$DetailTblVar = explode(",", $sDetailTblVar);
-			if (in_array("t06_siswarutin", $DetailTblVar)) {
-				if (!isset($GLOBALS["t06_siswarutin_grid"]))
-					$GLOBALS["t06_siswarutin_grid"] = new ct06_siswarutin_grid;
-				if ($GLOBALS["t06_siswarutin_grid"]->DetailView) {
-					$GLOBALS["t06_siswarutin_grid"]->CurrentMode = "view";
-
-					// Save current master table to detail table
-					$GLOBALS["t06_siswarutin_grid"]->setCurrentMasterTable($this->TableVar);
-					$GLOBALS["t06_siswarutin_grid"]->setStartRecordNumber(1);
-					$GLOBALS["t06_siswarutin_grid"]->siswa_id->FldIsDetailKey = TRUE;
-					$GLOBALS["t06_siswarutin_grid"]->siswa_id->CurrentValue = $this->id->CurrentValue;
-					$GLOBALS["t06_siswarutin_grid"]->siswa_id->setSessionValue($GLOBALS["t06_siswarutin_grid"]->siswa_id->CurrentValue);
-				}
-			}
-		}
-	}
-
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t04_siswalist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t99_audittraillist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -972,29 +899,29 @@ class ct04_siswa_view extends ct04_siswa {
 <?php
 
 // Create page object
-if (!isset($t04_siswa_view)) $t04_siswa_view = new ct04_siswa_view();
+if (!isset($t99_audittrail_view)) $t99_audittrail_view = new ct99_audittrail_view();
 
 // Page init
-$t04_siswa_view->Page_Init();
+$t99_audittrail_view->Page_Init();
 
 // Page main
-$t04_siswa_view->Page_Main();
+$t99_audittrail_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t04_siswa_view->Page_Render();
+$t99_audittrail_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ft04_siswaview = new ew_Form("ft04_siswaview", "view");
+var CurrentForm = ft99_audittrailview = new ew_Form("ft99_audittrailview", "view");
 
 // Form_CustomValidate event
-ft04_siswaview.Form_CustomValidate = 
+ft99_audittrailview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1003,150 +930,206 @@ ft04_siswaview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft04_siswaview.ValidateRequired = true;
+ft99_audittrailview.ValidateRequired = true;
 <?php } else { ?>
-ft04_siswaview.ValidateRequired = false; 
+ft99_audittrailview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft04_siswaview.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":["x_kelas_id"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
-ft04_siswaview.Lists["x_kelas_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kelas","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t03_kelas"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <div class="ewToolbar">
-<?php if (!$t04_siswa_view->IsModal) { ?>
+<?php if (!$t99_audittrail_view->IsModal) { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php $t04_siswa_view->ExportOptions->Render("body") ?>
+<?php $t99_audittrail_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($t04_siswa_view->OtherOptions as &$option)
+	foreach ($t99_audittrail_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$t04_siswa_view->IsModal) { ?>
+<?php if (!$t99_audittrail_view->IsModal) { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
-<?php $t04_siswa_view->ShowPageHeader(); ?>
+<?php $t99_audittrail_view->ShowPageHeader(); ?>
 <?php
-$t04_siswa_view->ShowMessage();
+$t99_audittrail_view->ShowMessage();
 ?>
-<form name="ft04_siswaview" id="ft04_siswaview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t04_siswa_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t04_siswa_view->Token ?>">
+<form name="ft99_audittrailview" id="ft99_audittrailview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t99_audittrail_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t99_audittrail_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t04_siswa">
-<?php if ($t04_siswa_view->IsModal) { ?>
+<input type="hidden" name="t" value="t99_audittrail">
+<?php if ($t99_audittrail_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
-	<tr id="r_sekolah_id">
-		<td><span id="elh_t04_siswa_sekolah_id"><?php echo $t04_siswa->sekolah_id->FldCaption() ?></span></td>
-		<td data-name="sekolah_id"<?php echo $t04_siswa->sekolah_id->CellAttributes() ?>>
-<span id="el_t04_siswa_sekolah_id">
-<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
-<?php echo $t04_siswa->sekolah_id->ViewValue ?></span>
+<?php if ($t99_audittrail->id->Visible) { // id ?>
+	<tr id="r_id">
+		<td><span id="elh_t99_audittrail_id"><?php echo $t99_audittrail->id->FldCaption() ?></span></td>
+		<td data-name="id"<?php echo $t99_audittrail->id->CellAttributes() ?>>
+<span id="el_t99_audittrail_id">
+<span<?php echo $t99_audittrail->id->ViewAttributes() ?>>
+<?php echo $t99_audittrail->id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
-	<tr id="r_kelas_id">
-		<td><span id="elh_t04_siswa_kelas_id"><?php echo $t04_siswa->kelas_id->FldCaption() ?></span></td>
-		<td data-name="kelas_id"<?php echo $t04_siswa->kelas_id->CellAttributes() ?>>
-<span id="el_t04_siswa_kelas_id">
-<span<?php echo $t04_siswa->kelas_id->ViewAttributes() ?>>
-<?php echo $t04_siswa->kelas_id->ViewValue ?></span>
+<?php if ($t99_audittrail->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_t99_audittrail_datetime"><?php echo $t99_audittrail->datetime->FldCaption() ?></span></td>
+		<td data-name="datetime"<?php echo $t99_audittrail->datetime->CellAttributes() ?>>
+<span id="el_t99_audittrail_datetime">
+<span<?php echo $t99_audittrail->datetime->ViewAttributes() ?>>
+<?php echo $t99_audittrail->datetime->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t04_siswa->NIS->Visible) { // NIS ?>
-	<tr id="r_NIS">
-		<td><span id="elh_t04_siswa_NIS"><?php echo $t04_siswa->NIS->FldCaption() ?></span></td>
-		<td data-name="NIS"<?php echo $t04_siswa->NIS->CellAttributes() ?>>
-<span id="el_t04_siswa_NIS">
-<span<?php echo $t04_siswa->NIS->ViewAttributes() ?>>
-<?php echo $t04_siswa->NIS->ViewValue ?></span>
+<?php if ($t99_audittrail->script->Visible) { // script ?>
+	<tr id="r_script">
+		<td><span id="elh_t99_audittrail_script"><?php echo $t99_audittrail->script->FldCaption() ?></span></td>
+		<td data-name="script"<?php echo $t99_audittrail->script->CellAttributes() ?>>
+<span id="el_t99_audittrail_script">
+<span<?php echo $t99_audittrail->script->ViewAttributes() ?>>
+<?php echo $t99_audittrail->script->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t04_siswa->Nama->Visible) { // Nama ?>
-	<tr id="r_Nama">
-		<td><span id="elh_t04_siswa_Nama"><?php echo $t04_siswa->Nama->FldCaption() ?></span></td>
-		<td data-name="Nama"<?php echo $t04_siswa->Nama->CellAttributes() ?>>
-<span id="el_t04_siswa_Nama">
-<span<?php echo $t04_siswa->Nama->ViewAttributes() ?>>
-<?php echo $t04_siswa->Nama->ViewValue ?></span>
+<?php if ($t99_audittrail->user->Visible) { // user ?>
+	<tr id="r_user">
+		<td><span id="elh_t99_audittrail_user"><?php echo $t99_audittrail->user->FldCaption() ?></span></td>
+		<td data-name="user"<?php echo $t99_audittrail->user->CellAttributes() ?>>
+<span id="el_t99_audittrail_user">
+<span<?php echo $t99_audittrail->user->ViewAttributes() ?>>
+<?php echo $t99_audittrail->user->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->action->Visible) { // action ?>
+	<tr id="r_action">
+		<td><span id="elh_t99_audittrail_action"><?php echo $t99_audittrail->action->FldCaption() ?></span></td>
+		<td data-name="action"<?php echo $t99_audittrail->action->CellAttributes() ?>>
+<span id="el_t99_audittrail_action">
+<span<?php echo $t99_audittrail->action->ViewAttributes() ?>>
+<?php echo $t99_audittrail->action->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->_table->Visible) { // table ?>
+	<tr id="r__table">
+		<td><span id="elh_t99_audittrail__table"><?php echo $t99_audittrail->_table->FldCaption() ?></span></td>
+		<td data-name="_table"<?php echo $t99_audittrail->_table->CellAttributes() ?>>
+<span id="el_t99_audittrail__table">
+<span<?php echo $t99_audittrail->_table->ViewAttributes() ?>>
+<?php echo $t99_audittrail->_table->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->_field->Visible) { // field ?>
+	<tr id="r__field">
+		<td><span id="elh_t99_audittrail__field"><?php echo $t99_audittrail->_field->FldCaption() ?></span></td>
+		<td data-name="_field"<?php echo $t99_audittrail->_field->CellAttributes() ?>>
+<span id="el_t99_audittrail__field">
+<span<?php echo $t99_audittrail->_field->ViewAttributes() ?>>
+<?php echo $t99_audittrail->_field->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->keyvalue->Visible) { // keyvalue ?>
+	<tr id="r_keyvalue">
+		<td><span id="elh_t99_audittrail_keyvalue"><?php echo $t99_audittrail->keyvalue->FldCaption() ?></span></td>
+		<td data-name="keyvalue"<?php echo $t99_audittrail->keyvalue->CellAttributes() ?>>
+<span id="el_t99_audittrail_keyvalue">
+<span<?php echo $t99_audittrail->keyvalue->ViewAttributes() ?>>
+<?php echo $t99_audittrail->keyvalue->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->oldvalue->Visible) { // oldvalue ?>
+	<tr id="r_oldvalue">
+		<td><span id="elh_t99_audittrail_oldvalue"><?php echo $t99_audittrail->oldvalue->FldCaption() ?></span></td>
+		<td data-name="oldvalue"<?php echo $t99_audittrail->oldvalue->CellAttributes() ?>>
+<span id="el_t99_audittrail_oldvalue">
+<span<?php echo $t99_audittrail->oldvalue->ViewAttributes() ?>>
+<?php echo $t99_audittrail->oldvalue->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t99_audittrail->newvalue->Visible) { // newvalue ?>
+	<tr id="r_newvalue">
+		<td><span id="elh_t99_audittrail_newvalue"><?php echo $t99_audittrail->newvalue->FldCaption() ?></span></td>
+		<td data-name="newvalue"<?php echo $t99_audittrail->newvalue->CellAttributes() ?>>
+<span id="el_t99_audittrail_newvalue">
+<span<?php echo $t99_audittrail->newvalue->ViewAttributes() ?>>
+<?php echo $t99_audittrail->newvalue->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
-<?php if (!$t04_siswa_view->IsModal) { ?>
-<?php if (!isset($t04_siswa_view->Pager)) $t04_siswa_view->Pager = new cPrevNextPager($t04_siswa_view->StartRec, $t04_siswa_view->DisplayRecs, $t04_siswa_view->TotalRecs) ?>
-<?php if ($t04_siswa_view->Pager->RecordCount > 0 && $t04_siswa_view->Pager->Visible) { ?>
+<?php if (!$t99_audittrail_view->IsModal) { ?>
+<?php if (!isset($t99_audittrail_view->Pager)) $t99_audittrail_view->Pager = new cPrevNextPager($t99_audittrail_view->StartRec, $t99_audittrail_view->DisplayRecs, $t99_audittrail_view->TotalRecs) ?>
+<?php if ($t99_audittrail_view->Pager->RecordCount > 0 && $t99_audittrail_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t04_siswa_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t99_audittrail_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t99_audittrail_view->PageUrl() ?>start=<?php echo $t99_audittrail_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t04_siswa_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t99_audittrail_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t99_audittrail_view->PageUrl() ?>start=<?php echo $t99_audittrail_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t04_siswa_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t99_audittrail_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t04_siswa_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t99_audittrail_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t99_audittrail_view->PageUrl() ?>start=<?php echo $t99_audittrail_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t04_siswa_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t99_audittrail_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t99_audittrail_view->PageUrl() ?>start=<?php echo $t99_audittrail_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t04_siswa_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t99_audittrail_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
-<?php
-	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailView) {
-?>
-<?php if ($t04_siswa->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "t06_siswarutingrid.php" ?>
-<?php } ?>
 </form>
 <script type="text/javascript">
-ft04_siswaview.Init();
+ft99_audittrailview.Init();
 </script>
 <?php
-$t04_siswa_view->ShowPageFooter();
+$t99_audittrail_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1158,5 +1141,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t04_siswa_view->Page_Terminate();
+$t99_audittrail_view->Page_Terminate();
 ?>

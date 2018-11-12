@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t02_sekolahinfo.php" ?>
-<?php include_once "t03_kelasgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -22,7 +21,7 @@ class ct02_sekolah_edit extends ct02_sekolah {
 	var $PageID = 'edit';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't02_sekolah';
@@ -272,14 +271,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Process auto fill for detail table 't03_kelas'
-			if (@$_POST["grid"] == "ft03_kelasgrid") {
-				if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid;
-				$GLOBALS["t03_kelas_grid"]->Page_Init();
-				$this->Page_Terminate();
-				exit();
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -372,9 +363,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 		if (@$_POST["a_edit"] <> "") {
 			$this->CurrentAction = $_POST["a_edit"]; // Get action code
 			$this->LoadFormValues(); // Get form values
-
-			// Set up detail parameters
-			$this->SetUpDetailParms();
 		} else {
 			$this->CurrentAction = "I"; // Default action is display
 		}
@@ -399,15 +387,9 @@ class ct02_sekolah_edit extends ct02_sekolah {
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
 					$this->Page_Terminate("t02_sekolahlist.php"); // No matching record, return to list
 				}
-
-				// Set up detail parameters
-				$this->SetUpDetailParms();
 				break;
 			Case "U": // Update
-				if ($this->getCurrentDetailTable() <> "") // Master/detail edit
-					$sReturnUrl = $this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $this->getCurrentDetailTable()); // Master/Detail view page
-				else
-					$sReturnUrl = $this->getReturnUrl();
+				$sReturnUrl = $this->getReturnUrl();
 				if (ew_GetPageName($sReturnUrl) == "t02_sekolahlist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
@@ -420,9 +402,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Restore form values if update failed
-
-					// Set up detail parameters
-					$this->SetUpDetailParms();
 				}
 		}
 
@@ -605,13 +584,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->Sekolah->FldCaption(), $this->Sekolah->ReqErrMsg));
 		}
 
-		// Validate detail grid
-		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-		if (in_array("t03_kelas", $DetailTblVar) && $GLOBALS["t03_kelas"]->DetailEdit) {
-			if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid(); // get detail page object
-			$GLOBALS["t03_kelas_grid"]->ValidateGridForm();
-		}
-
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
 
@@ -642,10 +614,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 			$EditRow = FALSE; // Update Failed
 		} else {
 
-			// Begin transaction
-			if ($this->getCurrentDetailTable() <> "")
-				$conn->BeginTrans();
-
 			// Save old values
 			$rsold = &$rs->fields;
 			$this->LoadDbValues($rsold);
@@ -664,24 +632,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 					$EditRow = TRUE; // No field to update
 				$conn->raiseErrorFn = '';
 				if ($EditRow) {
-				}
-
-				// Update detail records
-				$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-				if ($EditRow) {
-					if (in_array("t03_kelas", $DetailTblVar) && $GLOBALS["t03_kelas"]->DetailEdit) {
-						if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid(); // Get detail page object
-						$EditRow = $GLOBALS["t03_kelas_grid"]->GridUpdate();
-					}
-				}
-
-				// Commit/Rollback transaction
-				if ($this->getCurrentDetailTable() <> "") {
-					if ($EditRow) {
-						$conn->CommitTrans(); // Commit transaction
-					} else {
-						$conn->RollbackTrans(); // Rollback transaction
-					}
 				}
 			} else {
 				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -702,36 +652,6 @@ class ct02_sekolah_edit extends ct02_sekolah {
 			$this->Row_Updated($rsold, $rsnew);
 		$rs->Close();
 		return $EditRow;
-	}
-
-	// Set up detail parms based on QueryString
-	function SetUpDetailParms() {
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
-			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
-			$this->setCurrentDetailTable($sDetailTblVar);
-		} else {
-			$sDetailTblVar = $this->getCurrentDetailTable();
-		}
-		if ($sDetailTblVar <> "") {
-			$DetailTblVar = explode(",", $sDetailTblVar);
-			if (in_array("t03_kelas", $DetailTblVar)) {
-				if (!isset($GLOBALS["t03_kelas_grid"]))
-					$GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid;
-				if ($GLOBALS["t03_kelas_grid"]->DetailEdit) {
-					$GLOBALS["t03_kelas_grid"]->CurrentMode = "edit";
-					$GLOBALS["t03_kelas_grid"]->CurrentAction = "gridedit";
-
-					// Save current master table to detail table
-					$GLOBALS["t03_kelas_grid"]->setCurrentMasterTable($this->TableVar);
-					$GLOBALS["t03_kelas_grid"]->setStartRecordNumber(1);
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->FldIsDetailKey = TRUE;
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->CurrentValue = $this->id->CurrentValue;
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->setSessionValue($GLOBALS["t03_kelas_grid"]->sekolah_id->CurrentValue);
-				}
-			}
-		}
 	}
 
 	// Set up Breadcrumb
@@ -944,14 +864,6 @@ $t02_sekolah_edit->ShowMessage();
 <?php } ?>
 </div>
 <input type="hidden" data-table="t02_sekolah" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t02_sekolah->id->CurrentValue) ?>">
-<?php
-	if (in_array("t03_kelas", explode(",", $t02_sekolah->getCurrentDetailTable())) && $t03_kelas->DetailEdit) {
-?>
-<?php if ($t02_sekolah->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t03_kelas", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "t03_kelasgrid.php" ?>
-<?php } ?>
 <?php if (!$t02_sekolah_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

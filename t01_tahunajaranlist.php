@@ -21,7 +21,7 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	var $PageID = 'list';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't01_tahunajaran';
@@ -530,38 +530,8 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-			ew_AddFilter($this->DefaultSearchWhere, $this->AdvancedSearchWhere(TRUE));
-
-			// Get basic search values
-			$this->LoadBasicSearchValues();
-
-			// Get and validate search values for advanced search
-			$this->LoadSearchValues(); // Get search values
-
-			// Process filter list
-			$this->ProcessFilterList();
-			if (!$this->ValidateSearch())
-				$this->setFailureMessage($gsSearchError);
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetUpSortOrder();
-
-			// Get basic search criteria
-			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
-
-			// Get search criteria for advanced search
-			if ($gsSearchError == "")
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
 		}
 
 		// Restore display records
@@ -573,36 +543,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Load Sorting Order
 		$this->LoadSortOrder();
-
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
-
-			// Load advanced search from default
-			if ($this->LoadAdvancedSearchDefault()) {
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
-			}
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} else {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
 
 		// Build filter
 		$sFilter = "";
@@ -666,403 +606,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		return TRUE;
 	}
 
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft01_tahunajaranlistsrch") : "";
-		} else {
-			$sSavedFilterList = "";
-		}
-
-		// Initialize
-		$sFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->Awal_Bulan->AdvancedSearch->ToJSON(), ","); // Field Awal_Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Awal_Tahun->AdvancedSearch->ToJSON(), ","); // Field Awal_Tahun
-		$sFilterList = ew_Concat($sFilterList, $this->Akhir_Bulan->AdvancedSearch->ToJSON(), ","); // Field Akhir_Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Akhir_Tahun->AdvancedSearch->ToJSON(), ","); // Field Akhir_Tahun
-		$sFilterList = ew_Concat($sFilterList, $this->Tahun_Ajaran->AdvancedSearch->ToJSON(), ","); // Field Tahun_Ajaran
-		$sFilterList = ew_Concat($sFilterList, $this->Aktif->AdvancedSearch->ToJSON(), ","); // Field Aktif
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft01_tahunajaranlistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(ew_StripSlashes(@$_POST["filter"]), TRUE);
-		$this->Command = "search";
-
-		// Field id
-		$this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-		$this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-		$this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-		$this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-		$this->id->AdvancedSearch->Save();
-
-		// Field Awal_Bulan
-		$this->Awal_Bulan->AdvancedSearch->SearchValue = @$filter["x_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator = @$filter["z_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchCondition = @$filter["v_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Awal_Bulan"];
-		$this->Awal_Bulan->AdvancedSearch->Save();
-
-		// Field Awal_Tahun
-		$this->Awal_Tahun->AdvancedSearch->SearchValue = @$filter["x_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator = @$filter["z_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchCondition = @$filter["v_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchValue2 = @$filter["y_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator2 = @$filter["w_Awal_Tahun"];
-		$this->Awal_Tahun->AdvancedSearch->Save();
-
-		// Field Akhir_Bulan
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue = @$filter["x_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator = @$filter["z_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchCondition = @$filter["v_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Akhir_Bulan"];
-		$this->Akhir_Bulan->AdvancedSearch->Save();
-
-		// Field Akhir_Tahun
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue = @$filter["x_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator = @$filter["z_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchCondition = @$filter["v_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue2 = @$filter["y_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator2 = @$filter["w_Akhir_Tahun"];
-		$this->Akhir_Tahun->AdvancedSearch->Save();
-
-		// Field Tahun_Ajaran
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue = @$filter["x_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator = @$filter["z_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchCondition = @$filter["v_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue2 = @$filter["y_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator2 = @$filter["w_Tahun_Ajaran"];
-		$this->Tahun_Ajaran->AdvancedSearch->Save();
-
-		// Field Aktif
-		$this->Aktif->AdvancedSearch->SearchValue = @$filter["x_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchOperator = @$filter["z_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchCondition = @$filter["v_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchValue2 = @$filter["y_Aktif"];
-		$this->Aktif->AdvancedSearch->SearchOperator2 = @$filter["w_Aktif"];
-		$this->Aktif->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Advanced search WHERE clause based on QueryString
-	function AdvancedSearchWhere($Default = FALSE) {
-		global $Security;
-		$sWhere = "";
-		$this->BuildSearchSql($sWhere, $this->id, $Default, FALSE); // id
-		$this->BuildSearchSql($sWhere, $this->Awal_Bulan, $Default, FALSE); // Awal_Bulan
-		$this->BuildSearchSql($sWhere, $this->Awal_Tahun, $Default, FALSE); // Awal_Tahun
-		$this->BuildSearchSql($sWhere, $this->Akhir_Bulan, $Default, FALSE); // Akhir_Bulan
-		$this->BuildSearchSql($sWhere, $this->Akhir_Tahun, $Default, FALSE); // Akhir_Tahun
-		$this->BuildSearchSql($sWhere, $this->Tahun_Ajaran, $Default, FALSE); // Tahun_Ajaran
-		$this->BuildSearchSql($sWhere, $this->Aktif, $Default, FALSE); // Aktif
-
-		// Set up search parm
-		if (!$Default && $sWhere <> "") {
-			$this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->id->AdvancedSearch->Save(); // id
-			$this->Awal_Bulan->AdvancedSearch->Save(); // Awal_Bulan
-			$this->Awal_Tahun->AdvancedSearch->Save(); // Awal_Tahun
-			$this->Akhir_Bulan->AdvancedSearch->Save(); // Akhir_Bulan
-			$this->Akhir_Tahun->AdvancedSearch->Save(); // Akhir_Tahun
-			$this->Tahun_Ajaran->AdvancedSearch->Save(); // Tahun_Ajaran
-			$this->Aktif->AdvancedSearch->Save(); // Aktif
-		}
-		return $sWhere;
-	}
-
-	// Build search SQL
-	function BuildSearchSql(&$Where, &$Fld, $Default, $MultiValue) {
-		$FldParm = substr($Fld->FldVar, 2);
-		$FldVal = ($Default) ? $Fld->AdvancedSearch->SearchValueDefault : $Fld->AdvancedSearch->SearchValue; // @$_GET["x_$FldParm"]
-		$FldOpr = ($Default) ? $Fld->AdvancedSearch->SearchOperatorDefault : $Fld->AdvancedSearch->SearchOperator; // @$_GET["z_$FldParm"]
-		$FldCond = ($Default) ? $Fld->AdvancedSearch->SearchConditionDefault : $Fld->AdvancedSearch->SearchCondition; // @$_GET["v_$FldParm"]
-		$FldVal2 = ($Default) ? $Fld->AdvancedSearch->SearchValue2Default : $Fld->AdvancedSearch->SearchValue2; // @$_GET["y_$FldParm"]
-		$FldOpr2 = ($Default) ? $Fld->AdvancedSearch->SearchOperator2Default : $Fld->AdvancedSearch->SearchOperator2; // @$_GET["w_$FldParm"]
-		$sWrk = "";
-
-		//$FldVal = ew_StripSlashes($FldVal);
-		if (is_array($FldVal)) $FldVal = implode(",", $FldVal);
-
-		//$FldVal2 = ew_StripSlashes($FldVal2);
-		if (is_array($FldVal2)) $FldVal2 = implode(",", $FldVal2);
-		$FldOpr = strtoupper(trim($FldOpr));
-		if ($FldOpr == "") $FldOpr = "=";
-		$FldOpr2 = strtoupper(trim($FldOpr2));
-		if ($FldOpr2 == "") $FldOpr2 = "=";
-		if (EW_SEARCH_MULTI_VALUE_OPTION == 1)
-			$MultiValue = FALSE;
-		if ($MultiValue) {
-			$sWrk1 = ($FldVal <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr, $FldVal, $this->DBID) : ""; // Field value 1
-			$sWrk2 = ($FldVal2 <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr2, $FldVal2, $this->DBID) : ""; // Field value 2
-			$sWrk = $sWrk1; // Build final SQL
-			if ($sWrk2 <> "")
-				$sWrk = ($sWrk <> "") ? "($sWrk) $FldCond ($sWrk2)" : $sWrk2;
-		} else {
-			$FldVal = $this->ConvertSearchValue($Fld, $FldVal);
-			$FldVal2 = $this->ConvertSearchValue($Fld, $FldVal2);
-			$sWrk = ew_GetSearchSql($Fld, $FldVal, $FldOpr, $FldCond, $FldVal2, $FldOpr2, $this->DBID);
-		}
-		ew_AddFilter($Where, $sWrk);
-	}
-
-	// Convert search value
-	function ConvertSearchValue(&$Fld, $FldVal) {
-		if ($FldVal == EW_NULL_VALUE || $FldVal == EW_NOT_NULL_VALUE)
-			return $FldVal;
-		$Value = $FldVal;
-		if ($Fld->FldDataType == EW_DATATYPE_BOOLEAN) {
-			if ($FldVal <> "") $Value = ($FldVal == "1" || strtolower(strval($FldVal)) == "y" || strtolower(strval($FldVal)) == "t") ? $Fld->TrueValue : $Fld->FalseValue;
-		} elseif ($Fld->FldDataType == EW_DATATYPE_DATE || $Fld->FldDataType == EW_DATATYPE_TIME) {
-			if ($FldVal <> "") $Value = ew_UnFormatDateTime($FldVal, $Fld->FldDateTimeFormat);
-		}
-		return $Value;
-	}
-
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
-		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->Tahun_Ajaran, $arKeywords, $type);
-		return $sWhere;
-	}
-
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		global $EW_BASIC_SEARCH_IGNORE_PATTERN;
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if ($EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace($EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
-		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .=  "(" . $sSql . ")";
-		}
-	}
-
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-		if ($sSearchKeyword <> "") {
-			$sSearch = trim($sSearchKeyword);
-			if ($sSearchType <> "=") {
-				$ar = array();
-
-				// Match quoted keywords (i.e.: "...")
-				if (preg_match_all('/"([^"]*)"/i', $sSearch, $matches, PREG_SET_ORDER)) {
-					foreach ($matches as $match) {
-						$p = strpos($sSearch, $match[0]);
-						$str = substr($sSearch, 0, $p);
-						$sSearch = substr($sSearch, $p + strlen($match[0]));
-						if (strlen(trim($str)) > 0)
-							$ar = array_merge($ar, explode(" ", trim($str)));
-						$ar[] = $match[1]; // Save quoted keyword
-					}
-				}
-
-				// Match individual keywords
-				if (strlen(trim($sSearch)) > 0)
-					$ar = array_merge($ar, explode(" ", trim($sSearch)));
-
-				// Search keyword in any fields
-				if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-					foreach ($ar as $sKeyword) {
-						if ($sKeyword <> "") {
-							if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-							$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-						}
-					}
-				} else {
-					$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL(array($sSearch), $sSearchType);
-			}
-			if (!$Default) $this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
-			return TRUE;
-		if ($this->id->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Awal_Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Awal_Tahun->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Akhir_Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Akhir_Tahun->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Tahun_Ajaran->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Aktif->AdvancedSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
-
-		// Clear advanced search parameters
-		$this->ResetAdvancedSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
-	}
-
-	// Clear all advanced search parameters
-	function ResetAdvancedSearchParms() {
-		$this->id->AdvancedSearch->UnsetSession();
-		$this->Awal_Bulan->AdvancedSearch->UnsetSession();
-		$this->Awal_Tahun->AdvancedSearch->UnsetSession();
-		$this->Akhir_Bulan->AdvancedSearch->UnsetSession();
-		$this->Akhir_Tahun->AdvancedSearch->UnsetSession();
-		$this->Tahun_Ajaran->AdvancedSearch->UnsetSession();
-		$this->Aktif->AdvancedSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore basic search values
-		$this->BasicSearch->Load();
-
-		// Restore advanced search values
-		$this->id->AdvancedSearch->Load();
-		$this->Awal_Bulan->AdvancedSearch->Load();
-		$this->Awal_Tahun->AdvancedSearch->Load();
-		$this->Akhir_Bulan->AdvancedSearch->Load();
-		$this->Akhir_Tahun->AdvancedSearch->Load();
-		$this->Tahun_Ajaran->AdvancedSearch->Load();
-		$this->Aktif->AdvancedSearch->Load();
-	}
-
 	// Set up sort parameters
 	function SetUpSortOrder() {
 
@@ -1102,10 +645,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
-
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
 
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
@@ -1299,10 +838,10 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
 		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft01_tahunajaranlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
 		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft01_tahunajaranlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1426,17 +965,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft01_tahunajaranlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1495,55 +1023,6 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
 			$this->setStartRecordNumber($this->StartRec);
 		}
-	}
-
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
-	}
-
-	// Load search values for validation
-	function LoadSearchValues() {
-		global $objForm;
-
-		// Load search values
-		// id
-
-		$this->id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_id"]);
-		if ($this->id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->id->AdvancedSearch->SearchOperator = @$_GET["z_id"];
-
-		// Awal_Bulan
-		$this->Awal_Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Awal_Bulan"]);
-		if ($this->Awal_Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Awal_Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Awal_Bulan"];
-
-		// Awal_Tahun
-		$this->Awal_Tahun->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Awal_Tahun"]);
-		if ($this->Awal_Tahun->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Awal_Tahun->AdvancedSearch->SearchOperator = @$_GET["z_Awal_Tahun"];
-
-		// Akhir_Bulan
-		$this->Akhir_Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Akhir_Bulan"]);
-		if ($this->Akhir_Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Akhir_Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Akhir_Bulan"];
-
-		// Akhir_Tahun
-		$this->Akhir_Tahun->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Akhir_Tahun"]);
-		if ($this->Akhir_Tahun->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Akhir_Tahun->AdvancedSearch->SearchOperator = @$_GET["z_Akhir_Tahun"];
-
-		// Tahun_Ajaran
-		$this->Tahun_Ajaran->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Tahun_Ajaran"]);
-		if ($this->Tahun_Ajaran->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Tahun_Ajaran->AdvancedSearch->SearchOperator = @$_GET["z_Tahun_Ajaran"];
-
-		// Aktif
-		$this->Aktif->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Aktif"]);
-		if ($this->Aktif->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Aktif->AdvancedSearch->SearchOperator = @$_GET["z_Aktif"];
 	}
 
 	// Load recordset
@@ -1733,85 +1212,11 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 			$this->Aktif->LinkCustomAttributes = "";
 			$this->Aktif->HrefValue = "";
 			$this->Aktif->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
-
-			// Awal_Bulan
-			$this->Awal_Bulan->EditAttrs["class"] = "form-control";
-			$this->Awal_Bulan->EditCustomAttributes = "";
-			$this->Awal_Bulan->EditValue = ew_HtmlEncode($this->Awal_Bulan->AdvancedSearch->SearchValue);
-			$this->Awal_Bulan->PlaceHolder = ew_RemoveHtml($this->Awal_Bulan->FldCaption());
-
-			// Awal_Tahun
-			$this->Awal_Tahun->EditAttrs["class"] = "form-control";
-			$this->Awal_Tahun->EditCustomAttributes = "";
-			$this->Awal_Tahun->EditValue = ew_HtmlEncode($this->Awal_Tahun->AdvancedSearch->SearchValue);
-			$this->Awal_Tahun->PlaceHolder = ew_RemoveHtml($this->Awal_Tahun->FldCaption());
-
-			// Akhir_Bulan
-			$this->Akhir_Bulan->EditAttrs["class"] = "form-control";
-			$this->Akhir_Bulan->EditCustomAttributes = "";
-			$this->Akhir_Bulan->EditValue = ew_HtmlEncode($this->Akhir_Bulan->AdvancedSearch->SearchValue);
-			$this->Akhir_Bulan->PlaceHolder = ew_RemoveHtml($this->Akhir_Bulan->FldCaption());
-
-			// Akhir_Tahun
-			$this->Akhir_Tahun->EditAttrs["class"] = "form-control";
-			$this->Akhir_Tahun->EditCustomAttributes = "";
-			$this->Akhir_Tahun->EditValue = ew_HtmlEncode($this->Akhir_Tahun->AdvancedSearch->SearchValue);
-			$this->Akhir_Tahun->PlaceHolder = ew_RemoveHtml($this->Akhir_Tahun->FldCaption());
-
-			// Tahun_Ajaran
-			$this->Tahun_Ajaran->EditAttrs["class"] = "form-control";
-			$this->Tahun_Ajaran->EditCustomAttributes = "";
-			$this->Tahun_Ajaran->EditValue = ew_HtmlEncode($this->Tahun_Ajaran->AdvancedSearch->SearchValue);
-			$this->Tahun_Ajaran->PlaceHolder = ew_RemoveHtml($this->Tahun_Ajaran->FldCaption());
-
-			// Aktif
-			$this->Aktif->EditCustomAttributes = "";
-			$this->Aktif->EditValue = $this->Aktif->Options(FALSE);
-		}
-		if ($this->RowType == EW_ROWTYPE_ADD ||
-			$this->RowType == EW_ROWTYPE_EDIT ||
-			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
-			$this->SetupFieldTitles();
 		}
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
-	}
-
-	// Validate search
-	function ValidateSearch() {
-		global $gsSearchError;
-
-		// Initialize
-		$gsSearchError = "";
-
-		// Check if validation required
-		if (!EW_SERVER_VALIDATE)
-			return TRUE;
-
-		// Return validate result
-		$ValidateSearch = ($gsSearchError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateSearch = $ValidateSearch && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsSearchError, $sFormCustomError);
-		}
-		return $ValidateSearch;
-	}
-
-	// Load advanced search
-	function LoadAdvancedSearch() {
-		$this->id->AdvancedSearch->Load();
-		$this->Awal_Bulan->AdvancedSearch->Load();
-		$this->Awal_Tahun->AdvancedSearch->Load();
-		$this->Akhir_Bulan->AdvancedSearch->Load();
-		$this->Akhir_Tahun->AdvancedSearch->Load();
-		$this->Tahun_Ajaran->AdvancedSearch->Load();
-		$this->Aktif->AdvancedSearch->Load();
 	}
 
 	// Set up Breadcrumb
@@ -1827,26 +1232,16 @@ class ct01_tahunajaran_list extends ct01_tahunajaran {
 	function SetupLookupFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Setup AutoSuggest filters of a field
 	function SetupAutoSuggestFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Page Load event
@@ -2015,39 +1410,6 @@ ft01_tahunajaranlist.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":f
 ft01_tahunajaranlist.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
 
 // Form object for search
-var CurrentSearchForm = ft01_tahunajaranlistsrch = new ew_Form("ft01_tahunajaranlistsrch");
-
-// Validate function for search
-ft01_tahunajaranlistsrch.Validate = function(fobj) {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	fobj = fobj || this.Form;
-	var infix = "";
-
-	// Fire Form_CustomValidate event
-	if (!this.Form_CustomValidate(fobj))
-		return false;
-	return true;
-}
-
-// Form_CustomValidate event
-ft01_tahunajaranlistsrch.Form_CustomValidate = 
- function(fobj) { // DO NOT CHANGE THIS LINE!
-
- 	// Your custom validation code here, return false if invalid. 
- 	return true;
- }
-
-// Use JavaScript validation or not
-<?php if (EW_CLIENT_VALIDATE) { ?>
-ft01_tahunajaranlistsrch.ValidateRequired = true; // Use JavaScript validation
-<?php } else { ?>
-ft01_tahunajaranlistsrch.ValidateRequired = false; // No JavaScript validation
-<?php } ?>
-
-// Dynamic selection lists
-ft01_tahunajaranlistsrch.Lists["x_Aktif"] = {"LinkField":"","Ajax":null,"AutoFill":false,"DisplayFields":["","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":""};
-ft01_tahunajaranlistsrch.Lists["x_Aktif"].Options = <?php echo json_encode($t01_tahunajaran->Aktif->Options()) ?>;
 </script>
 <script type="text/javascript">
 
@@ -2057,12 +1419,6 @@ ft01_tahunajaranlistsrch.Lists["x_Aktif"].Options = <?php echo json_encode($t01_
 <?php $Breadcrumb->Render(); ?>
 <?php if ($t01_tahunajaran_list->TotalRecs > 0 && $t01_tahunajaran_list->ExportOptions->Visible()) { ?>
 <?php $t01_tahunajaran_list->ExportOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t01_tahunajaran_list->SearchOptions->Visible()) { ?>
-<?php $t01_tahunajaran_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t01_tahunajaran_list->FilterOptions->Visible()) { ?>
-<?php $t01_tahunajaran_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
@@ -2093,58 +1449,6 @@ ft01_tahunajaranlistsrch.Lists["x_Aktif"].Options = <?php echo json_encode($t01_
 	}
 $t01_tahunajaran_list->RenderOtherOptions();
 ?>
-<?php if ($t01_tahunajaran->Export == "" && $t01_tahunajaran->CurrentAction == "") { ?>
-<form name="ft01_tahunajaranlistsrch" id="ft01_tahunajaranlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t01_tahunajaran_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft01_tahunajaranlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t01_tahunajaran">
-	<div class="ewBasicSearch">
-<?php
-if ($gsSearchError == "")
-	$t01_tahunajaran_list->LoadAdvancedSearch(); // Load advanced search
-
-// Render for search
-$t01_tahunajaran->RowType = EW_ROWTYPE_SEARCH;
-
-// Render row
-$t01_tahunajaran->ResetAttrs();
-$t01_tahunajaran_list->RenderRow();
-?>
-<div id="xsr_1" class="ewRow">
-<?php if ($t01_tahunajaran->Aktif->Visible) { // Aktif ?>
-	<div id="xsc_Aktif" class="ewCell form-group">
-		<label class="ewSearchCaption ewLabel"><?php echo $t01_tahunajaran->Aktif->FldCaption() ?></label>
-		<span class="ewSearchOperator"><?php echo $Language->Phrase("=") ?><input type="hidden" name="z_Aktif" id="z_Aktif" value="="></span>
-		<span class="ewSearchField">
-<div id="tp_x_Aktif" class="ewTemplate"><input type="radio" data-table="t01_tahunajaran" data-field="x_Aktif" data-value-separator="<?php echo $t01_tahunajaran->Aktif->DisplayValueSeparatorAttribute() ?>" name="x_Aktif" id="x_Aktif" value="{value}"<?php echo $t01_tahunajaran->Aktif->EditAttributes() ?>></div>
-<div id="dsl_x_Aktif" data-repeatcolumn="5" class="ewItemList" style="display: none;"><div>
-<?php echo $t01_tahunajaran->Aktif->RadioButtonListHtml(FALSE, "x_Aktif") ?>
-</div></div>
-</span>
-	</div>
-<?php } ?>
-</div>
-<div id="xsr_2" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t01_tahunajaran_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t01_tahunajaran_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t01_tahunajaran_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t01_tahunajaran_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
-	</div>
-	</div>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
 <?php $t01_tahunajaran_list->ShowPageHeader(); ?>
 <?php
 $t01_tahunajaran_list->ShowMessage();
@@ -2214,7 +1518,7 @@ $t01_tahunajaran_list->ListOptions->Render("header", "left");
 		<th data-name="Tahun_Ajaran"><div id="elh_t01_tahunajaran_Tahun_Ajaran" class="t01_tahunajaran_Tahun_Ajaran"><div class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?></div></div></th>
 	<?php } else { ?>
 		<th data-name="Tahun_Ajaran"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t01_tahunajaran->SortUrl($t01_tahunajaran->Tahun_Ajaran) ?>',2);"><div id="elh_t01_tahunajaran_Tahun_Ajaran" class="t01_tahunajaran_Tahun_Ajaran">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Tahun_Ajaran->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Tahun_Ajaran->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t01_tahunajaran->Tahun_Ajaran->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t01_tahunajaran->Tahun_Ajaran->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t01_tahunajaran->Tahun_Ajaran->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -2436,8 +1740,6 @@ if ($t01_tahunajaran_list->Recordset)
 <div class="clearfix"></div>
 <?php } ?>
 <script type="text/javascript">
-ft01_tahunajaranlistsrch.FilterList = <?php echo $t01_tahunajaran_list->GetFilterList() ?>;
-ft01_tahunajaranlistsrch.Init();
 ft01_tahunajaranlist.Init();
 </script>
 <?php

@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t02_sekolahinfo.php" ?>
-<?php include_once "t03_kelasgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -22,7 +21,7 @@ class ct02_sekolah_add extends ct02_sekolah {
 	var $PageID = 'add';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't02_sekolah';
@@ -272,14 +271,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Process auto fill for detail table 't03_kelas'
-			if (@$_POST["grid"] == "ft03_kelasgrid") {
-				if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid;
-				$GLOBALS["t03_kelas_grid"]->Page_Init();
-				$this->Page_Terminate();
-				exit();
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -393,9 +384,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
 
-		// Set up detail parameters
-		$this->SetUpDetailParms();
-
 		// Validate form if post back
 		if (@$_POST["a_add"] <> "") {
 			if (!$this->ValidateForm()) {
@@ -418,19 +406,13 @@ class ct02_sekolah_add extends ct02_sekolah {
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
 					$this->Page_Terminate("t02_sekolahlist.php"); // No matching record, return to list
 				}
-
-				// Set up detail parameters
-				$this->SetUpDetailParms();
 				break;
 			case "A": // Add new record
 				$this->SendEmail = TRUE; // Send email on add success
 				if ($this->AddRow($this->OldRecordset)) { // Add successful
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
-					if ($this->getCurrentDetailTable() <> "") // Master/detail add
-						$sReturnUrl = $this->GetDetailUrl();
-					else
-						$sReturnUrl = $this->getReturnUrl();
+					$sReturnUrl = $this->getReturnUrl();
 					if (ew_GetPageName($sReturnUrl) == "t02_sekolahlist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 					elseif (ew_GetPageName($sReturnUrl) == "t02_sekolahview.php")
@@ -439,9 +421,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Add failed, restore form values
-
-					// Set up detail parameters
-					$this->SetUpDetailParms();
 				}
 		}
 
@@ -613,13 +592,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->Sekolah->FldCaption(), $this->Sekolah->ReqErrMsg));
 		}
 
-		// Validate detail grid
-		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-		if (in_array("t03_kelas", $DetailTblVar) && $GLOBALS["t03_kelas"]->DetailAdd) {
-			if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid(); // get detail page object
-			$GLOBALS["t03_kelas_grid"]->ValidateGridForm();
-		}
-
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
 
@@ -636,10 +608,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
 		$conn = &$this->Connection();
-
-		// Begin transaction
-		if ($this->getCurrentDetailTable() <> "")
-			$conn->BeginTrans();
 
 		// Load db values from rsold
 		if ($rsold) {
@@ -671,27 +639,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 			}
 			$AddRow = FALSE;
 		}
-
-		// Add detail records
-		if ($AddRow) {
-			$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-			if (in_array("t03_kelas", $DetailTblVar) && $GLOBALS["t03_kelas"]->DetailAdd) {
-				$GLOBALS["t03_kelas"]->sekolah_id->setSessionValue($this->id->CurrentValue); // Set master key
-				if (!isset($GLOBALS["t03_kelas_grid"])) $GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid(); // Get detail page object
-				$AddRow = $GLOBALS["t03_kelas_grid"]->GridInsert();
-				if (!$AddRow)
-					$GLOBALS["t03_kelas"]->sekolah_id->setSessionValue(""); // Clear master key if insert failed
-			}
-		}
-
-		// Commit/Rollback transaction
-		if ($this->getCurrentDetailTable() <> "") {
-			if ($AddRow) {
-				$conn->CommitTrans(); // Commit transaction
-			} else {
-				$conn->RollbackTrans(); // Rollback transaction
-			}
-		}
 		if ($AddRow) {
 
 			// Call Row Inserted event
@@ -699,39 +646,6 @@ class ct02_sekolah_add extends ct02_sekolah {
 			$this->Row_Inserted($rs, $rsnew);
 		}
 		return $AddRow;
-	}
-
-	// Set up detail parms based on QueryString
-	function SetUpDetailParms() {
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
-			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
-			$this->setCurrentDetailTable($sDetailTblVar);
-		} else {
-			$sDetailTblVar = $this->getCurrentDetailTable();
-		}
-		if ($sDetailTblVar <> "") {
-			$DetailTblVar = explode(",", $sDetailTblVar);
-			if (in_array("t03_kelas", $DetailTblVar)) {
-				if (!isset($GLOBALS["t03_kelas_grid"]))
-					$GLOBALS["t03_kelas_grid"] = new ct03_kelas_grid;
-				if ($GLOBALS["t03_kelas_grid"]->DetailAdd) {
-					if ($this->CopyRecord)
-						$GLOBALS["t03_kelas_grid"]->CurrentMode = "copy";
-					else
-						$GLOBALS["t03_kelas_grid"]->CurrentMode = "add";
-					$GLOBALS["t03_kelas_grid"]->CurrentAction = "gridadd";
-
-					// Save current master table to detail table
-					$GLOBALS["t03_kelas_grid"]->setCurrentMasterTable($this->TableVar);
-					$GLOBALS["t03_kelas_grid"]->setStartRecordNumber(1);
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->FldIsDetailKey = TRUE;
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->CurrentValue = $this->id->CurrentValue;
-					$GLOBALS["t03_kelas_grid"]->sekolah_id->setSessionValue($GLOBALS["t03_kelas_grid"]->sekolah_id->CurrentValue);
-				}
-			}
-		}
 	}
 
 	// Set up Breadcrumb
@@ -943,14 +857,6 @@ $t02_sekolah_add->ShowMessage();
 	</div>
 <?php } ?>
 </div>
-<?php
-	if (in_array("t03_kelas", explode(",", $t02_sekolah->getCurrentDetailTable())) && $t03_kelas->DetailAdd) {
-?>
-<?php if ($t02_sekolah->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t03_kelas", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "t03_kelasgrid.php" ?>
-<?php } ?>
 <?php if (!$t02_sekolah_add->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

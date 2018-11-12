@@ -23,7 +23,7 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 	var $PageID = 'list';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't06_siswarutin';
@@ -338,9 +338,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
-
-		// Create form object
-		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 
 		// Get grid add count
@@ -523,55 +520,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
-			// Check QueryString parameters
-			if (@$_GET["a"] <> "") {
-				$this->CurrentAction = $_GET["a"];
-
-				// Clear inline mode
-				if ($this->CurrentAction == "cancel")
-					$this->ClearInlineMode();
-
-				// Switch to grid edit mode
-				if ($this->CurrentAction == "gridedit")
-					$this->GridEditMode();
-
-				// Switch to grid add mode
-				if ($this->CurrentAction == "gridadd")
-					$this->GridAddMode();
-			} else {
-				if (@$_POST["a_list"] <> "") {
-					$this->CurrentAction = $_POST["a_list"]; // Get action
-
-					// Grid Update
-					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
-						if ($this->ValidateGridForm()) {
-							$bGridUpdate = $this->GridUpdate();
-						} else {
-							$bGridUpdate = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridUpdate) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
-						}
-					}
-
-					// Grid Insert
-					if ($this->CurrentAction == "gridinsert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridadd") {
-						if ($this->ValidateGridForm()) {
-							$bGridInsert = $this->GridInsert();
-						} else {
-							$bGridInsert = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridInsert) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridadd"; // Stay in Grid Add mode
-						}
-					}
-				}
-			}
-
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -593,14 +541,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 			if ($this->Export <> "") {
 				foreach ($this->OtherOptions as &$option)
 					$option->HideAllOptions();
-			}
-
-			// Show grid delete link for grid add / grid edit
-			if ($this->AllowAddDeleteRow) {
-				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-					$item = $this->ListOptions->GetItem("griddelete");
-					if ($item) $item->Visible = TRUE;
-				}
 			}
 
 			// Set up sorting order
@@ -661,126 +601,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		$this->SetupSearchOptions();
 	}
 
-	//  Exit inline mode
-	function ClearInlineMode() {
-		$this->Nilai->FormValue = ""; // Clear form value
-		$this->LastAction = $this->CurrentAction; // Save last action
-		$this->CurrentAction = ""; // Clear action
-		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
-	}
-
-	// Switch to Grid Add mode
-	function GridAddMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
-	}
-
-	// Switch to Grid Edit mode
-	function GridEditMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
-	}
-
-	// Perform update to grid
-	function GridUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$bGridUpdate = TRUE;
-
-		// Get old recordset
-		$this->CurrentFilter = $this->BuildKeyFilter();
-		if ($this->CurrentFilter == "")
-			$this->CurrentFilter = "0=1";
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		if ($rs = $conn->Execute($sSql)) {
-			$rsold = $rs->GetRows();
-			$rs->Close();
-		}
-
-		// Call Grid Updating event
-		if (!$this->Grid_Updating($rsold)) {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-		$sKey = "";
-
-		// Update row index and get row key
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Update all rows based on key
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-			$objForm->Index = $rowindex;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-
-			// Load all values and keys
-			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
-				} else {
-					$bGridUpdate = TRUE;
-				}
-
-				// Skip empty row
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// No action required
-				// Validate form and insert/update/delete record
-
-				} elseif ($bGridUpdate) {
-					if ($rowaction == "delete") {
-						$this->CurrentFilter = $this->KeyFilter();
-						$bGridUpdate = $this->DeleteRows(); // Delete this row
-					} else if (!$this->ValidateForm()) {
-						$bGridUpdate = FALSE; // Form error, reset action
-						$this->setFailureMessage($gsFormError);
-					} else {
-						if ($rowaction == "insert") {
-							$bGridUpdate = $this->AddRow(); // Insert this row
-						} else {
-							if ($rowkey <> "") {
-								$this->SendEmail = FALSE; // Do not send email on update success
-								$bGridUpdate = $this->EditRow(); // Update this row
-							}
-						} // End update
-					}
-				}
-				if ($bGridUpdate) {
-					if ($sKey <> "") $sKey .= ", ";
-					$sKey .= $rowkey;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($bGridUpdate) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Updated event
-			$this->Grid_Updated($rsold, $rsnew);
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-		}
-		return $bGridUpdate;
-	}
-
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -817,177 +637,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 				return FALSE;
 		}
 		return TRUE;
-	}
-
-	// Perform Grid Add
-	function GridInsert() {
-		global $Language, $objForm, $gsFormError;
-		$rowindex = 1;
-		$bGridInsert = FALSE;
-		$conn = &$this->Connection();
-
-		// Call Grid Inserting event
-		if (!$this->Grid_Inserting()) {
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("GridAddCancelled")); // Set grid add cancelled message
-			}
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-
-		// Init key filter
-		$sWrkFilter = "";
-		$addcnt = 0;
-		$sKey = "";
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Insert all rows
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "" && $rowaction <> "insert")
-				continue; // Skip
-			$this->LoadFormValues(); // Get form values
-			if (!$this->EmptyRow()) {
-				$addcnt++;
-				$this->SendEmail = FALSE; // Do not send email on insert success
-
-				// Validate form
-				if (!$this->ValidateForm()) {
-					$bGridInsert = FALSE; // Form error, reset action
-					$this->setFailureMessage($gsFormError);
-				} else {
-					$bGridInsert = $this->AddRow($this->OldRecordset); // Insert this row
-				}
-				if ($bGridInsert) {
-					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->id->CurrentValue;
-
-					// Add filter for this record
-					$sFilter = $this->KeyFilter();
-					if ($sWrkFilter <> "") $sWrkFilter .= " OR ";
-					$sWrkFilter .= $sFilter;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($addcnt == 0) { // No record inserted
-			$this->setFailureMessage($Language->Phrase("NoAddRecord"));
-			$bGridInsert = FALSE;
-		}
-		if ($bGridInsert) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			$this->CurrentFilter = $sWrkFilter;
-			$sSql = $this->SQL();
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Inserted event
-			$this->Grid_Inserted($rsnew);
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
-			$this->ClearInlineMode(); // Clear grid add mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
-			}
-		}
-		return $bGridInsert;
-	}
-
-	// Check if empty row
-	function EmptyRow() {
-		global $objForm;
-		if ($objForm->HasValue("x_siswa_id") && $objForm->HasValue("o_siswa_id") && $this->siswa_id->CurrentValue <> $this->siswa_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_rutin_id") && $objForm->HasValue("o_rutin_id") && $this->rutin_id->CurrentValue <> $this->rutin_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_Nilai") && $objForm->HasValue("o_Nilai") && $this->Nilai->CurrentValue <> $this->Nilai->OldValue)
-			return FALSE;
-		return TRUE;
-	}
-
-	// Validate grid form
-	function ValidateGridForm() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Validate all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else if (!$this->ValidateForm()) {
-					return FALSE;
-				}
-			}
-		}
-		return TRUE;
-	}
-
-	// Get all form values of the grid
-	function GetGridFormValues() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-		$rows = array();
-
-		// Loop through all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else {
-					$rows[] = $this->GetFieldValues("FormValue"); // Return row as array
-				}
-			}
-		}
-		return $rows; // Return as array of array
-	}
-
-	// Restore form values for current row
-	function RestoreCurrentRowFormValues($idx) {
-		global $objForm;
-
-		// Get row based on current index
-		$objForm->Index = $idx;
-		$this->LoadFormValues(); // Load form values
 	}
 
 	// Set up sort parameters
@@ -1054,19 +703,29 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 	function SetupListOptions() {
 		global $Security, $Language;
 
-		// "griddelete"
-		if ($this->AllowAddDeleteRow) {
-			$item = &$this->ListOptions->Add("griddelete");
-			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = TRUE;
-			$item->Visible = FALSE; // Default hidden
-		}
-
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
+
+		// "view"
+		$item = &$this->ListOptions->Add("view");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
+		// "edit"
+		$item = &$this->ListOptions->Add("edit");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
+		// "copy"
+		$item = &$this->ListOptions->Add("copy");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
 
 		// "delete"
 		$item = &$this->ListOptions->Add("delete");
@@ -1142,37 +801,36 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
 
-		// Set up row action and key
-		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
-			$objForm->Index = $this->RowIndex;
-			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
-			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
-			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
-			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
-			if ($this->RowAction <> "")
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
-			if ($this->RowAction == "delete") {
-				$rowkey = $objForm->GetValue($this->FormKeyName);
-				$this->SetupKeyValues($rowkey);
-			}
-			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
-		}
-
-		// "delete"
-		if ($this->AllowAddDeleteRow) {
-			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-				$option = &$this->ListOptions;
-				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
-				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
-				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
-			}
-		}
-
 		// "sequence"
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+
+		// "view"
+		$oListOpt = &$this->ListOptions->Items["view"];
+		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
+		// "copy"
+		$oListOpt = &$this->ListOptions->Items["copy"];
+		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
 
 		// "delete"
 		$oListOpt = &$this->ListOptions->Items["delete"];
@@ -1219,6 +877,21 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t07_siswarutinbayar", "TblCaption");
 			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t07_siswarutinbayarlist.php?" . EW_TABLE_SHOW_MASTER . "=t06_siswarutin&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
 			$links = "";
+			if ($GLOBALS["t07_siswarutinbayar_grid"]->DetailView) {
+				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=t07_siswarutinbayar")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
+				if ($DetailViewTblVar <> "") $DetailViewTblVar .= ",";
+				$DetailViewTblVar .= "t07_siswarutinbayar";
+			}
+			if ($GLOBALS["t07_siswarutinbayar_grid"]->DetailEdit) {
+				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=t07_siswarutinbayar")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
+				$DetailEditTblVar .= "t07_siswarutinbayar";
+			}
+			if ($GLOBALS["t07_siswarutinbayar_grid"]->DetailAdd) {
+				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=t07_siswarutinbayar")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
+				if ($DetailCopyTblVar <> "") $DetailCopyTblVar .= ",";
+				$DetailCopyTblVar .= "t07_siswarutinbayar";
+			}
 			if ($links <> "") {
 				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
 				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
@@ -1254,9 +927,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
-		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1268,15 +938,39 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
-		$item = &$option->Add("gridadd");
-		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "");
 
-		// Add grid edit
-		$option = $options["addedit"];
-		$item = &$option->Add("gridedit");
-		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "");
+		// Add
+		$item = &$option->Add("add");
+		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
+		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
+		$item->Visible = ($this->AddUrl <> "");
+		$option = $options["detail"];
+		$DetailTableLink = "";
+		$item = &$option->Add("detailadd_t07_siswarutinbayar");
+		$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=t07_siswarutinbayar");
+		$caption = $Language->Phrase("Add") . "&nbsp;" . $this->TableCaption() . "/" . $GLOBALS["t07_siswarutinbayar"]->TableCaption();
+		$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($caption) . "\" data-caption=\"" . ew_HtmlTitle($caption) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $caption . "</a>";
+		$item->Visible = ($GLOBALS["t07_siswarutinbayar"]->DetailAdd);
+		if ($item->Visible) {
+			if ($DetailTableLink <> "") $DetailTableLink .= ",";
+			$DetailTableLink .= "t07_siswarutinbayar";
+		}
+
+		// Add multiple details
+		if ($this->ShowMultipleDetails) {
+			$item = &$option->Add("detailsadd");
+			$url = $this->GetAddUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailTableLink);
+			$item->Body = "<a class=\"ewDetailAddGroup ewDetailAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddMasterDetailLink")) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . $Language->Phrase("AddMasterDetailLink") . "</a>";
+			$item->Visible = ($DetailTableLink <> "");
+
+			// Hide single master/detail items
+			$ar = explode(",", $DetailTableLink);
+			$cnt = count($ar);
+			for ($i = 0; $i < $cnt; $i++) {
+				if ($item = &$option->GetItem("detailadd_" . $ar[$i]))
+					$item->Visible = FALSE;
+			}
+		}
 		$option = $options["action"];
 
 		// Set up options default
@@ -1314,7 +1008,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 
 			// Set up list action buttons
@@ -1336,56 +1029,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 				$option = &$options["action"];
 				$option->HideAllOptions();
 			}
-		} else { // Grid add/edit mode
-
-			// Hide all options first
-			foreach ($options as &$option)
-				$option->HideAllOptions();
-			if ($this->CurrentAction == "gridadd") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = FALSE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-
-				// Add grid insert
-				$item = &$option->Add("gridinsert");
-				$item->Body = "<a class=\"ewAction ewGridInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridInsertLink") . "</a>";
-
-				// Add grid cancel
-				$item = &$option->Add("gridcancel");
-				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-			if ($this->CurrentAction == "gridedit") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = FALSE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-					$item = &$option->Add("gridsave");
-					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
-					$item = &$option->Add("gridcancel");
-					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-		}
 	}
 
 	// Process list action
@@ -1534,47 +1177,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		}
 	}
 
-	// Load default values
-	function LoadDefaultValues() {
-		$this->siswa_id->CurrentValue = NULL;
-		$this->siswa_id->OldValue = $this->siswa_id->CurrentValue;
-		$this->rutin_id->CurrentValue = NULL;
-		$this->rutin_id->OldValue = $this->rutin_id->CurrentValue;
-		$this->Nilai->CurrentValue = 0.00;
-		$this->Nilai->OldValue = $this->Nilai->CurrentValue;
-	}
-
-	// Load form values
-	function LoadFormValues() {
-
-		// Load from form
-		global $objForm;
-		if (!$this->siswa_id->FldIsDetailKey) {
-			$this->siswa_id->setFormValue($objForm->GetValue("x_siswa_id"));
-		}
-		$this->siswa_id->setOldValue($objForm->GetValue("o_siswa_id"));
-		if (!$this->rutin_id->FldIsDetailKey) {
-			$this->rutin_id->setFormValue($objForm->GetValue("x_rutin_id"));
-		}
-		$this->rutin_id->setOldValue($objForm->GetValue("o_rutin_id"));
-		if (!$this->Nilai->FldIsDetailKey) {
-			$this->Nilai->setFormValue($objForm->GetValue("x_Nilai"));
-		}
-		$this->Nilai->setOldValue($objForm->GetValue("o_Nilai"));
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
-	}
-
-	// Restore form values
-	function RestoreFormValues() {
-		global $objForm;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->CurrentValue = $this->id->FormValue;
-		$this->siswa_id->CurrentValue = $this->siswa_id->FormValue;
-		$this->rutin_id->CurrentValue = $this->rutin_id->FormValue;
-		$this->Nilai->CurrentValue = $this->Nilai->FormValue;
-	}
-
 	// Load recordset
 	function LoadRecordset($offset = -1, $rowcnt = -1) {
 
@@ -1701,7 +1303,27 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		$this->id->ViewCustomAttributes = "";
 
 		// siswa_id
-		$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
+		if (strval($this->siswa_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->siswa_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `NIS` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_siswa`";
+		$sWhereWrk = "";
+		$this->siswa_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->siswa_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$arwrk[2] = $rswrk->fields('Disp2Fld');
+				$this->siswa_id->ViewValue = $this->siswa_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
+			}
+		} else {
+			$this->siswa_id->ViewValue = NULL;
+		}
 		$this->siswa_id->ViewCustomAttributes = "";
 
 		// rutin_id
@@ -1747,400 +1369,11 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
 			$this->Nilai->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
-
-			// siswa_id
-			$this->siswa_id->EditAttrs["class"] = "form-control";
-			$this->siswa_id->EditCustomAttributes = "";
-			if ($this->siswa_id->getSessionValue() <> "") {
-				$this->siswa_id->CurrentValue = $this->siswa_id->getSessionValue();
-				$this->siswa_id->OldValue = $this->siswa_id->CurrentValue;
-			$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
-			$this->siswa_id->ViewCustomAttributes = "";
-			} else {
-			$this->siswa_id->EditValue = ew_HtmlEncode($this->siswa_id->CurrentValue);
-			$this->siswa_id->PlaceHolder = ew_RemoveHtml($this->siswa_id->FldCaption());
-			}
-
-			// rutin_id
-			$this->rutin_id->EditAttrs["class"] = "form-control";
-			$this->rutin_id->EditCustomAttributes = "";
-			if (trim(strval($this->rutin_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_rutin`";
-			$sWhereWrk = "";
-			$this->rutin_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->rutin_id->EditValue = $arwrk;
-
-			// Nilai
-			$this->Nilai->EditAttrs["class"] = "form-control";
-			$this->Nilai->EditCustomAttributes = "";
-			$this->Nilai->EditValue = ew_HtmlEncode($this->Nilai->CurrentValue);
-			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
-			if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) {
-			$this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
-			$this->Nilai->OldValue = $this->Nilai->EditValue;
-			}
-
-			// Add refer script
-			// siswa_id
-
-			$this->siswa_id->LinkCustomAttributes = "";
-			$this->siswa_id->HrefValue = "";
-
-			// rutin_id
-			$this->rutin_id->LinkCustomAttributes = "";
-			$this->rutin_id->HrefValue = "";
-
-			// Nilai
-			$this->Nilai->LinkCustomAttributes = "";
-			$this->Nilai->HrefValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// siswa_id
-			$this->siswa_id->EditAttrs["class"] = "form-control";
-			$this->siswa_id->EditCustomAttributes = "";
-			if ($this->siswa_id->getSessionValue() <> "") {
-				$this->siswa_id->CurrentValue = $this->siswa_id->getSessionValue();
-				$this->siswa_id->OldValue = $this->siswa_id->CurrentValue;
-			$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
-			$this->siswa_id->ViewCustomAttributes = "";
-			} else {
-			$this->siswa_id->EditValue = ew_HtmlEncode($this->siswa_id->CurrentValue);
-			$this->siswa_id->PlaceHolder = ew_RemoveHtml($this->siswa_id->FldCaption());
-			}
-
-			// rutin_id
-			$this->rutin_id->EditAttrs["class"] = "form-control";
-			$this->rutin_id->EditCustomAttributes = "";
-			if (trim(strval($this->rutin_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_rutin`";
-			$sWhereWrk = "";
-			$this->rutin_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->rutin_id->EditValue = $arwrk;
-
-			// Nilai
-			$this->Nilai->EditAttrs["class"] = "form-control";
-			$this->Nilai->EditCustomAttributes = "";
-			$this->Nilai->EditValue = ew_HtmlEncode($this->Nilai->CurrentValue);
-			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
-			if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) {
-			$this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
-			$this->Nilai->OldValue = $this->Nilai->EditValue;
-			}
-
-			// Edit refer script
-			// siswa_id
-
-			$this->siswa_id->LinkCustomAttributes = "";
-			$this->siswa_id->HrefValue = "";
-
-			// rutin_id
-			$this->rutin_id->LinkCustomAttributes = "";
-			$this->rutin_id->HrefValue = "";
-
-			// Nilai
-			$this->Nilai->LinkCustomAttributes = "";
-			$this->Nilai->HrefValue = "";
-		}
-		if ($this->RowType == EW_ROWTYPE_ADD ||
-			$this->RowType == EW_ROWTYPE_EDIT ||
-			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
-			$this->SetupFieldTitles();
 		}
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
-	}
-
-	// Validate form
-	function ValidateForm() {
-		global $Language, $gsFormError;
-
-		// Initialize form error message
-		$gsFormError = "";
-
-		// Check if validation required
-		if (!EW_SERVER_VALIDATE)
-			return ($gsFormError == "");
-		if (!$this->siswa_id->FldIsDetailKey && !is_null($this->siswa_id->FormValue) && $this->siswa_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->siswa_id->FldCaption(), $this->siswa_id->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->siswa_id->FormValue)) {
-			ew_AddMessage($gsFormError, $this->siswa_id->FldErrMsg());
-		}
-		if (!$this->rutin_id->FldIsDetailKey && !is_null($this->rutin_id->FormValue) && $this->rutin_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->rutin_id->FldCaption(), $this->rutin_id->ReqErrMsg));
-		}
-		if (!$this->Nilai->FldIsDetailKey && !is_null($this->Nilai->FormValue) && $this->Nilai->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Nilai->FldCaption(), $this->Nilai->ReqErrMsg));
-		}
-		if (!ew_CheckNumber($this->Nilai->FormValue)) {
-			ew_AddMessage($gsFormError, $this->Nilai->FldErrMsg());
-		}
-
-		// Return validate result
-		$ValidateForm = ($gsFormError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsFormError, $sFormCustomError);
-		}
-		return $ValidateForm;
-	}
-
-	//
-	// Delete records based on current filter
-	//
-	function DeleteRows() {
-		global $Language, $Security;
-		$DeleteRows = TRUE;
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE) {
-			return FALSE;
-		} elseif ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-			$rs->Close();
-			return FALSE;
-
-		//} else {
-		//	$this->LoadRowValues($rs); // Load row values
-
-		}
-		$rows = ($rs) ? $rs->GetRows() : array();
-
-		// Clone old rows
-		$rsold = $rows;
-		if ($rs)
-			$rs->Close();
-
-		// Call row deleting event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$DeleteRows = $this->Row_Deleting($row);
-				if (!$DeleteRows) break;
-			}
-		}
-		if ($DeleteRows) {
-			$sKey = "";
-			foreach ($rsold as $row) {
-				$sThisKey = "";
-				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['id'];
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				$DeleteRows = $this->Delete($row); // Delete
-				$conn->raiseErrorFn = '';
-				if ($DeleteRows === FALSE)
-					break;
-				if ($sKey <> "") $sKey .= ", ";
-				$sKey .= $sThisKey;
-			}
-		} else {
-
-			// Set up error message
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
-			}
-		}
-		if ($DeleteRows) {
-		} else {
-		}
-
-		// Call Row Deleted event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$this->Row_Deleted($row);
-			}
-		}
-		return $DeleteRows;
-	}
-
-	// Update record based on key values
-	function EditRow() {
-		global $Security, $Language;
-		$sFilter = $this->KeyFilter();
-		$sFilter = $this->ApplyUserIDFilters($sFilter);
-		$conn = &$this->Connection();
-		$this->CurrentFilter = $sFilter;
-		$sSql = $this->SQL();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE)
-			return FALSE;
-		if ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$EditRow = FALSE; // Update Failed
-		} else {
-
-			// Save old values
-			$rsold = &$rs->fields;
-			$this->LoadDbValues($rsold);
-			$rsnew = array();
-
-			// siswa_id
-			$this->siswa_id->SetDbValueDef($rsnew, $this->siswa_id->CurrentValue, 0, $this->siswa_id->ReadOnly);
-
-			// rutin_id
-			$this->rutin_id->SetDbValueDef($rsnew, $this->rutin_id->CurrentValue, 0, $this->rutin_id->ReadOnly);
-
-			// Nilai
-			$this->Nilai->SetDbValueDef($rsnew, $this->Nilai->CurrentValue, 0, $this->Nilai->ReadOnly);
-
-			// Check referential integrity for master table 't04_siswa'
-			$bValidMasterRecord = TRUE;
-			$sMasterFilter = $this->SqlMasterFilter_t04_siswa();
-			$KeyValue = isset($rsnew['siswa_id']) ? $rsnew['siswa_id'] : $rsold['siswa_id'];
-			if (strval($KeyValue) <> "") {
-				$sMasterFilter = str_replace("@id@", ew_AdjustSql($KeyValue), $sMasterFilter);
-			} else {
-				$bValidMasterRecord = FALSE;
-			}
-			if ($bValidMasterRecord) {
-				if (!isset($GLOBALS["t04_siswa"])) $GLOBALS["t04_siswa"] = new ct04_siswa();
-				$rsmaster = $GLOBALS["t04_siswa"]->LoadRs($sMasterFilter);
-				$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
-				$rsmaster->Close();
-			}
-			if (!$bValidMasterRecord) {
-				$sRelatedRecordMsg = str_replace("%t", "t04_siswa", $Language->Phrase("RelatedRecordRequired"));
-				$this->setFailureMessage($sRelatedRecordMsg);
-				$rs->Close();
-				return FALSE;
-			}
-
-			// Call Row Updating event
-			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
-			if ($bUpdateRow) {
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				if (count($rsnew) > 0)
-					$EditRow = $this->Update($rsnew, "", $rsold);
-				else
-					$EditRow = TRUE; // No field to update
-				$conn->raiseErrorFn = '';
-				if ($EditRow) {
-				}
-			} else {
-				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-					// Use the message, do nothing
-				} elseif ($this->CancelMessage <> "") {
-					$this->setFailureMessage($this->CancelMessage);
-					$this->CancelMessage = "";
-				} else {
-					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
-				}
-				$EditRow = FALSE;
-			}
-		}
-
-		// Call Row_Updated event
-		if ($EditRow)
-			$this->Row_Updated($rsold, $rsnew);
-		$rs->Close();
-		return $EditRow;
-	}
-
-	// Add record
-	function AddRow($rsold = NULL) {
-		global $Language, $Security;
-
-		// Check referential integrity for master table 't04_siswa'
-		$bValidMasterRecord = TRUE;
-		$sMasterFilter = $this->SqlMasterFilter_t04_siswa();
-		if (strval($this->siswa_id->CurrentValue) <> "") {
-			$sMasterFilter = str_replace("@id@", ew_AdjustSql($this->siswa_id->CurrentValue, "DB"), $sMasterFilter);
-		} else {
-			$bValidMasterRecord = FALSE;
-		}
-		if ($bValidMasterRecord) {
-			if (!isset($GLOBALS["t04_siswa"])) $GLOBALS["t04_siswa"] = new ct04_siswa();
-			$rsmaster = $GLOBALS["t04_siswa"]->LoadRs($sMasterFilter);
-			$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
-			$rsmaster->Close();
-		}
-		if (!$bValidMasterRecord) {
-			$sRelatedRecordMsg = str_replace("%t", "t04_siswa", $Language->Phrase("RelatedRecordRequired"));
-			$this->setFailureMessage($sRelatedRecordMsg);
-			return FALSE;
-		}
-		$conn = &$this->Connection();
-
-		// Load db values from rsold
-		if ($rsold) {
-			$this->LoadDbValues($rsold);
-		}
-		$rsnew = array();
-
-		// siswa_id
-		$this->siswa_id->SetDbValueDef($rsnew, $this->siswa_id->CurrentValue, 0, FALSE);
-
-		// rutin_id
-		$this->rutin_id->SetDbValueDef($rsnew, $this->rutin_id->CurrentValue, 0, FALSE);
-
-		// Nilai
-		$this->Nilai->SetDbValueDef($rsnew, $this->Nilai->CurrentValue, 0, strval($this->Nilai->CurrentValue) == "");
-
-		// Call Row Inserting event
-		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-		if ($bInsertRow) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$AddRow = $this->Insert($rsnew);
-			$conn->raiseErrorFn = '';
-			if ($AddRow) {
-			}
-		} else {
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
-			}
-			$AddRow = FALSE;
-		}
-		if ($AddRow) {
-
-			// Call Row Inserted event
-			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-			$this->Row_Inserted($rs, $rsnew);
-		}
-		return $AddRow;
 	}
 
 	// Set up master/detail based on QueryString
@@ -2223,18 +1456,6 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_rutin_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_rutin`";
-			$sWhereWrk = "";
-			$this->rutin_id->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -2250,6 +1471,9 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 	function Page_Load() {
 
 		//echo "Page Load";
+		if (isset($_GET[EW_TABLE_SHOW_MASTER]) == "t04_siswa") {
+			$this->siswa_id->Visible = false;
+		}
 	}
 
 	// Page Unload event
@@ -2322,6 +1546,10 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		//$opt->OnLeft = TRUE; // Link on left
 		//$opt->MoveTo(0); // Move to first column
 
+		$opt = &$this->ListOptions->Add("bayar");
+		$opt->Header = "Bayar";
+		$opt->OnLeft = TRUE; // Link on left
+		$opt->MoveTo(0); // Move to first column
 	}
 
 	// ListOptions Rendered event
@@ -2330,6 +1558,7 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		// Example: 
 		//$this->ListOptions->Items["new"]->Body = "xxx";
 
+		$this->ListOptions->Items["bayar"]->Body = "<a class=\"ewAddEdit ewAdd\" title=\"Bayar\" data-caption=\"Bayar\" href=\"t07_siswarutinbayaredit.php?id=25&showmaster=t06_siswarutin&fk_id=3\">Proses</a>"; // definisikan link, style, dan caption tombol //"xxx";
 	}
 
 	// Row Custom Action event
@@ -2392,61 +1621,6 @@ var CurrentPageID = EW_PAGE_ID = "list";
 var CurrentForm = ft06_siswarutinlist = new ew_Form("ft06_siswarutinlist", "list");
 ft06_siswarutinlist.FormKeyCountName = '<?php echo $t06_siswarutin_list->FormKeyCountName ?>';
 
-// Validate form
-ft06_siswarutinlist.Validate = function() {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
-	if ($fobj.find("#a_confirm").val() == "F")
-		return true;
-	var elm, felm, uelm, addcnt = 0;
-	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
-	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
-	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
-	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
-	for (var i = startcnt; i <= rowcnt; i++) {
-		var infix = ($k[0]) ? String(i) : "";
-		$fobj.data("rowindex", infix);
-		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
-		if (checkrow) {
-			addcnt++;
-			elm = this.GetElements("x" + infix + "_siswa_id");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->siswa_id->FldCaption(), $t06_siswarutin->siswa_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_siswa_id");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutin->siswa_id->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "_rutin_id");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->rutin_id->FldCaption(), $t06_siswarutin->rutin_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Nilai");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->Nilai->FldCaption(), $t06_siswarutin->Nilai->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Nilai");
-			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutin->Nilai->FldErrMsg()) ?>");
-
-			// Fire Form_CustomValidate event
-			if (!this.Form_CustomValidate(fobj))
-				return false;
-		} // End Grid Add checking
-	}
-	if (gridinsert && addcnt == 0) { // No row added
-		ew_Alert(ewLanguage.Phrase("NoAddRecord"));
-		return false;
-	}
-	return true;
-}
-
-// Check empty row
-ft06_siswarutinlist.EmptyRow = function(infix) {
-	var fobj = this.Form;
-	if (ew_ValueChanged(fobj, infix, "siswa_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "rutin_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Nilai", false)) return false;
-	return true;
-}
-
 // Form_CustomValidate event
 ft06_siswarutinlist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
@@ -2463,6 +1637,7 @@ ft06_siswarutinlist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft06_siswarutinlist.Lists["x_siswa_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_NIS","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_siswa"};
 ft06_siswarutinlist.Lists["x_rutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_rutin"};
 
 // Form object for search
@@ -2491,13 +1666,6 @@ if ($t06_siswarutin_list->DbMasterFilter <> "" && $t06_siswarutin->getCurrentMas
 ?>
 <?php } ?>
 <?php
-if ($t06_siswarutin->CurrentAction == "gridadd") {
-	$t06_siswarutin->CurrentFilter = "0=1";
-	$t06_siswarutin_list->StartRec = 1;
-	$t06_siswarutin_list->DisplayRecs = $t06_siswarutin->GridAddRowCount;
-	$t06_siswarutin_list->TotalRecs = $t06_siswarutin_list->DisplayRecs;
-	$t06_siswarutin_list->StopRec = $t06_siswarutin_list->DisplayRecs;
-} else {
 	$bSelectLimit = $t06_siswarutin_list->UseSelectLimit;
 	if ($bSelectLimit) {
 		if ($t06_siswarutin_list->TotalRecs <= 0)
@@ -2521,7 +1689,6 @@ if ($t06_siswarutin->CurrentAction == "gridadd") {
 		else
 			$t06_siswarutin_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-}
 $t06_siswarutin_list->RenderOtherOptions();
 ?>
 <?php $t06_siswarutin_list->ShowPageHeader(); ?>
@@ -2602,15 +1769,6 @@ if ($t06_siswarutin->ExportAll && $t06_siswarutin->Export <> "") {
 	else
 		$t06_siswarutin_list->StopRec = $t06_siswarutin_list->TotalRecs;
 }
-
-// Restore number of post back records
-if ($objForm) {
-	$objForm->Index = -1;
-	if ($objForm->HasValue($t06_siswarutin_list->FormKeyCountName) && ($t06_siswarutin->CurrentAction == "gridadd" || $t06_siswarutin->CurrentAction == "gridedit" || $t06_siswarutin->CurrentAction == "F")) {
-		$t06_siswarutin_list->KeyCount = $objForm->GetValue($t06_siswarutin_list->FormKeyCountName);
-		$t06_siswarutin_list->StopRec = $t06_siswarutin_list->StartRec + $t06_siswarutin_list->KeyCount - 1;
-	}
-}
 $t06_siswarutin_list->RecCnt = $t06_siswarutin_list->StartRec - 1;
 if ($t06_siswarutin_list->Recordset && !$t06_siswarutin_list->Recordset->EOF) {
 	$t06_siswarutin_list->Recordset->MoveFirst();
@@ -2625,24 +1783,10 @@ if ($t06_siswarutin_list->Recordset && !$t06_siswarutin_list->Recordset->EOF) {
 $t06_siswarutin->RowType = EW_ROWTYPE_AGGREGATEINIT;
 $t06_siswarutin->ResetAttrs();
 $t06_siswarutin_list->RenderRow();
-if ($t06_siswarutin->CurrentAction == "gridadd")
-	$t06_siswarutin_list->RowIndex = 0;
-if ($t06_siswarutin->CurrentAction == "gridedit")
-	$t06_siswarutin_list->RowIndex = 0;
 while ($t06_siswarutin_list->RecCnt < $t06_siswarutin_list->StopRec) {
 	$t06_siswarutin_list->RecCnt++;
 	if (intval($t06_siswarutin_list->RecCnt) >= intval($t06_siswarutin_list->StartRec)) {
 		$t06_siswarutin_list->RowCnt++;
-		if ($t06_siswarutin->CurrentAction == "gridadd" || $t06_siswarutin->CurrentAction == "gridedit" || $t06_siswarutin->CurrentAction == "F") {
-			$t06_siswarutin_list->RowIndex++;
-			$objForm->Index = $t06_siswarutin_list->RowIndex;
-			if ($objForm->HasValue($t06_siswarutin_list->FormActionName))
-				$t06_siswarutin_list->RowAction = strval($objForm->GetValue($t06_siswarutin_list->FormActionName));
-			elseif ($t06_siswarutin->CurrentAction == "gridadd")
-				$t06_siswarutin_list->RowAction = "insert";
-			else
-				$t06_siswarutin_list->RowAction = "";
-		}
 
 		// Set up key count
 		$t06_siswarutin_list->KeyCount = $t06_siswarutin_list->RowIndex;
@@ -2651,28 +1795,10 @@ while ($t06_siswarutin_list->RecCnt < $t06_siswarutin_list->StopRec) {
 		$t06_siswarutin->ResetAttrs();
 		$t06_siswarutin->CssClass = "";
 		if ($t06_siswarutin->CurrentAction == "gridadd") {
-			$t06_siswarutin_list->LoadDefaultValues(); // Load default values
 		} else {
 			$t06_siswarutin_list->LoadRowValues($t06_siswarutin_list->Recordset); // Load row values
 		}
 		$t06_siswarutin->RowType = EW_ROWTYPE_VIEW; // Render view
-		if ($t06_siswarutin->CurrentAction == "gridadd") // Grid add
-			$t06_siswarutin->RowType = EW_ROWTYPE_ADD; // Render add
-		if ($t06_siswarutin->CurrentAction == "gridadd" && $t06_siswarutin->EventCancelled && !$objForm->HasValue("k_blankrow")) // Insert failed
-			$t06_siswarutin_list->RestoreCurrentRowFormValues($t06_siswarutin_list->RowIndex); // Restore form values
-		if ($t06_siswarutin->CurrentAction == "gridedit") { // Grid edit
-			if ($t06_siswarutin->EventCancelled) {
-				$t06_siswarutin_list->RestoreCurrentRowFormValues($t06_siswarutin_list->RowIndex); // Restore form values
-			}
-			if ($t06_siswarutin_list->RowAction == "insert")
-				$t06_siswarutin->RowType = EW_ROWTYPE_ADD; // Render add
-			else
-				$t06_siswarutin->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
-		if ($t06_siswarutin->CurrentAction == "gridedit" && ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT || $t06_siswarutin->RowType == EW_ROWTYPE_ADD) && $t06_siswarutin->EventCancelled) // Update failed
-			$t06_siswarutin_list->RestoreCurrentRowFormValues($t06_siswarutin_list->RowIndex); // Restore form values
-		if ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT) // Edit row
-			$t06_siswarutin_list->EditRowCnt++;
 
 		// Set up row id / data-rowindex
 		$t06_siswarutin->RowAttrs = array_merge($t06_siswarutin->RowAttrs, array('data-rowindex'=>$t06_siswarutin_list->RowCnt, 'id'=>'r' . $t06_siswarutin_list->RowCnt . '_t06_siswarutin', 'data-rowtype'=>$t06_siswarutin->RowType));
@@ -2682,9 +1808,6 @@ while ($t06_siswarutin_list->RecCnt < $t06_siswarutin_list->StopRec) {
 
 		// Render list options
 		$t06_siswarutin_list->RenderListOptions();
-
-		// Skip delete row / empty row for confirm page
-		if ($t06_siswarutin_list->RowAction <> "delete" && $t06_siswarutin_list->RowAction <> "insertdelete" && !($t06_siswarutin_list->RowAction == "insert" && $t06_siswarutin->CurrentAction == "F" && $t06_siswarutin_list->EmptyRow())) {
 ?>
 	<tr<?php echo $t06_siswarutin->RowAttributes() ?>>
 <?php
@@ -2694,94 +1817,26 @@ $t06_siswarutin_list->ListOptions->Render("body", "left", $t06_siswarutin_list->
 ?>
 	<?php if ($t06_siswarutin->siswa_id->Visible) { // siswa_id ?>
 		<td data-name="siswa_id"<?php echo $t06_siswarutin->siswa_id->CellAttributes() ?>>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<?php if ($t06_siswarutin->siswa_id->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<span<?php echo $t06_siswarutin->siswa_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t06_siswarutin->siswa_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
-</span>
-<?php } ?>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_siswa_id" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($t06_siswarutin->siswa_id->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<span<?php echo $t06_siswarutin->siswa_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t06_siswarutin->siswa_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_siswa_id" class="t06_siswarutin_siswa_id">
 <span<?php echo $t06_siswarutin->siswa_id->ViewAttributes() ?>>
 <?php echo $t06_siswarutin->siswa_id->ListViewValue() ?></span>
 </span>
-<?php } ?>
 <a id="<?php echo $t06_siswarutin_list->PageObjName . "_row_" . $t06_siswarutin_list->RowCnt ?>"></a></td>
 	<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_id" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->id->CurrentValue) ?>">
-<input type="hidden" data-table="t06_siswarutin" data-field="x_id" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_id" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->id->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT || $t06_siswarutin->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_id" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t06_siswarutin->rutin_id->Visible) { // rutin_id ?>
 		<td data-name="rutin_id"<?php echo $t06_siswarutin->rutin_id->CellAttributes() ?>>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_rutin_id" class="form-group t06_siswarutin_rutin_id">
-<select data-table="t06_siswarutin" data-field="x_rutin_id" data-value-separator="<?php echo $t06_siswarutin->rutin_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id"<?php echo $t06_siswarutin->rutin_id->EditAttributes() ?>>
-<?php echo $t06_siswarutin->rutin_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" id="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" value="<?php echo $t06_siswarutin->rutin_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_rutin_id" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->rutin_id->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_rutin_id" class="form-group t06_siswarutin_rutin_id">
-<select data-table="t06_siswarutin" data-field="x_rutin_id" data-value-separator="<?php echo $t06_siswarutin->rutin_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id"<?php echo $t06_siswarutin->rutin_id->EditAttributes() ?>>
-<?php echo $t06_siswarutin->rutin_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" id="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" value="<?php echo $t06_siswarutin->rutin_id->LookupFilterQuery() ?>">
-</span>
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_rutin_id" class="t06_siswarutin_rutin_id">
 <span<?php echo $t06_siswarutin->rutin_id->ViewAttributes() ?>>
 <?php echo $t06_siswarutin->rutin_id->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 	<?php if ($t06_siswarutin->Nilai->Visible) { // Nilai ?>
 		<td data-name="Nilai"<?php echo $t06_siswarutin->Nilai->CellAttributes() ?>>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_Nilai" class="form-group t06_siswarutin_Nilai">
-<input type="text" data-table="t06_siswarutin" data-field="x_Nilai" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->Nilai->EditValue ?>"<?php echo $t06_siswarutin->Nilai->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_Nilai" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_Nilai" class="form-group t06_siswarutin_Nilai">
-<input type="text" data-table="t06_siswarutin" data-field="x_Nilai" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->Nilai->EditValue ?>"<?php echo $t06_siswarutin->Nilai->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_siswarutin_list->RowCnt ?>_t06_siswarutin_Nilai" class="t06_siswarutin_Nilai">
 <span<?php echo $t06_siswarutin->Nilai->ViewAttributes() ?>>
 <?php echo $t06_siswarutin->Nilai->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 <?php
@@ -2790,101 +1845,14 @@ $t06_siswarutin_list->ListOptions->Render("body", "left", $t06_siswarutin_list->
 $t06_siswarutin_list->ListOptions->Render("body", "right", $t06_siswarutin_list->RowCnt);
 ?>
 	</tr>
-<?php if ($t06_siswarutin->RowType == EW_ROWTYPE_ADD || $t06_siswarutin->RowType == EW_ROWTYPE_EDIT) { ?>
-<script type="text/javascript">
-ft06_siswarutinlist.UpdateOpts(<?php echo $t06_siswarutin_list->RowIndex ?>);
-</script>
-<?php } ?>
 <?php
 	}
-	} // End delete row checking
 	if ($t06_siswarutin->CurrentAction <> "gridadd")
-		if (!$t06_siswarutin_list->Recordset->EOF) $t06_siswarutin_list->Recordset->MoveNext();
-}
-?>
-<?php
-	if ($t06_siswarutin->CurrentAction == "gridadd" || $t06_siswarutin->CurrentAction == "gridedit") {
-		$t06_siswarutin_list->RowIndex = '$rowindex$';
-		$t06_siswarutin_list->LoadDefaultValues();
-
-		// Set row properties
-		$t06_siswarutin->ResetAttrs();
-		$t06_siswarutin->RowAttrs = array_merge($t06_siswarutin->RowAttrs, array('data-rowindex'=>$t06_siswarutin_list->RowIndex, 'id'=>'r0_t06_siswarutin', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		ew_AppendClass($t06_siswarutin->RowAttrs["class"], "ewTemplate");
-		$t06_siswarutin->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t06_siswarutin_list->RenderRow();
-
-		// Render list options
-		$t06_siswarutin_list->RenderListOptions();
-		$t06_siswarutin_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t06_siswarutin->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t06_siswarutin_list->ListOptions->Render("body", "left", $t06_siswarutin_list->RowIndex);
-?>
-	<?php if ($t06_siswarutin->siswa_id->Visible) { // siswa_id ?>
-		<td data-name="siswa_id">
-<?php if ($t06_siswarutin->siswa_id->getSessionValue() <> "") { ?>
-<span id="el$rowindex$_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<span<?php echo $t06_siswarutin->siswa_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t06_siswarutin->siswa_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el$rowindex$_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
-</span>
-<?php } ?>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_siswa_id" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_siswarutin->rutin_id->Visible) { // rutin_id ?>
-		<td data-name="rutin_id">
-<span id="el$rowindex$_t06_siswarutin_rutin_id" class="form-group t06_siswarutin_rutin_id">
-<select data-table="t06_siswarutin" data-field="x_rutin_id" data-value-separator="<?php echo $t06_siswarutin->rutin_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id"<?php echo $t06_siswarutin->rutin_id->EditAttributes() ?>>
-<?php echo $t06_siswarutin->rutin_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" id="s_x<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" value="<?php echo $t06_siswarutin->rutin_id->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_rutin_id" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_rutin_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->rutin_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_siswarutin->Nilai->Visible) { // Nilai ?>
-		<td data-name="Nilai">
-<span id="el$rowindex$_t06_siswarutin_Nilai" class="form-group t06_siswarutin_Nilai">
-<input type="text" data-table="t06_siswarutin" data-field="x_Nilai" name="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" id="x<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->Nilai->EditValue ?>"<?php echo $t06_siswarutin->Nilai->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_siswarutin" data-field="x_Nilai" name="o<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" id="o<?php echo $t06_siswarutin_list->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t06_siswarutin->Nilai->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t06_siswarutin_list->ListOptions->Render("body", "right", $t06_siswarutin_list->RowCnt);
-?>
-<script type="text/javascript">
-ft06_siswarutinlist.UpdateOpts(<?php echo $t06_siswarutin_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
+		$t06_siswarutin_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
-<?php } ?>
-<?php if ($t06_siswarutin->CurrentAction == "gridadd") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridinsert">
-<input type="hidden" name="<?php echo $t06_siswarutin_list->FormKeyCountName ?>" id="<?php echo $t06_siswarutin_list->FormKeyCountName ?>" value="<?php echo $t06_siswarutin_list->KeyCount ?>">
-<?php echo $t06_siswarutin_list->MultiSelectKey ?>
-<?php } ?>
-<?php if ($t06_siswarutin->CurrentAction == "gridedit") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridupdate">
-<input type="hidden" name="<?php echo $t06_siswarutin_list->FormKeyCountName ?>" id="<?php echo $t06_siswarutin_list->FormKeyCountName ?>" value="<?php echo $t06_siswarutin_list->KeyCount ?>">
-<?php echo $t06_siswarutin_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($t06_siswarutin->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">

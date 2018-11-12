@@ -21,7 +21,7 @@ class ct01_tahunajaran_add extends ct01_tahunajaran {
 	var $PageID = 'add';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't01_tahunajaran';

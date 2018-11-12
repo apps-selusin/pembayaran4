@@ -22,7 +22,7 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 	var $PageID = 'view';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't07_siswarutinbayar';
@@ -313,8 +313,11 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->siswarutin_id->SetVisibility();
-		$this->Tanggal_Bayar->SetVisibility();
+		$this->Bulan->SetVisibility();
+		$this->Tahun->SetVisibility();
 		$this->Nilai->SetVisibility();
+		$this->Tanggal_Bayar->SetVisibility();
+		$this->Nilai_Bayar->SetVisibility();
 		$this->Periode->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
@@ -393,6 +396,7 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 	var $StopRec;
 	var $TotalRecs = 0;
 	var $RecRange = 10;
+	var $Pager;
 	var $RecCnt;
 	var $RecKey = array();
 	var $IsModal = FALSE;
@@ -409,6 +413,9 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$this->IsModal = (@$_GET["modal"] == "1" || @$_POST["modal"] == "1");
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
+
+		// Load current record
+		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
 
@@ -422,17 +429,46 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 				$this->id->setFormValue($_POST["id"]);
 				$this->RecKey["id"] = $this->id->FormValue;
 			} else {
-				$sReturnUrl = "t07_siswarutinbayarlist.php"; // Return to list
+				$bLoadCurrentRecord = TRUE;
 			}
 
 			// Get action
 			$this->CurrentAction = "I"; // Display form
 			switch ($this->CurrentAction) {
 				case "I": // Get a record to display
-					if (!$this->LoadRow()) { // Load record based on key
+					$this->StartRec = 1; // Initialize start position
+					if ($this->Recordset = $this->LoadRecordset()) // Load records
+						$this->TotalRecs = $this->Recordset->RecordCount(); // Get record count
+					if ($this->TotalRecs <= 0) { // No record found
+						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
+							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
+						$this->Page_Terminate("t07_siswarutinbayarlist.php"); // Return to list page
+					} elseif ($bLoadCurrentRecord) { // Load current record position
+						$this->SetUpStartRec(); // Set up start record position
+
+						// Point to current record
+						if (intval($this->StartRec) <= intval($this->TotalRecs)) {
+							$bMatchRecord = TRUE;
+							$this->Recordset->Move($this->StartRec-1);
+						}
+					} else { // Match key values
+						while (!$this->Recordset->EOF) {
+							if (strval($this->id->CurrentValue) == strval($this->Recordset->fields('id'))) {
+								$this->setStartRecordNumber($this->StartRec); // Save record position
+								$bMatchRecord = TRUE;
+								break;
+							} else {
+								$this->StartRec++;
+								$this->Recordset->MoveNext();
+							}
+						}
+					}
+					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
 						$sReturnUrl = "t07_siswarutinbayarlist.php"; // No matching record, return to list
+					} else {
+						$this->LoadRowValues($this->Recordset); // Load row values
 					}
 			}
 		} else {
@@ -539,6 +575,32 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		}
 	}
 
+	// Load recordset
+	function LoadRecordset($offset = -1, $rowcnt = -1) {
+
+		// Load List page SQL
+		$sSql = $this->SelectSQL();
+		$conn = &$this->Connection();
+
+		// Load recordset
+		$dbtype = ew_GetConnectionType($this->DBID);
+		if ($this->UseSelectLimit) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			if ($dbtype == "MSSQL") {
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
+			} else {
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
+			}
+			$conn->raiseErrorFn = '';
+		} else {
+			$rs = ew_LoadRecordset($sSql, $conn);
+		}
+
+		// Call Recordset Selected event
+		$this->Recordset_Selected($rs);
+		return $rs;
+	}
+
 	// Load row based on key values
 	function LoadRow() {
 		global $Security, $Language;
@@ -568,10 +630,14 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
+		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswarutin_id->setDbValue($rs->fields('siswarutin_id'));
-		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
+		$this->Bulan->setDbValue($rs->fields('Bulan'));
+		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
+		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
+		$this->Nilai_Bayar->setDbValue($rs->fields('Nilai_Bayar'));
 		$this->Periode->setDbValue($rs->fields('Periode'));
 	}
 
@@ -581,8 +647,11 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->siswarutin_id->DbValue = $row['siswarutin_id'];
-		$this->Tanggal_Bayar->DbValue = $row['Tanggal_Bayar'];
+		$this->Bulan->DbValue = $row['Bulan'];
+		$this->Tahun->DbValue = $row['Tahun'];
 		$this->Nilai->DbValue = $row['Nilai'];
+		$this->Tanggal_Bayar->DbValue = $row['Tanggal_Bayar'];
+		$this->Nilai_Bayar->DbValue = $row['Nilai_Bayar'];
 		$this->Periode->DbValue = $row['Periode'];
 	}
 
@@ -602,14 +671,21 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		if ($this->Nilai->FormValue == $this->Nilai->CurrentValue && is_numeric(ew_StrToFloat($this->Nilai->CurrentValue)))
 			$this->Nilai->CurrentValue = ew_StrToFloat($this->Nilai->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->Nilai_Bayar->FormValue == $this->Nilai_Bayar->CurrentValue && is_numeric(ew_StrToFloat($this->Nilai_Bayar->CurrentValue)))
+			$this->Nilai_Bayar->CurrentValue = ew_StrToFloat($this->Nilai_Bayar->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
 		// siswarutin_id
-		// Tanggal_Bayar
+		// Bulan
+		// Tahun
 		// Nilai
+		// Tanggal_Bayar
+		// Nilai_Bayar
 		// Periode
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
@@ -622,16 +698,72 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$this->siswarutin_id->ViewValue = $this->siswarutin_id->CurrentValue;
 		$this->siswarutin_id->ViewCustomAttributes = "";
 
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
-		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
-		$this->Tanggal_Bayar->ViewCustomAttributes = "";
+		// Bulan
+		if (strval($this->Bulan->CurrentValue) <> "") {
+			$sFilterWrk = "`Bulan`" . ew_SearchString("=", $this->Bulan->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `Bulan`, `Bulan` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Bulan->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Bulan, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Bulan->ViewValue = $this->Bulan->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Bulan->ViewValue = $this->Bulan->CurrentValue;
+			}
+		} else {
+			$this->Bulan->ViewValue = NULL;
+		}
+		$this->Bulan->ViewCustomAttributes = "";
+
+		// Tahun
+		if (strval($this->Tahun->CurrentValue) <> "") {
+			$sFilterWrk = "`Tahun`" . ew_SearchString("=", $this->Tahun->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `Tahun`, `Tahun` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Tahun->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Tahun, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Tahun->ViewValue = $this->Tahun->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Tahun->ViewValue = $this->Tahun->CurrentValue;
+			}
+		} else {
+			$this->Tahun->ViewValue = NULL;
+		}
+		$this->Tahun->ViewCustomAttributes = "";
 
 		// Nilai
 		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
 		$this->Nilai->ViewValue = ew_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
 		$this->Nilai->CellCssStyle .= "text-align: right;";
 		$this->Nilai->ViewCustomAttributes = "";
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
+		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
+		$this->Tanggal_Bayar->ViewCustomAttributes = "";
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
+		$this->Nilai_Bayar->ViewValue = ew_FormatNumber($this->Nilai_Bayar->ViewValue, 2, -2, -2, -2);
+		$this->Nilai_Bayar->CellCssStyle .= "text-align: right;";
+		$this->Nilai_Bayar->ViewCustomAttributes = "";
 
 		// Periode
 		$this->Periode->ViewValue = $this->Periode->CurrentValue;
@@ -642,15 +774,30 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 			$this->siswarutin_id->HrefValue = "";
 			$this->siswarutin_id->TooltipValue = "";
 
-			// Tanggal_Bayar
-			$this->Tanggal_Bayar->LinkCustomAttributes = "";
-			$this->Tanggal_Bayar->HrefValue = "";
-			$this->Tanggal_Bayar->TooltipValue = "";
+			// Bulan
+			$this->Bulan->LinkCustomAttributes = "";
+			$this->Bulan->HrefValue = "";
+			$this->Bulan->TooltipValue = "";
+
+			// Tahun
+			$this->Tahun->LinkCustomAttributes = "";
+			$this->Tahun->HrefValue = "";
+			$this->Tahun->TooltipValue = "";
 
 			// Nilai
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
 			$this->Nilai->TooltipValue = "";
+
+			// Tanggal_Bayar
+			$this->Tanggal_Bayar->LinkCustomAttributes = "";
+			$this->Tanggal_Bayar->HrefValue = "";
+			$this->Tanggal_Bayar->TooltipValue = "";
+
+			// Nilai_Bayar
+			$this->Nilai_Bayar->LinkCustomAttributes = "";
+			$this->Nilai_Bayar->HrefValue = "";
+			$this->Nilai_Bayar->TooltipValue = "";
 
 			// Periode
 			$this->Periode->LinkCustomAttributes = "";
@@ -878,8 +1025,10 @@ ft07_siswarutinbayarview.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ft07_siswarutinbayarview.Lists["x_Bulan"] = {"LinkField":"x_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Bulan","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
+ft07_siswarutinbayarview.Lists["x_Tahun"] = {"LinkField":"x_Tahun","Ajax":true,"AutoFill":false,"DisplayFields":["x_Tahun","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -923,13 +1072,24 @@ $t07_siswarutinbayar_view->ShowMessage();
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t07_siswarutinbayar->Tanggal_Bayar->Visible) { // Tanggal_Bayar ?>
-	<tr id="r_Tanggal_Bayar">
-		<td><span id="elh_t07_siswarutinbayar_Tanggal_Bayar"><?php echo $t07_siswarutinbayar->Tanggal_Bayar->FldCaption() ?></span></td>
-		<td data-name="Tanggal_Bayar"<?php echo $t07_siswarutinbayar->Tanggal_Bayar->CellAttributes() ?>>
-<span id="el_t07_siswarutinbayar_Tanggal_Bayar">
-<span<?php echo $t07_siswarutinbayar->Tanggal_Bayar->ViewAttributes() ?>>
-<?php echo $t07_siswarutinbayar->Tanggal_Bayar->ViewValue ?></span>
+<?php if ($t07_siswarutinbayar->Bulan->Visible) { // Bulan ?>
+	<tr id="r_Bulan">
+		<td><span id="elh_t07_siswarutinbayar_Bulan"><?php echo $t07_siswarutinbayar->Bulan->FldCaption() ?></span></td>
+		<td data-name="Bulan"<?php echo $t07_siswarutinbayar->Bulan->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Bulan">
+<span<?php echo $t07_siswarutinbayar->Bulan->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Bulan->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t07_siswarutinbayar->Tahun->Visible) { // Tahun ?>
+	<tr id="r_Tahun">
+		<td><span id="elh_t07_siswarutinbayar_Tahun"><?php echo $t07_siswarutinbayar->Tahun->FldCaption() ?></span></td>
+		<td data-name="Tahun"<?php echo $t07_siswarutinbayar->Tahun->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Tahun">
+<span<?php echo $t07_siswarutinbayar->Tahun->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Tahun->ViewValue ?></span>
 </span>
 </td>
 	</tr>
@@ -941,6 +1101,28 @@ $t07_siswarutinbayar_view->ShowMessage();
 <span id="el_t07_siswarutinbayar_Nilai">
 <span<?php echo $t07_siswarutinbayar->Nilai->ViewAttributes() ?>>
 <?php echo $t07_siswarutinbayar->Nilai->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t07_siswarutinbayar->Tanggal_Bayar->Visible) { // Tanggal_Bayar ?>
+	<tr id="r_Tanggal_Bayar">
+		<td><span id="elh_t07_siswarutinbayar_Tanggal_Bayar"><?php echo $t07_siswarutinbayar->Tanggal_Bayar->FldCaption() ?></span></td>
+		<td data-name="Tanggal_Bayar"<?php echo $t07_siswarutinbayar->Tanggal_Bayar->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Tanggal_Bayar">
+<span<?php echo $t07_siswarutinbayar->Tanggal_Bayar->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Tanggal_Bayar->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t07_siswarutinbayar->Nilai_Bayar->Visible) { // Nilai_Bayar ?>
+	<tr id="r_Nilai_Bayar">
+		<td><span id="elh_t07_siswarutinbayar_Nilai_Bayar"><?php echo $t07_siswarutinbayar->Nilai_Bayar->FldCaption() ?></span></td>
+		<td data-name="Nilai_Bayar"<?php echo $t07_siswarutinbayar->Nilai_Bayar->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Nilai_Bayar">
+<span<?php echo $t07_siswarutinbayar->Nilai_Bayar->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Nilai_Bayar->ViewValue ?></span>
 </span>
 </td>
 	</tr>
@@ -957,6 +1139,49 @@ $t07_siswarutinbayar_view->ShowMessage();
 	</tr>
 <?php } ?>
 </table>
+<?php if (!$t07_siswarutinbayar_view->IsModal) { ?>
+<?php if (!isset($t07_siswarutinbayar_view->Pager)) $t07_siswarutinbayar_view->Pager = new cPrevNextPager($t07_siswarutinbayar_view->StartRec, $t07_siswarutinbayar_view->DisplayRecs, $t07_siswarutinbayar_view->TotalRecs) ?>
+<?php if ($t07_siswarutinbayar_view->Pager->RecordCount > 0 && $t07_siswarutinbayar_view->Pager->Visible) { ?>
+<div class="ewPager">
+<span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
+<div class="ewPrevNext"><div class="input-group">
+<div class="input-group-btn">
+<!--first page button-->
+	<?php if ($t07_siswarutinbayar_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t07_siswarutinbayar_view->PageUrl() ?>start=<?php echo $t07_siswarutinbayar_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php } else { ?>
+	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
+	<?php } ?>
+<!--previous page button-->
+	<?php if ($t07_siswarutinbayar_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t07_siswarutinbayar_view->PageUrl() ?>start=<?php echo $t07_siswarutinbayar_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php } else { ?>
+	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php } ?>
+</div>
+<!--current page number-->
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t07_siswarutinbayar_view->Pager->CurrentPage ?>">
+<div class="input-group-btn">
+<!--next page button-->
+	<?php if ($t07_siswarutinbayar_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t07_siswarutinbayar_view->PageUrl() ?>start=<?php echo $t07_siswarutinbayar_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php } else { ?>
+	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
+	<?php } ?>
+<!--last page button-->
+	<?php if ($t07_siswarutinbayar_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t07_siswarutinbayar_view->PageUrl() ?>start=<?php echo $t07_siswarutinbayar_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php } else { ?>
+	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
+	<?php } ?>
+</div>
+</div>
+</div>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t07_siswarutinbayar_view->Pager->PageCount ?></span>
+</div>
+<?php } ?>
+<div class="clearfix"></div>
+<?php } ?>
 </form>
 <script type="text/javascript">
 ft07_siswarutinbayarview.Init();

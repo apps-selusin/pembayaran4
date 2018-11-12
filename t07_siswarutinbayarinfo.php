@@ -7,10 +7,19 @@ $t07_siswarutinbayar = NULL;
 // Table class for t07_siswarutinbayar
 //
 class ct07_siswarutinbayar extends cTable {
+	var $AuditTrailOnAdd = TRUE;
+	var $AuditTrailOnEdit = TRUE;
+	var $AuditTrailOnDelete = TRUE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 	var $id;
 	var $siswarutin_id;
-	var $Tanggal_Bayar;
+	var $Bulan;
+	var $Tahun;
 	var $Nilai;
+	var $Tanggal_Bayar;
+	var $Nilai_Bayar;
 	var $Periode;
 
 	//
@@ -36,7 +45,7 @@ class ct07_siswarutinbayar extends cTable {
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
 		$this->DetailAdd = TRUE; // Allow detail add
 		$this->DetailEdit = TRUE; // Allow detail edit
-		$this->DetailView = FALSE; // Allow detail view
+		$this->DetailView = TRUE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = ew_AllowAddDeleteRow(); // Allow add/delete row
@@ -55,17 +64,39 @@ class ct07_siswarutinbayar extends cTable {
 		$this->siswarutin_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['siswarutin_id'] = &$this->siswarutin_id;
 
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Tanggal_Bayar', 'Tanggal_Bayar', '`Tanggal_Bayar`', ew_CastDateFieldForLike('`Tanggal_Bayar`', 7, "DB"), 133, 7, FALSE, '`Tanggal_Bayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Tanggal_Bayar->Sortable = TRUE; // Allow sort
-		$this->Tanggal_Bayar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
-		$this->fields['Tanggal_Bayar'] = &$this->Tanggal_Bayar;
+		// Bulan
+		$this->Bulan = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Bulan', 'Bulan', '`Bulan`', '`Bulan`', 16, -1, FALSE, '`Bulan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
+		$this->Bulan->Sortable = TRUE; // Allow sort
+		$this->Bulan->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->Bulan->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->Bulan->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['Bulan'] = &$this->Bulan;
+
+		// Tahun
+		$this->Tahun = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Tahun', 'Tahun', '`Tahun`', '`Tahun`', 2, -1, FALSE, '`Tahun`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
+		$this->Tahun->Sortable = TRUE; // Allow sort
+		$this->Tahun->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->Tahun->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->Tahun->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['Tahun'] = &$this->Tahun;
 
 		// Nilai
 		$this->Nilai = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Nilai', 'Nilai', '`Nilai`', '`Nilai`', 4, -1, FALSE, '`Nilai`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->Nilai->Sortable = TRUE; // Allow sort
 		$this->Nilai->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['Nilai'] = &$this->Nilai;
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Tanggal_Bayar', 'Tanggal_Bayar', '`Tanggal_Bayar`', ew_CastDateFieldForLike('`Tanggal_Bayar`', 7, "DB"), 133, 7, FALSE, '`Tanggal_Bayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Tanggal_Bayar->Sortable = TRUE; // Allow sort
+		$this->Tanggal_Bayar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->fields['Tanggal_Bayar'] = &$this->Tanggal_Bayar;
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Nilai_Bayar', 'Nilai_Bayar', '`Nilai_Bayar`', '`Nilai_Bayar`', 4, -1, FALSE, '`Nilai_Bayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Nilai_Bayar->Sortable = TRUE; // Allow sort
+		$this->Nilai_Bayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Nilai_Bayar'] = &$this->Nilai_Bayar;
 
 		// Periode
 		$this->Periode = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Periode', 'Periode', '`Periode`', '`Periode`', 200, -1, FALSE, '`Periode`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
@@ -383,6 +414,8 @@ class ct07_siswarutinbayar extends cTable {
 			// Get insert id if necessary
 			$this->id->setDbValue($conn->Insert_ID());
 			$rs['id'] = $this->id->DbValue;
+			if ($this->AuditTrailOnAdd)
+				$this->WriteAuditTrailOnAdd($rs);
 		}
 		return $bInsert;
 	}
@@ -410,6 +443,12 @@ class ct07_siswarutinbayar extends cTable {
 	function Update(&$rs, $where = "", $rsold = NULL, $curfilter = TRUE) {
 		$conn = &$this->Connection();
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
+		if ($bUpdate && $this->AuditTrailOnEdit) {
+			$rsaudit = $rs;
+			$fldname = 'id';
+			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
+		}
 		return $bUpdate;
 	}
 
@@ -435,6 +474,8 @@ class ct07_siswarutinbayar extends cTable {
 	function Delete(&$rs, $where = "", $curfilter = TRUE) {
 		$conn = &$this->Connection();
 		$bDelete = $conn->Execute($this->DeleteSQL($rs, $where, $curfilter));
+		if ($bDelete && $this->AuditTrailOnDelete)
+			$this->WriteAuditTrailOnDelete($rs);
 		return $bDelete;
 	}
 
@@ -626,8 +667,11 @@ class ct07_siswarutinbayar extends cTable {
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswarutin_id->setDbValue($rs->fields('siswarutin_id'));
-		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
+		$this->Bulan->setDbValue($rs->fields('Bulan'));
+		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
+		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
+		$this->Nilai_Bayar->setDbValue($rs->fields('Nilai_Bayar'));
 		$this->Periode->setDbValue($rs->fields('Periode'));
 	}
 
@@ -641,8 +685,11 @@ class ct07_siswarutinbayar extends cTable {
    // Common render codes
 		// id
 		// siswarutin_id
-		// Tanggal_Bayar
+		// Bulan
+		// Tahun
 		// Nilai
+		// Tanggal_Bayar
+		// Nilai_Bayar
 		// Periode
 		// id
 
@@ -653,16 +700,72 @@ class ct07_siswarutinbayar extends cTable {
 		$this->siswarutin_id->ViewValue = $this->siswarutin_id->CurrentValue;
 		$this->siswarutin_id->ViewCustomAttributes = "";
 
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
-		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
-		$this->Tanggal_Bayar->ViewCustomAttributes = "";
+		// Bulan
+		if (strval($this->Bulan->CurrentValue) <> "") {
+			$sFilterWrk = "`Bulan`" . ew_SearchString("=", $this->Bulan->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `Bulan`, `Bulan` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Bulan->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Bulan, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Bulan->ViewValue = $this->Bulan->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Bulan->ViewValue = $this->Bulan->CurrentValue;
+			}
+		} else {
+			$this->Bulan->ViewValue = NULL;
+		}
+		$this->Bulan->ViewCustomAttributes = "";
+
+		// Tahun
+		if (strval($this->Tahun->CurrentValue) <> "") {
+			$sFilterWrk = "`Tahun`" . ew_SearchString("=", $this->Tahun->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `Tahun`, `Tahun` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sWhereWrk = "";
+		$this->Tahun->LookupFilters = array();
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		ew_AddFilter($sWhereWrk, $lookuptblfilter);
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->Tahun, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Tahun->ViewValue = $this->Tahun->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->Tahun->ViewValue = $this->Tahun->CurrentValue;
+			}
+		} else {
+			$this->Tahun->ViewValue = NULL;
+		}
+		$this->Tahun->ViewCustomAttributes = "";
 
 		// Nilai
 		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
 		$this->Nilai->ViewValue = ew_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
 		$this->Nilai->CellCssStyle .= "text-align: right;";
 		$this->Nilai->ViewCustomAttributes = "";
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar->ViewValue = $this->Tanggal_Bayar->CurrentValue;
+		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 7);
+		$this->Tanggal_Bayar->ViewCustomAttributes = "";
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
+		$this->Nilai_Bayar->ViewValue = ew_FormatNumber($this->Nilai_Bayar->ViewValue, 2, -2, -2, -2);
+		$this->Nilai_Bayar->CellCssStyle .= "text-align: right;";
+		$this->Nilai_Bayar->ViewCustomAttributes = "";
 
 		// Periode
 		$this->Periode->ViewValue = $this->Periode->CurrentValue;
@@ -678,15 +781,30 @@ class ct07_siswarutinbayar extends cTable {
 		$this->siswarutin_id->HrefValue = "";
 		$this->siswarutin_id->TooltipValue = "";
 
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->LinkCustomAttributes = "";
-		$this->Tanggal_Bayar->HrefValue = "";
-		$this->Tanggal_Bayar->TooltipValue = "";
+		// Bulan
+		$this->Bulan->LinkCustomAttributes = "";
+		$this->Bulan->HrefValue = "";
+		$this->Bulan->TooltipValue = "";
+
+		// Tahun
+		$this->Tahun->LinkCustomAttributes = "";
+		$this->Tahun->HrefValue = "";
+		$this->Tahun->TooltipValue = "";
 
 		// Nilai
 		$this->Nilai->LinkCustomAttributes = "";
 		$this->Nilai->HrefValue = "";
 		$this->Nilai->TooltipValue = "";
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar->LinkCustomAttributes = "";
+		$this->Tanggal_Bayar->HrefValue = "";
+		$this->Tanggal_Bayar->TooltipValue = "";
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar->LinkCustomAttributes = "";
+		$this->Nilai_Bayar->HrefValue = "";
+		$this->Nilai_Bayar->TooltipValue = "";
 
 		// Periode
 		$this->Periode->LinkCustomAttributes = "";
@@ -722,11 +840,13 @@ class ct07_siswarutinbayar extends cTable {
 		$this->siswarutin_id->PlaceHolder = ew_RemoveHtml($this->siswarutin_id->FldCaption());
 		}
 
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->EditAttrs["class"] = "form-control";
-		$this->Tanggal_Bayar->EditCustomAttributes = "";
-		$this->Tanggal_Bayar->EditValue = ew_FormatDateTime($this->Tanggal_Bayar->CurrentValue, 7);
-		$this->Tanggal_Bayar->PlaceHolder = ew_RemoveHtml($this->Tanggal_Bayar->FldCaption());
+		// Bulan
+		$this->Bulan->EditAttrs["class"] = "form-control";
+		$this->Bulan->EditCustomAttributes = "";
+
+		// Tahun
+		$this->Tahun->EditAttrs["class"] = "form-control";
+		$this->Tahun->EditCustomAttributes = "";
 
 		// Nilai
 		$this->Nilai->EditAttrs["class"] = "form-control";
@@ -734,6 +854,19 @@ class ct07_siswarutinbayar extends cTable {
 		$this->Nilai->EditValue = $this->Nilai->CurrentValue;
 		$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
 		if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) $this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
+
+		// Tanggal_Bayar
+		$this->Tanggal_Bayar->EditAttrs["class"] = "form-control";
+		$this->Tanggal_Bayar->EditCustomAttributes = "";
+		$this->Tanggal_Bayar->EditValue = ew_FormatDateTime($this->Tanggal_Bayar->CurrentValue, 7);
+		$this->Tanggal_Bayar->PlaceHolder = ew_RemoveHtml($this->Tanggal_Bayar->FldCaption());
+
+		// Nilai_Bayar
+		$this->Nilai_Bayar->EditAttrs["class"] = "form-control";
+		$this->Nilai_Bayar->EditCustomAttributes = "";
+		$this->Nilai_Bayar->EditValue = $this->Nilai_Bayar->CurrentValue;
+		$this->Nilai_Bayar->PlaceHolder = ew_RemoveHtml($this->Nilai_Bayar->FldCaption());
+		if (strval($this->Nilai_Bayar->EditValue) <> "" && is_numeric($this->Nilai_Bayar->EditValue)) $this->Nilai_Bayar->EditValue = ew_FormatNumber($this->Nilai_Bayar->EditValue, -2, -2, -2, -2);
 
 		// Periode
 		$this->Periode->EditAttrs["class"] = "form-control";
@@ -769,14 +902,20 @@ class ct07_siswarutinbayar extends cTable {
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
 					if ($this->siswarutin_id->Exportable) $Doc->ExportCaption($this->siswarutin_id);
-					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
+					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
+					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
+					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
+					if ($this->Nilai_Bayar->Exportable) $Doc->ExportCaption($this->Nilai_Bayar);
 					if ($this->Periode->Exportable) $Doc->ExportCaption($this->Periode);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswarutin_id->Exportable) $Doc->ExportCaption($this->siswarutin_id);
-					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
+					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
+					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
+					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
+					if ($this->Nilai_Bayar->Exportable) $Doc->ExportCaption($this->Nilai_Bayar);
 					if ($this->Periode->Exportable) $Doc->ExportCaption($this->Periode);
 				}
 				$Doc->EndExportRow();
@@ -810,14 +949,20 @@ class ct07_siswarutinbayar extends cTable {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
 						if ($this->siswarutin_id->Exportable) $Doc->ExportField($this->siswarutin_id);
-						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
+						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
+						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
+						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
+						if ($this->Nilai_Bayar->Exportable) $Doc->ExportField($this->Nilai_Bayar);
 						if ($this->Periode->Exportable) $Doc->ExportField($this->Periode);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswarutin_id->Exportable) $Doc->ExportField($this->siswarutin_id);
-						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
+						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
+						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
+						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
+						if ($this->Nilai_Bayar->Exportable) $Doc->ExportField($this->Nilai_Bayar);
 						if ($this->Periode->Exportable) $Doc->ExportField($this->Periode);
 					}
 					$Doc->EndExportRow();
@@ -857,6 +1002,129 @@ class ct07_siswarutinbayar extends cTable {
 			return ew_ArrayToJson($rsarr);
 		} else {
 			return FALSE;
+		}
+	}
+
+	// Write Audit Trail start/end for grid update
+	function WriteAuditTrailDummy($typ) {
+		$table = 't07_siswarutinbayar';
+		$usr = CurrentUserName();
+		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
+	}
+
+	// Write Audit Trail (add page)
+	function WriteAuditTrailOnAdd(&$rs) {
+		global $Language;
+		if (!$this->AuditTrailOnAdd) return;
+		$table = 't07_siswarutinbayar';
+
+		// Get key value
+		$key = "";
+		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rs['id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+		$usr = CurrentUserName();
+		foreach (array_keys($rs) as $fldname) {
+			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
+					$newvalue = $Language->Phrase("PasswordMask"); // Password Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
+					if (EW_AUDIT_TRAIL_TO_DATABASE)
+						$newvalue = $rs[$fldname];
+					else
+						$newvalue = "[MEMO]"; // Memo Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
+					$newvalue = "[XML]"; // XML Field
+				} else {
+					$newvalue = $rs[$fldname];
+				}
+				ew_WriteAuditTrail("log", $dt, $id, $usr, "A", $table, $fldname, $key, "", $newvalue);
+			}
+		}
+	}
+
+	// Write Audit Trail (edit page)
+	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
+		global $Language;
+		if (!$this->AuditTrailOnEdit) return;
+		$table = 't07_siswarutinbayar';
+
+		// Get key value
+		$key = "";
+		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rsold['id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+		$usr = CurrentUserName();
+		foreach (array_keys($rsnew) as $fldname) {
+			if (array_key_exists($fldname, $this->fields) && array_key_exists($fldname, $rsold) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
+					$modified = (ew_FormatDateTime($rsold[$fldname], 0) <> ew_FormatDateTime($rsnew[$fldname], 0));
+				} else {
+					$modified = !ew_CompareValue($rsold[$fldname], $rsnew[$fldname]);
+				}
+				if ($modified) {
+					if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") { // Password Field
+						$oldvalue = $Language->Phrase("PasswordMask");
+						$newvalue = $Language->Phrase("PasswordMask");
+					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) { // Memo field
+						if (EW_AUDIT_TRAIL_TO_DATABASE) {
+							$oldvalue = $rsold[$fldname];
+							$newvalue = $rsnew[$fldname];
+						} else {
+							$oldvalue = "[MEMO]";
+							$newvalue = "[MEMO]";
+						}
+					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) { // XML field
+						$oldvalue = "[XML]";
+						$newvalue = "[XML]";
+					} else {
+						$oldvalue = $rsold[$fldname];
+						$newvalue = $rsnew[$fldname];
+					}
+					ew_WriteAuditTrail("log", $dt, $id, $usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
+				}
+			}
+		}
+	}
+
+	// Write Audit Trail (delete page)
+	function WriteAuditTrailOnDelete(&$rs) {
+		global $Language;
+		if (!$this->AuditTrailOnDelete) return;
+		$table = 't07_siswarutinbayar';
+
+		// Get key value
+		$key = "";
+		if ($key <> "")
+			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rs['id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+		$curUser = CurrentUserName();
+		foreach (array_keys($rs) as $fldname) {
+			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
+					$oldvalue = $Language->Phrase("PasswordMask"); // Password Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
+					if (EW_AUDIT_TRAIL_TO_DATABASE)
+						$oldvalue = $rs[$fldname];
+					else
+						$oldvalue = "[MEMO]"; // Memo field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
+					$oldvalue = "[XML]"; // XML field
+				} else {
+					$oldvalue = $rs[$fldname];
+				}
+				ew_WriteAuditTrail("log", $dt, $id, $curUser, "D", $table, $fldname, $key, $oldvalue, "");
+			}
 		}
 	}
 

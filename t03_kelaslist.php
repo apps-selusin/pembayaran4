@@ -6,8 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t03_kelasinfo.php" ?>
-<?php include_once "t02_sekolahinfo.php" ?>
-<?php include_once "t04_siswagridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -23,7 +21,7 @@ class ct03_kelas_list extends ct03_kelas {
 	var $PageID = 'list';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't03_kelas';
@@ -280,15 +278,12 @@ class ct03_kelas_list extends ct03_kelas {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "t03_kelasadd.php?" . EW_TABLE_SHOW_DETAIL . "=";
+		$this->AddUrl = "t03_kelasadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
 		$this->MultiDeleteUrl = "t03_kelasdelete.php";
 		$this->MultiUpdateUrl = "t03_kelasupdate.php";
-
-		// Table object (t02_sekolah)
-		if (!isset($GLOBALS['t02_sekolah'])) $GLOBALS['t02_sekolah'] = new ct02_sekolah();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
@@ -338,9 +333,6 @@ class ct03_kelas_list extends ct03_kelas {
 	//
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
-
-		// Create form object
-		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 
 		// Get grid add count
@@ -368,14 +360,6 @@ class ct03_kelas_list extends ct03_kelas {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Process auto fill for detail table 't04_siswa'
-			if (@$_POST["grid"] == "ft04_siswagrid") {
-				if (!isset($GLOBALS["t04_siswa_grid"])) $GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid;
-				$GLOBALS["t04_siswa_grid"]->Page_Init();
-				$this->Page_Terminate();
-				exit();
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -390,9 +374,6 @@ class ct03_kelas_list extends ct03_kelas {
 
 		// Create Token
 		$this->CreateToken();
-
-		// Set up master detail parameters
-		$this->SetUpMasterParms();
 
 		// Setup other options
 		$this->SetupOtherOptions();
@@ -522,55 +503,6 @@ class ct03_kelas_list extends ct03_kelas {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
-			// Check QueryString parameters
-			if (@$_GET["a"] <> "") {
-				$this->CurrentAction = $_GET["a"];
-
-				// Clear inline mode
-				if ($this->CurrentAction == "cancel")
-					$this->ClearInlineMode();
-
-				// Switch to grid edit mode
-				if ($this->CurrentAction == "gridedit")
-					$this->GridEditMode();
-
-				// Switch to grid add mode
-				if ($this->CurrentAction == "gridadd")
-					$this->GridAddMode();
-			} else {
-				if (@$_POST["a_list"] <> "") {
-					$this->CurrentAction = $_POST["a_list"]; // Get action
-
-					// Grid Update
-					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
-						if ($this->ValidateGridForm()) {
-							$bGridUpdate = $this->GridUpdate();
-						} else {
-							$bGridUpdate = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridUpdate) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
-						}
-					}
-
-					// Grid Insert
-					if ($this->CurrentAction == "gridinsert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridadd") {
-						if ($this->ValidateGridForm()) {
-							$bGridInsert = $this->GridInsert();
-						} else {
-							$bGridInsert = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridInsert) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridadd"; // Stay in Grid Add mode
-						}
-					}
-				}
-			}
-
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -594,22 +526,16 @@ class ct03_kelas_list extends ct03_kelas {
 					$option->HideAllOptions();
 			}
 
-			// Show grid delete link for grid add / grid edit
-			if ($this->AllowAddDeleteRow) {
-				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-					$item = $this->ListOptions->GetItem("griddelete");
-					if ($item) $item->Visible = TRUE;
-				}
-			}
-
 			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
+			ew_AddFilter($this->DefaultSearchWhere, $this->AdvancedSearchWhere(TRUE));
 
-			// Get basic search values
-			$this->LoadBasicSearchValues();
+			// Get and validate search values for advanced search
+			$this->LoadSearchValues(); // Get search values
 
 			// Process filter list
 			$this->ProcessFilterList();
+			if (!$this->ValidateSearch())
+				$this->setFailureMessage($gsSearchError);
 
 			// Restore search parms from Session if not searching / reset / export
 			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
@@ -621,9 +547,9 @@ class ct03_kelas_list extends ct03_kelas {
 			// Set up sorting order
 			$this->SetUpSortOrder();
 
-			// Get basic search criteria
+			// Get search criteria for advanced search
 			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
+				$sSrchAdvanced = $this->AdvancedSearchWhere();
 		}
 
 		// Restore display records
@@ -639,10 +565,10 @@ class ct03_kelas_list extends ct03_kelas {
 		// Load search default if no existing search criteria
 		if (!$this->CheckSearchParms()) {
 
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
+			// Load advanced search from default
+			if ($this->LoadAdvancedSearchDefault()) {
+				$sSrchAdvanced = $this->AdvancedSearchWhere();
+			}
 		}
 
 		// Build search criteria
@@ -663,28 +589,8 @@ class ct03_kelas_list extends ct03_kelas {
 
 		// Build filter
 		$sFilter = "";
-
-		// Restore master/detail filter
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
-
-		// Load master record
-		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t02_sekolah") {
-			global $t02_sekolah;
-			$rsmaster = $t02_sekolah->LoadRs($this->DbMasterFilter);
-			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
-			if (!$this->MasterRecordExists) {
-				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
-				$this->Page_Terminate("t02_sekolahlist.php"); // Return to master page
-			} else {
-				$t02_sekolah->LoadListRowValues($rsmaster);
-				$t02_sekolah->RowType = EW_ROWTYPE_MASTER; // Master row
-				$t02_sekolah->RenderListRow();
-				$rsmaster->Close();
-			}
-		}
 
 		// Set up filter in session
 		$this->setSessionWhere($sFilter);
@@ -703,125 +609,6 @@ class ct03_kelas_list extends ct03_kelas {
 
 		// Search options
 		$this->SetupSearchOptions();
-	}
-
-	//  Exit inline mode
-	function ClearInlineMode() {
-		$this->LastAction = $this->CurrentAction; // Save last action
-		$this->CurrentAction = ""; // Clear action
-		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
-	}
-
-	// Switch to Grid Add mode
-	function GridAddMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
-	}
-
-	// Switch to Grid Edit mode
-	function GridEditMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
-	}
-
-	// Perform update to grid
-	function GridUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$bGridUpdate = TRUE;
-
-		// Get old recordset
-		$this->CurrentFilter = $this->BuildKeyFilter();
-		if ($this->CurrentFilter == "")
-			$this->CurrentFilter = "0=1";
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		if ($rs = $conn->Execute($sSql)) {
-			$rsold = $rs->GetRows();
-			$rs->Close();
-		}
-
-		// Call Grid Updating event
-		if (!$this->Grid_Updating($rsold)) {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-		$sKey = "";
-
-		// Update row index and get row key
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Update all rows based on key
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-			$objForm->Index = $rowindex;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-
-			// Load all values and keys
-			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
-				} else {
-					$bGridUpdate = TRUE;
-				}
-
-				// Skip empty row
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// No action required
-				// Validate form and insert/update/delete record
-
-				} elseif ($bGridUpdate) {
-					if ($rowaction == "delete") {
-						$this->CurrentFilter = $this->KeyFilter();
-						$bGridUpdate = $this->DeleteRows(); // Delete this row
-					} else if (!$this->ValidateForm()) {
-						$bGridUpdate = FALSE; // Form error, reset action
-						$this->setFailureMessage($gsFormError);
-					} else {
-						if ($rowaction == "insert") {
-							$bGridUpdate = $this->AddRow(); // Insert this row
-						} else {
-							if ($rowkey <> "") {
-								$this->SendEmail = FALSE; // Do not send email on update success
-								$bGridUpdate = $this->EditRow(); // Update this row
-							}
-						} // End update
-					}
-				}
-				if ($bGridUpdate) {
-					if ($sKey <> "") $sKey .= ", ";
-					$sKey .= $rowkey;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($bGridUpdate) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Updated event
-			$this->Grid_Updated($rsold, $rsnew);
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-		}
-		return $bGridUpdate;
 	}
 
 	// Build filter for all keys
@@ -862,175 +649,6 @@ class ct03_kelas_list extends ct03_kelas {
 		return TRUE;
 	}
 
-	// Perform Grid Add
-	function GridInsert() {
-		global $Language, $objForm, $gsFormError;
-		$rowindex = 1;
-		$bGridInsert = FALSE;
-		$conn = &$this->Connection();
-
-		// Call Grid Inserting event
-		if (!$this->Grid_Inserting()) {
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("GridAddCancelled")); // Set grid add cancelled message
-			}
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-
-		// Init key filter
-		$sWrkFilter = "";
-		$addcnt = 0;
-		$sKey = "";
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Insert all rows
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "" && $rowaction <> "insert")
-				continue; // Skip
-			$this->LoadFormValues(); // Get form values
-			if (!$this->EmptyRow()) {
-				$addcnt++;
-				$this->SendEmail = FALSE; // Do not send email on insert success
-
-				// Validate form
-				if (!$this->ValidateForm()) {
-					$bGridInsert = FALSE; // Form error, reset action
-					$this->setFailureMessage($gsFormError);
-				} else {
-					$bGridInsert = $this->AddRow($this->OldRecordset); // Insert this row
-				}
-				if ($bGridInsert) {
-					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->id->CurrentValue;
-
-					// Add filter for this record
-					$sFilter = $this->KeyFilter();
-					if ($sWrkFilter <> "") $sWrkFilter .= " OR ";
-					$sWrkFilter .= $sFilter;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($addcnt == 0) { // No record inserted
-			$this->setFailureMessage($Language->Phrase("NoAddRecord"));
-			$bGridInsert = FALSE;
-		}
-		if ($bGridInsert) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			$this->CurrentFilter = $sWrkFilter;
-			$sSql = $this->SQL();
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Inserted event
-			$this->Grid_Inserted($rsnew);
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
-			$this->ClearInlineMode(); // Clear grid add mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
-			}
-		}
-		return $bGridInsert;
-	}
-
-	// Check if empty row
-	function EmptyRow() {
-		global $objForm;
-		if ($objForm->HasValue("x_sekolah_id") && $objForm->HasValue("o_sekolah_id") && $this->sekolah_id->CurrentValue <> $this->sekolah_id->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_Kelas") && $objForm->HasValue("o_Kelas") && $this->Kelas->CurrentValue <> $this->Kelas->OldValue)
-			return FALSE;
-		return TRUE;
-	}
-
-	// Validate grid form
-	function ValidateGridForm() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Validate all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else if (!$this->ValidateForm()) {
-					return FALSE;
-				}
-			}
-		}
-		return TRUE;
-	}
-
-	// Get all form values of the grid
-	function GetGridFormValues() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-		$rows = array();
-
-		// Loop through all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else {
-					$rows[] = $this->GetFieldValues("FormValue"); // Return row as array
-				}
-			}
-		}
-		return $rows; // Return as array of array
-	}
-
-	// Restore form values for current row
-	function RestoreCurrentRowFormValues($idx) {
-		global $objForm;
-
-		// Get row based on current index
-		$objForm->Index = $idx;
-		$this->LoadFormValues(); // Load form values
-	}
-
 	// Get list of filters
 	function GetFilterList() {
 		global $UserProfile;
@@ -1047,10 +665,6 @@ class ct03_kelas_list extends ct03_kelas {
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->sekolah_id->AdvancedSearch->ToJSON(), ","); // Field sekolah_id
 		$sFilterList = ew_Concat($sFilterList, $this->Kelas->AdvancedSearch->ToJSON(), ","); // Field Kelas
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
 		$sFilterList = preg_replace('/,$/', "", $sFilterList);
 
 		// Return filter list in json
@@ -1114,138 +728,83 @@ class ct03_kelas_list extends ct03_kelas {
 		$this->Kelas->AdvancedSearch->SearchValue2 = @$filter["y_Kelas"];
 		$this->Kelas->AdvancedSearch->SearchOperator2 = @$filter["w_Kelas"];
 		$this->Kelas->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
 
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
+	// Advanced search WHERE clause based on QueryString
+	function AdvancedSearchWhere($Default = FALSE) {
+		global $Security;
 		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->Kelas, $arKeywords, $type);
+		$this->BuildSearchSql($sWhere, $this->id, $Default, FALSE); // id
+		$this->BuildSearchSql($sWhere, $this->sekolah_id, $Default, FALSE); // sekolah_id
+		$this->BuildSearchSql($sWhere, $this->Kelas, $Default, FALSE); // Kelas
+
+		// Set up search parm
+		if (!$Default && $sWhere <> "") {
+			$this->Command = "search";
+		}
+		if (!$Default && $this->Command == "search") {
+			$this->id->AdvancedSearch->Save(); // id
+			$this->sekolah_id->AdvancedSearch->Save(); // sekolah_id
+			$this->Kelas->AdvancedSearch->Save(); // Kelas
+		}
 		return $sWhere;
 	}
 
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		global $EW_BASIC_SEARCH_IGNORE_PATTERN;
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if ($EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace($EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
+	// Build search SQL
+	function BuildSearchSql(&$Where, &$Fld, $Default, $MultiValue) {
+		$FldParm = substr($Fld->FldVar, 2);
+		$FldVal = ($Default) ? $Fld->AdvancedSearch->SearchValueDefault : $Fld->AdvancedSearch->SearchValue; // @$_GET["x_$FldParm"]
+		$FldOpr = ($Default) ? $Fld->AdvancedSearch->SearchOperatorDefault : $Fld->AdvancedSearch->SearchOperator; // @$_GET["z_$FldParm"]
+		$FldCond = ($Default) ? $Fld->AdvancedSearch->SearchConditionDefault : $Fld->AdvancedSearch->SearchCondition; // @$_GET["v_$FldParm"]
+		$FldVal2 = ($Default) ? $Fld->AdvancedSearch->SearchValue2Default : $Fld->AdvancedSearch->SearchValue2; // @$_GET["y_$FldParm"]
+		$FldOpr2 = ($Default) ? $Fld->AdvancedSearch->SearchOperator2Default : $Fld->AdvancedSearch->SearchOperator2; // @$_GET["w_$FldParm"]
+		$sWrk = "";
+
+		//$FldVal = ew_StripSlashes($FldVal);
+		if (is_array($FldVal)) $FldVal = implode(",", $FldVal);
+
+		//$FldVal2 = ew_StripSlashes($FldVal2);
+		if (is_array($FldVal2)) $FldVal2 = implode(",", $FldVal2);
+		$FldOpr = strtoupper(trim($FldOpr));
+		if ($FldOpr == "") $FldOpr = "=";
+		$FldOpr2 = strtoupper(trim($FldOpr2));
+		if ($FldOpr2 == "") $FldOpr2 = "=";
+		if (EW_SEARCH_MULTI_VALUE_OPTION == 1)
+			$MultiValue = FALSE;
+		if ($MultiValue) {
+			$sWrk1 = ($FldVal <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr, $FldVal, $this->DBID) : ""; // Field value 1
+			$sWrk2 = ($FldVal2 <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr2, $FldVal2, $this->DBID) : ""; // Field value 2
+			$sWrk = $sWrk1; // Build final SQL
+			if ($sWrk2 <> "")
+				$sWrk = ($sWrk <> "") ? "($sWrk) $FldCond ($sWrk2)" : $sWrk2;
+		} else {
+			$FldVal = $this->ConvertSearchValue($Fld, $FldVal);
+			$FldVal2 = $this->ConvertSearchValue($Fld, $FldVal2);
+			$sWrk = ew_GetSearchSql($Fld, $FldVal, $FldOpr, $FldCond, $FldVal2, $FldOpr2, $this->DBID);
 		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .=  "(" . $sSql . ")";
-		}
+		ew_AddFilter($Where, $sWrk);
 	}
 
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-		if ($sSearchKeyword <> "") {
-			$sSearch = trim($sSearchKeyword);
-			if ($sSearchType <> "=") {
-				$ar = array();
-
-				// Match quoted keywords (i.e.: "...")
-				if (preg_match_all('/"([^"]*)"/i', $sSearch, $matches, PREG_SET_ORDER)) {
-					foreach ($matches as $match) {
-						$p = strpos($sSearch, $match[0]);
-						$str = substr($sSearch, 0, $p);
-						$sSearch = substr($sSearch, $p + strlen($match[0]));
-						if (strlen(trim($str)) > 0)
-							$ar = array_merge($ar, explode(" ", trim($str)));
-						$ar[] = $match[1]; // Save quoted keyword
-					}
-				}
-
-				// Match individual keywords
-				if (strlen(trim($sSearch)) > 0)
-					$ar = array_merge($ar, explode(" ", trim($sSearch)));
-
-				// Search keyword in any fields
-				if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-					foreach ($ar as $sKeyword) {
-						if ($sKeyword <> "") {
-							if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-							$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-						}
-					}
-				} else {
-					$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL(array($sSearch), $sSearchType);
-			}
-			if (!$Default) $this->Command = "search";
+	// Convert search value
+	function ConvertSearchValue(&$Fld, $FldVal) {
+		if ($FldVal == EW_NULL_VALUE || $FldVal == EW_NOT_NULL_VALUE)
+			return $FldVal;
+		$Value = $FldVal;
+		if ($Fld->FldDataType == EW_DATATYPE_BOOLEAN) {
+			if ($FldVal <> "") $Value = ($FldVal == "1" || strtolower(strval($FldVal)) == "y" || strtolower(strval($FldVal)) == "t") ? $Fld->TrueValue : $Fld->FalseValue;
+		} elseif ($Fld->FldDataType == EW_DATATYPE_DATE || $Fld->FldDataType == EW_DATATYPE_TIME) {
+			if ($FldVal <> "") $Value = ew_UnFormatDateTime($FldVal, $Fld->FldDateTimeFormat);
 		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
+		return $Value;
 	}
 
 	// Check if search parm exists
 	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
+		if ($this->id->AdvancedSearch->IssetSession())
+			return TRUE;
+		if ($this->sekolah_id->AdvancedSearch->IssetSession())
+			return TRUE;
+		if ($this->Kelas->AdvancedSearch->IssetSession())
 			return TRUE;
 		return FALSE;
 	}
@@ -1257,8 +816,8 @@ class ct03_kelas_list extends ct03_kelas {
 		$this->SearchWhere = "";
 		$this->setSearchWhere($this->SearchWhere);
 
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
+		// Clear advanced search parameters
+		$this->ResetAdvancedSearchParms();
 	}
 
 	// Load advanced search default values
@@ -1266,17 +825,21 @@ class ct03_kelas_list extends ct03_kelas {
 		return FALSE;
 	}
 
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
+	// Clear all advanced search parameters
+	function ResetAdvancedSearchParms() {
+		$this->id->AdvancedSearch->UnsetSession();
+		$this->sekolah_id->AdvancedSearch->UnsetSession();
+		$this->Kelas->AdvancedSearch->UnsetSession();
 	}
 
 	// Restore all search parameters
 	function RestoreSearchParms() {
 		$this->RestoreSearch = TRUE;
 
-		// Restore basic search values
-		$this->BasicSearch->Load();
+		// Restore advanced search values
+		$this->id->AdvancedSearch->Load();
+		$this->sekolah_id->AdvancedSearch->Load();
+		$this->Kelas->AdvancedSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -1319,14 +882,6 @@ class ct03_kelas_list extends ct03_kelas {
 			if ($this->Command == "reset" || $this->Command == "resetall")
 				$this->ResetSearchParms();
 
-			// Reset master/detail keys
-			if ($this->Command == "resetall") {
-				$this->setCurrentMasterTable(""); // Clear master table
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-				$this->sekolah_id->setSessionValue("");
-			}
-
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
@@ -1345,47 +900,35 @@ class ct03_kelas_list extends ct03_kelas {
 	function SetupListOptions() {
 		global $Security, $Language;
 
-		// "griddelete"
-		if ($this->AllowAddDeleteRow) {
-			$item = &$this->ListOptions->Add("griddelete");
-			$item->CssStyle = "white-space: nowrap;";
-			$item->OnLeft = TRUE;
-			$item->Visible = FALSE; // Default hidden
-		}
-
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
+		// "view"
+		$item = &$this->ListOptions->Add("view");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
+		// "edit"
+		$item = &$this->ListOptions->Add("edit");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
+		// "copy"
+		$item = &$this->ListOptions->Add("copy");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
 		// "delete"
 		$item = &$this->ListOptions->Add("delete");
 		$item->CssStyle = "white-space: nowrap;";
 		$item->Visible = TRUE;
 		$item->OnLeft = TRUE;
-
-		// "detail_t04_siswa"
-		$item = &$this->ListOptions->Add("detail_t04_siswa");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE && !$this->ShowMultipleDetails;
-		$item->OnLeft = TRUE;
-		$item->ShowInButtonGroup = FALSE;
-		if (!isset($GLOBALS["t04_siswa_grid"])) $GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid;
-
-		// Multiple details
-		if ($this->ShowMultipleDetails) {
-			$item = &$this->ListOptions->Add("details");
-			$item->CssStyle = "white-space: nowrap;";
-			$item->Visible = $this->ShowMultipleDetails;
-			$item->OnLeft = TRUE;
-			$item->ShowInButtonGroup = FALSE;
-		}
-
-		// Set up detail pages
-		$pages = new cSubPages();
-		$pages->Add("t04_siswa");
-		$this->DetailPages = $pages;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
@@ -1433,37 +976,36 @@ class ct03_kelas_list extends ct03_kelas {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
 
-		// Set up row action and key
-		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
-			$objForm->Index = $this->RowIndex;
-			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
-			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
-			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
-			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
-			if ($this->RowAction <> "")
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
-			if ($this->RowAction == "delete") {
-				$rowkey = $objForm->GetValue($this->FormKeyName);
-				$this->SetupKeyValues($rowkey);
-			}
-			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
-		}
-
-		// "delete"
-		if ($this->AllowAddDeleteRow) {
-			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-				$option = &$this->ListOptions;
-				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
-				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
-				$oListOpt = &$option->Items["griddelete"];
-				$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
-			}
-		}
-
 		// "sequence"
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+
+		// "view"
+		$oListOpt = &$this->ListOptions->Items["view"];
+		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
+		// "copy"
+		$oListOpt = &$this->ListOptions->Items["copy"];
+		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
 
 		// "delete"
 		$oListOpt = &$this->ListOptions->Items["delete"];
@@ -1500,54 +1042,10 @@ class ct03_kelas_list extends ct03_kelas {
 				$oListOpt->Visible = TRUE;
 			}
 		}
-		$DetailViewTblVar = "";
-		$DetailCopyTblVar = "";
-		$DetailEditTblVar = "";
-
-		// "detail_t04_siswa"
-		$oListOpt = &$this->ListOptions->Items["detail_t04_siswa"];
-		if (TRUE) {
-			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t04_siswa", "TblCaption");
-			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t04_siswalist.php?" . EW_TABLE_SHOW_MASTER . "=t03_kelas&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
-			$links = "";
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
-			}
-			$body = "<div class=\"btn-group\">" . $body . "</div>";
-			$oListOpt->Body = $body;
-			if ($this->ShowMultipleDetails) $oListOpt->Visible = FALSE;
-		}
-		if ($this->ShowMultipleDetails) {
-			$body = $Language->Phrase("MultipleMasterDetails");
-			$body = "<div class=\"btn-group\">";
-			$links = "";
-			if ($DetailViewTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailViewTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
-			}
-			if ($DetailEditTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailEditTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
-			}
-			if ($DetailCopyTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailCopyTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
-			}
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewMasterDetail\" title=\"" . ew_HtmlTitle($Language->Phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->Phrase("MultipleMasterDetails") . "<b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu ewMenu\">". $links . "</ul>";
-			}
-			$body .= "</div>";
-
-			// Multiple details
-			$oListOpt = &$this->ListOptions->Items["details"];
-			$oListOpt->Body = $body;
-		}
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event);'>";
-		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1559,15 +1057,12 @@ class ct03_kelas_list extends ct03_kelas {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
-		$item = &$option->Add("gridadd");
-		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "");
 
-		// Add grid edit
-		$option = $options["addedit"];
-		$item = &$option->Add("gridedit");
-		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "");
+		// Add
+		$item = &$option->Add("add");
+		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
+		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
+		$item->Visible = ($this->AddUrl <> "");
 		$option = $options["action"];
 
 		// Set up options default
@@ -1605,7 +1100,6 @@ class ct03_kelas_list extends ct03_kelas {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 
 			// Set up list action buttons
@@ -1627,56 +1121,6 @@ class ct03_kelas_list extends ct03_kelas {
 				$option = &$options["action"];
 				$option->HideAllOptions();
 			}
-		} else { // Grid add/edit mode
-
-			// Hide all options first
-			foreach ($options as &$option)
-				$option->HideAllOptions();
-			if ($this->CurrentAction == "gridadd") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = FALSE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-
-				// Add grid insert
-				$item = &$option->Add("gridinsert");
-				$item->Body = "<a class=\"ewAction ewGridInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridInsertLink") . "</a>";
-
-				// Add grid cancel
-				$item = &$option->Add("gridcancel");
-				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-			if ($this->CurrentAction == "gridedit") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = FALSE;
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-					$item = &$option->Add("gridsave");
-					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
-					$item = &$option->Add("gridcancel");
-					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-		}
 	}
 
 	// Process list action
@@ -1836,45 +1280,26 @@ class ct03_kelas_list extends ct03_kelas {
 		}
 	}
 
-	// Load default values
-	function LoadDefaultValues() {
-		$this->sekolah_id->CurrentValue = NULL;
-		$this->sekolah_id->OldValue = $this->sekolah_id->CurrentValue;
-		$this->Kelas->CurrentValue = NULL;
-		$this->Kelas->OldValue = $this->Kelas->CurrentValue;
-	}
-
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
-	}
-
-	// Load form values
-	function LoadFormValues() {
-
-		// Load from form
+	// Load search values for validation
+	function LoadSearchValues() {
 		global $objForm;
-		if (!$this->sekolah_id->FldIsDetailKey) {
-			$this->sekolah_id->setFormValue($objForm->GetValue("x_sekolah_id"));
-		}
-		$this->sekolah_id->setOldValue($objForm->GetValue("o_sekolah_id"));
-		if (!$this->Kelas->FldIsDetailKey) {
-			$this->Kelas->setFormValue($objForm->GetValue("x_Kelas"));
-		}
-		$this->Kelas->setOldValue($objForm->GetValue("o_Kelas"));
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
-	}
 
-	// Restore form values
-	function RestoreFormValues() {
-		global $objForm;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->CurrentValue = $this->id->FormValue;
-		$this->sekolah_id->CurrentValue = $this->sekolah_id->FormValue;
-		$this->Kelas->CurrentValue = $this->Kelas->FormValue;
+		// Load search values
+		// id
+
+		$this->id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_id"]);
+		if ($this->id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->id->AdvancedSearch->SearchOperator = @$_GET["z_id"];
+
+		// sekolah_id
+		$this->sekolah_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_sekolah_id"]);
+		if ($this->sekolah_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->sekolah_id->AdvancedSearch->SearchOperator = @$_GET["z_sekolah_id"];
+
+		// Kelas
+		$this->Kelas->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Kelas"]);
+		if ($this->Kelas->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->Kelas->AdvancedSearch->SearchOperator = @$_GET["z_Kelas"];
 	}
 
 	// Load recordset
@@ -2031,40 +1456,15 @@ class ct03_kelas_list extends ct03_kelas {
 			$this->Kelas->LinkCustomAttributes = "";
 			$this->Kelas->HrefValue = "";
 			$this->Kelas->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
 
 			// sekolah_id
 			$this->sekolah_id->EditAttrs["class"] = "form-control";
 			$this->sekolah_id->EditCustomAttributes = "";
-			if ($this->sekolah_id->getSessionValue() <> "") {
-				$this->sekolah_id->CurrentValue = $this->sekolah_id->getSessionValue();
-				$this->sekolah_id->OldValue = $this->sekolah_id->CurrentValue;
-			if (strval($this->sekolah_id->CurrentValue) <> "") {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
-			$sWhereWrk = "";
-			$this->sekolah_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
-				}
-			} else {
-				$this->sekolah_id->ViewValue = NULL;
-			}
-			$this->sekolah_id->ViewCustomAttributes = "";
-			} else {
-			if (trim(strval($this->sekolah_id->CurrentValue)) == "") {
+			if (trim(strval($this->sekolah_id->AdvancedSearch->SearchValue)) == "") {
 				$sFilterWrk = "0=1";
 			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->AdvancedSearch->SearchValue, EW_DATATYPE_NUMBER, "");
 			}
 			$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t02_sekolah`";
 			$sWhereWrk = "";
@@ -2076,85 +1476,12 @@ class ct03_kelas_list extends ct03_kelas {
 			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
 			if ($rswrk) $rswrk->Close();
 			$this->sekolah_id->EditValue = $arwrk;
-			}
 
 			// Kelas
 			$this->Kelas->EditAttrs["class"] = "form-control";
 			$this->Kelas->EditCustomAttributes = "";
-			$this->Kelas->EditValue = ew_HtmlEncode($this->Kelas->CurrentValue);
+			$this->Kelas->EditValue = ew_HtmlEncode($this->Kelas->AdvancedSearch->SearchValue);
 			$this->Kelas->PlaceHolder = ew_RemoveHtml($this->Kelas->FldCaption());
-
-			// Add refer script
-			// sekolah_id
-
-			$this->sekolah_id->LinkCustomAttributes = "";
-			$this->sekolah_id->HrefValue = "";
-
-			// Kelas
-			$this->Kelas->LinkCustomAttributes = "";
-			$this->Kelas->HrefValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// sekolah_id
-			$this->sekolah_id->EditAttrs["class"] = "form-control";
-			$this->sekolah_id->EditCustomAttributes = "";
-			if ($this->sekolah_id->getSessionValue() <> "") {
-				$this->sekolah_id->CurrentValue = $this->sekolah_id->getSessionValue();
-				$this->sekolah_id->OldValue = $this->sekolah_id->CurrentValue;
-			if (strval($this->sekolah_id->CurrentValue) <> "") {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
-			$sWhereWrk = "";
-			$this->sekolah_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
-				}
-			} else {
-				$this->sekolah_id->ViewValue = NULL;
-			}
-			$this->sekolah_id->ViewCustomAttributes = "";
-			} else {
-			if (trim(strval($this->sekolah_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t02_sekolah`";
-			$sWhereWrk = "";
-			$this->sekolah_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->sekolah_id->EditValue = $arwrk;
-			}
-
-			// Kelas
-			$this->Kelas->EditAttrs["class"] = "form-control";
-			$this->Kelas->EditCustomAttributes = "";
-			$this->Kelas->EditValue = ew_HtmlEncode($this->Kelas->CurrentValue);
-			$this->Kelas->PlaceHolder = ew_RemoveHtml($this->Kelas->FldCaption());
-
-			// Edit refer script
-			// sekolah_id
-
-			$this->sekolah_id->LinkCustomAttributes = "";
-			$this->sekolah_id->HrefValue = "";
-
-			// Kelas
-			$this->Kelas->LinkCustomAttributes = "";
-			$this->Kelas->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -2167,325 +1494,34 @@ class ct03_kelas_list extends ct03_kelas {
 			$this->Row_Rendered();
 	}
 
-	// Validate form
-	function ValidateForm() {
-		global $Language, $gsFormError;
+	// Validate search
+	function ValidateSearch() {
+		global $gsSearchError;
 
-		// Initialize form error message
-		$gsFormError = "";
+		// Initialize
+		$gsSearchError = "";
 
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
-			return ($gsFormError == "");
-		if (!$this->sekolah_id->FldIsDetailKey && !is_null($this->sekolah_id->FormValue) && $this->sekolah_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->sekolah_id->FldCaption(), $this->sekolah_id->ReqErrMsg));
-		}
-		if (!$this->Kelas->FldIsDetailKey && !is_null($this->Kelas->FormValue) && $this->Kelas->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Kelas->FldCaption(), $this->Kelas->ReqErrMsg));
-		}
+			return TRUE;
 
 		// Return validate result
-		$ValidateForm = ($gsFormError == "");
+		$ValidateSearch = ($gsSearchError == "");
 
 		// Call Form_CustomValidate event
 		$sFormCustomError = "";
-		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		$ValidateSearch = $ValidateSearch && $this->Form_CustomValidate($sFormCustomError);
 		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsFormError, $sFormCustomError);
+			ew_AddMessage($gsSearchError, $sFormCustomError);
 		}
-		return $ValidateForm;
+		return $ValidateSearch;
 	}
 
-	//
-	// Delete records based on current filter
-	//
-	function DeleteRows() {
-		global $Language, $Security;
-		$DeleteRows = TRUE;
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE) {
-			return FALSE;
-		} elseif ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-			$rs->Close();
-			return FALSE;
-
-		//} else {
-		//	$this->LoadRowValues($rs); // Load row values
-
-		}
-		$rows = ($rs) ? $rs->GetRows() : array();
-
-		// Clone old rows
-		$rsold = $rows;
-		if ($rs)
-			$rs->Close();
-
-		// Call row deleting event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$DeleteRows = $this->Row_Deleting($row);
-				if (!$DeleteRows) break;
-			}
-		}
-		if ($DeleteRows) {
-			$sKey = "";
-			foreach ($rsold as $row) {
-				$sThisKey = "";
-				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['id'];
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				$DeleteRows = $this->Delete($row); // Delete
-				$conn->raiseErrorFn = '';
-				if ($DeleteRows === FALSE)
-					break;
-				if ($sKey <> "") $sKey .= ", ";
-				$sKey .= $sThisKey;
-			}
-		} else {
-
-			// Set up error message
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
-			}
-		}
-		if ($DeleteRows) {
-		} else {
-		}
-
-		// Call Row Deleted event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$this->Row_Deleted($row);
-			}
-		}
-		return $DeleteRows;
-	}
-
-	// Update record based on key values
-	function EditRow() {
-		global $Security, $Language;
-		$sFilter = $this->KeyFilter();
-		$sFilter = $this->ApplyUserIDFilters($sFilter);
-		$conn = &$this->Connection();
-		$this->CurrentFilter = $sFilter;
-		$sSql = $this->SQL();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE)
-			return FALSE;
-		if ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$EditRow = FALSE; // Update Failed
-		} else {
-
-			// Save old values
-			$rsold = &$rs->fields;
-			$this->LoadDbValues($rsold);
-			$rsnew = array();
-
-			// sekolah_id
-			$this->sekolah_id->SetDbValueDef($rsnew, $this->sekolah_id->CurrentValue, 0, $this->sekolah_id->ReadOnly);
-
-			// Kelas
-			$this->Kelas->SetDbValueDef($rsnew, $this->Kelas->CurrentValue, "", $this->Kelas->ReadOnly);
-
-			// Check referential integrity for master table 't02_sekolah'
-			$bValidMasterRecord = TRUE;
-			$sMasterFilter = $this->SqlMasterFilter_t02_sekolah();
-			$KeyValue = isset($rsnew['sekolah_id']) ? $rsnew['sekolah_id'] : $rsold['sekolah_id'];
-			if (strval($KeyValue) <> "") {
-				$sMasterFilter = str_replace("@id@", ew_AdjustSql($KeyValue), $sMasterFilter);
-			} else {
-				$bValidMasterRecord = FALSE;
-			}
-			if ($bValidMasterRecord) {
-				if (!isset($GLOBALS["t02_sekolah"])) $GLOBALS["t02_sekolah"] = new ct02_sekolah();
-				$rsmaster = $GLOBALS["t02_sekolah"]->LoadRs($sMasterFilter);
-				$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
-				$rsmaster->Close();
-			}
-			if (!$bValidMasterRecord) {
-				$sRelatedRecordMsg = str_replace("%t", "t02_sekolah", $Language->Phrase("RelatedRecordRequired"));
-				$this->setFailureMessage($sRelatedRecordMsg);
-				$rs->Close();
-				return FALSE;
-			}
-
-			// Call Row Updating event
-			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
-			if ($bUpdateRow) {
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				if (count($rsnew) > 0)
-					$EditRow = $this->Update($rsnew, "", $rsold);
-				else
-					$EditRow = TRUE; // No field to update
-				$conn->raiseErrorFn = '';
-				if ($EditRow) {
-				}
-			} else {
-				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-					// Use the message, do nothing
-				} elseif ($this->CancelMessage <> "") {
-					$this->setFailureMessage($this->CancelMessage);
-					$this->CancelMessage = "";
-				} else {
-					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
-				}
-				$EditRow = FALSE;
-			}
-		}
-
-		// Call Row_Updated event
-		if ($EditRow)
-			$this->Row_Updated($rsold, $rsnew);
-		$rs->Close();
-		return $EditRow;
-	}
-
-	// Add record
-	function AddRow($rsold = NULL) {
-		global $Language, $Security;
-
-		// Check referential integrity for master table 't02_sekolah'
-		$bValidMasterRecord = TRUE;
-		$sMasterFilter = $this->SqlMasterFilter_t02_sekolah();
-		if (strval($this->sekolah_id->CurrentValue) <> "") {
-			$sMasterFilter = str_replace("@id@", ew_AdjustSql($this->sekolah_id->CurrentValue, "DB"), $sMasterFilter);
-		} else {
-			$bValidMasterRecord = FALSE;
-		}
-		if ($bValidMasterRecord) {
-			if (!isset($GLOBALS["t02_sekolah"])) $GLOBALS["t02_sekolah"] = new ct02_sekolah();
-			$rsmaster = $GLOBALS["t02_sekolah"]->LoadRs($sMasterFilter);
-			$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
-			$rsmaster->Close();
-		}
-		if (!$bValidMasterRecord) {
-			$sRelatedRecordMsg = str_replace("%t", "t02_sekolah", $Language->Phrase("RelatedRecordRequired"));
-			$this->setFailureMessage($sRelatedRecordMsg);
-			return FALSE;
-		}
-		$conn = &$this->Connection();
-
-		// Load db values from rsold
-		if ($rsold) {
-			$this->LoadDbValues($rsold);
-		}
-		$rsnew = array();
-
-		// sekolah_id
-		$this->sekolah_id->SetDbValueDef($rsnew, $this->sekolah_id->CurrentValue, 0, FALSE);
-
-		// Kelas
-		$this->Kelas->SetDbValueDef($rsnew, $this->Kelas->CurrentValue, "", FALSE);
-
-		// Call Row Inserting event
-		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-		if ($bInsertRow) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$AddRow = $this->Insert($rsnew);
-			$conn->raiseErrorFn = '';
-			if ($AddRow) {
-			}
-		} else {
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
-			}
-			$AddRow = FALSE;
-		}
-		if ($AddRow) {
-
-			// Call Row Inserted event
-			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-			$this->Row_Inserted($rs, $rsnew);
-		}
-		return $AddRow;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setQueryStringValue($_GET["fk_id"]);
-					$this->sekolah_id->setQueryStringValue($GLOBALS["t02_sekolah"]->id->QueryStringValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setFormValue($_POST["fk_id"]);
-					$this->sekolah_id->setFormValue($GLOBALS["t02_sekolah"]->id->FormValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->FormValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Update URL
-			$this->AddUrl = $this->AddMasterUrl($this->AddUrl);
-			$this->InlineAddUrl = $this->AddMasterUrl($this->InlineAddUrl);
-			$this->GridAddUrl = $this->AddMasterUrl($this->GridAddUrl);
-			$this->GridEditUrl = $this->AddMasterUrl($this->GridEditUrl);
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t02_sekolah") {
-				if ($this->sekolah_id->CurrentValue == "") $this->sekolah_id->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	// Load advanced search
+	function LoadAdvancedSearch() {
+		$this->id->AdvancedSearch->Load();
+		$this->sekolah_id->AdvancedSearch->Load();
+		$this->Kelas->AdvancedSearch->Load();
 	}
 
 	// Set up Breadcrumb
@@ -2501,7 +1537,11 @@ class ct03_kelas_list extends ct03_kelas {
 	function SetupLookupFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		switch ($fld->FldVar) {
+		if ($pageId == "list") {
+			switch ($fld->FldVar) {
+			}
+		} elseif ($pageId == "extbs") {
+			switch ($fld->FldVar) {
 		case "x_sekolah_id":
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
@@ -2514,15 +1554,21 @@ class ct03_kelas_list extends ct03_kelas {
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;
-		}
+			}
+		} 
 	}
 
 	// Setup AutoSuggest filters of a field
 	function SetupAutoSuggestFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		switch ($fld->FldVar) {
-		}
+		if ($pageId == "list") {
+			switch ($fld->FldVar) {
+			}
+		} elseif ($pageId == "extbs") {
+			switch ($fld->FldVar) {
+			}
+		} 
 	}
 
 	// Page Load event
@@ -2671,51 +1717,6 @@ var CurrentPageID = EW_PAGE_ID = "list";
 var CurrentForm = ft03_kelaslist = new ew_Form("ft03_kelaslist", "list");
 ft03_kelaslist.FormKeyCountName = '<?php echo $t03_kelas_list->FormKeyCountName ?>';
 
-// Validate form
-ft03_kelaslist.Validate = function() {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
-	if ($fobj.find("#a_confirm").val() == "F")
-		return true;
-	var elm, felm, uelm, addcnt = 0;
-	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
-	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
-	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
-	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
-	for (var i = startcnt; i <= rowcnt; i++) {
-		var infix = ($k[0]) ? String(i) : "";
-		$fobj.data("rowindex", infix);
-		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
-		if (checkrow) {
-			addcnt++;
-			elm = this.GetElements("x" + infix + "_sekolah_id");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t03_kelas->sekolah_id->FldCaption(), $t03_kelas->sekolah_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Kelas");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t03_kelas->Kelas->FldCaption(), $t03_kelas->Kelas->ReqErrMsg)) ?>");
-
-			// Fire Form_CustomValidate event
-			if (!this.Form_CustomValidate(fobj))
-				return false;
-		} // End Grid Add checking
-	}
-	if (gridinsert && addcnt == 0) { // No row added
-		ew_Alert(ewLanguage.Phrase("NoAddRecord"));
-		return false;
-	}
-	return true;
-}
-
-// Check empty row
-ft03_kelaslist.EmptyRow = function(infix) {
-	var fobj = this.Form;
-	if (ew_ValueChanged(fobj, infix, "sekolah_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Kelas", false)) return false;
-	return true;
-}
-
 // Form_CustomValidate event
 ft03_kelaslist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
@@ -2736,6 +1737,37 @@ ft03_kelaslist.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill
 
 // Form object for search
 var CurrentSearchForm = ft03_kelaslistsrch = new ew_Form("ft03_kelaslistsrch");
+
+// Validate function for search
+ft03_kelaslistsrch.Validate = function(fobj) {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	fobj = fobj || this.Form;
+	var infix = "";
+
+	// Fire Form_CustomValidate event
+	if (!this.Form_CustomValidate(fobj))
+		return false;
+	return true;
+}
+
+// Form_CustomValidate event
+ft03_kelaslistsrch.Form_CustomValidate = 
+ function(fobj) { // DO NOT CHANGE THIS LINE!
+
+ 	// Your custom validation code here, return false if invalid. 
+ 	return true;
+ }
+
+// Use JavaScript validation or not
+<?php if (EW_CLIENT_VALIDATE) { ?>
+ft03_kelaslistsrch.ValidateRequired = true; // Use JavaScript validation
+<?php } else { ?>
+ft03_kelaslistsrch.ValidateRequired = false; // No JavaScript validation
+<?php } ?>
+
+// Dynamic selection lists
+ft03_kelaslistsrch.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
 </script>
 <script type="text/javascript">
 
@@ -2755,25 +1787,7 @@ var CurrentSearchForm = ft03_kelaslistsrch = new ew_Form("ft03_kelaslistsrch");
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
-<?php if (($t03_kelas->Export == "") || (EW_EXPORT_MASTER_RECORD && $t03_kelas->Export == "print")) { ?>
 <?php
-if ($t03_kelas_list->DbMasterFilter <> "" && $t03_kelas->getCurrentMasterTable() == "t02_sekolah") {
-	if ($t03_kelas_list->MasterRecordExists) {
-?>
-<?php include_once "t02_sekolahmaster.php" ?>
-<?php
-	}
-}
-?>
-<?php } ?>
-<?php
-if ($t03_kelas->CurrentAction == "gridadd") {
-	$t03_kelas->CurrentFilter = "0=1";
-	$t03_kelas_list->StartRec = 1;
-	$t03_kelas_list->DisplayRecs = $t03_kelas->GridAddRowCount;
-	$t03_kelas_list->TotalRecs = $t03_kelas_list->DisplayRecs;
-	$t03_kelas_list->StopRec = $t03_kelas_list->DisplayRecs;
-} else {
 	$bSelectLimit = $t03_kelas_list->UseSelectLimit;
 	if ($bSelectLimit) {
 		if ($t03_kelas_list->TotalRecs <= 0)
@@ -2797,7 +1811,13 @@ if ($t03_kelas->CurrentAction == "gridadd") {
 		else
 			$t03_kelas_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-}
+
+	// Audit trail on search
+	if ($t03_kelas_list->AuditTrailOnSearch && $t03_kelas_list->Command == "search" && !$t03_kelas_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $t03_kelas_list->getSessionWhere();
+		$t03_kelas_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
+	}
 $t03_kelas_list->RenderOtherOptions();
 ?>
 <?php if ($t03_kelas->Export == "" && $t03_kelas->CurrentAction == "") { ?>
@@ -2807,21 +1827,44 @@ $t03_kelas_list->RenderOtherOptions();
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="t03_kelas">
 	<div class="ewBasicSearch">
+<?php
+if ($gsSearchError == "")
+	$t03_kelas_list->LoadAdvancedSearch(); // Load advanced search
+
+// Render for search
+$t03_kelas->RowType = EW_ROWTYPE_SEARCH;
+
+// Render row
+$t03_kelas->ResetAttrs();
+$t03_kelas_list->RenderRow();
+?>
 <div id="xsr_1" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t03_kelas_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t03_kelas_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t03_kelas_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t03_kelas_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t03_kelas_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t03_kelas_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t03_kelas_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
+<?php if ($t03_kelas->sekolah_id->Visible) { // sekolah_id ?>
+	<div id="xsc_sekolah_id" class="ewCell form-group">
+		<label for="x_sekolah_id" class="ewSearchCaption ewLabel"><?php echo $t03_kelas->sekolah_id->FldCaption() ?></label>
+		<span class="ewSearchOperator"><?php echo $Language->Phrase("=") ?><input type="hidden" name="z_sekolah_id" id="z_sekolah_id" value="="></span>
+		<span class="ewSearchField">
+<select data-table="t03_kelas" data-field="x_sekolah_id" data-value-separator="<?php echo $t03_kelas->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x_sekolah_id" name="x_sekolah_id"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
+<?php echo $t03_kelas->sekolah_id->SelectOptionListHtml("x_sekolah_id") ?>
+</select>
+<input type="hidden" name="s_x_sekolah_id" id="s_x_sekolah_id" value="<?php echo $t03_kelas->sekolah_id->LookupFilterQuery(false, "extbs") ?>">
+</span>
+	</div>
+<?php } ?>
+</div>
+<div id="xsr_2" class="ewRow">
+<?php if ($t03_kelas->Kelas->Visible) { // Kelas ?>
+	<div id="xsc_Kelas" class="ewCell form-group">
+		<label for="x_Kelas" class="ewSearchCaption ewLabel"><?php echo $t03_kelas->Kelas->FldCaption() ?></label>
+		<span class="ewSearchOperator"><?php echo $Language->Phrase("LIKE") ?><input type="hidden" name="z_Kelas" id="z_Kelas" value="LIKE"></span>
+		<span class="ewSearchField">
+<input type="text" data-table="t03_kelas" data-field="x_Kelas" name="x_Kelas" id="x_Kelas" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t03_kelas->Kelas->getPlaceHolder()) ?>" value="<?php echo $t03_kelas->Kelas->EditValue ?>"<?php echo $t03_kelas->Kelas->EditAttributes() ?>>
+</span>
+	</div>
+<?php } ?>
+</div>
+<div id="xsr_3" class="ewRow">
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
-	</div>
-	</div>
 </div>
 	</div>
 </div>
@@ -2838,10 +1881,6 @@ $t03_kelas_list->ShowMessage();
 <input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t03_kelas_list->Token ?>">
 <?php } ?>
 <input type="hidden" name="t" value="t03_kelas">
-<?php if ($t03_kelas->getCurrentMasterTable() == "t02_sekolah" && $t03_kelas->CurrentAction <> "") { ?>
-<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t02_sekolah">
-<input type="hidden" name="fk_id" value="<?php echo $t03_kelas->sekolah_id->getSessionValue() ?>">
-<?php } ?>
 <div id="gmp_t03_kelas" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
 <?php if ($t03_kelas_list->TotalRecs > 0 || $t03_kelas->CurrentAction == "gridedit") { ?>
 <table id="tbl_t03_kelaslist" class="table ewTable">
@@ -2873,7 +1912,7 @@ $t03_kelas_list->ListOptions->Render("header", "left");
 		<th data-name="Kelas"><div id="elh_t03_kelas_Kelas" class="t03_kelas_Kelas"><div class="ewTableHeaderCaption"><?php echo $t03_kelas->Kelas->FldCaption() ?></div></div></th>
 	<?php } else { ?>
 		<th data-name="Kelas"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t03_kelas->SortUrl($t03_kelas->Kelas) ?>',2);"><div id="elh_t03_kelas_Kelas" class="t03_kelas_Kelas">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t03_kelas->Kelas->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t03_kelas->Kelas->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t03_kelas->Kelas->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t03_kelas->Kelas->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t03_kelas->Kelas->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t03_kelas->Kelas->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -2896,15 +1935,6 @@ if ($t03_kelas->ExportAll && $t03_kelas->Export <> "") {
 	else
 		$t03_kelas_list->StopRec = $t03_kelas_list->TotalRecs;
 }
-
-// Restore number of post back records
-if ($objForm) {
-	$objForm->Index = -1;
-	if ($objForm->HasValue($t03_kelas_list->FormKeyCountName) && ($t03_kelas->CurrentAction == "gridadd" || $t03_kelas->CurrentAction == "gridedit" || $t03_kelas->CurrentAction == "F")) {
-		$t03_kelas_list->KeyCount = $objForm->GetValue($t03_kelas_list->FormKeyCountName);
-		$t03_kelas_list->StopRec = $t03_kelas_list->StartRec + $t03_kelas_list->KeyCount - 1;
-	}
-}
 $t03_kelas_list->RecCnt = $t03_kelas_list->StartRec - 1;
 if ($t03_kelas_list->Recordset && !$t03_kelas_list->Recordset->EOF) {
 	$t03_kelas_list->Recordset->MoveFirst();
@@ -2919,24 +1949,10 @@ if ($t03_kelas_list->Recordset && !$t03_kelas_list->Recordset->EOF) {
 $t03_kelas->RowType = EW_ROWTYPE_AGGREGATEINIT;
 $t03_kelas->ResetAttrs();
 $t03_kelas_list->RenderRow();
-if ($t03_kelas->CurrentAction == "gridadd")
-	$t03_kelas_list->RowIndex = 0;
-if ($t03_kelas->CurrentAction == "gridedit")
-	$t03_kelas_list->RowIndex = 0;
 while ($t03_kelas_list->RecCnt < $t03_kelas_list->StopRec) {
 	$t03_kelas_list->RecCnt++;
 	if (intval($t03_kelas_list->RecCnt) >= intval($t03_kelas_list->StartRec)) {
 		$t03_kelas_list->RowCnt++;
-		if ($t03_kelas->CurrentAction == "gridadd" || $t03_kelas->CurrentAction == "gridedit" || $t03_kelas->CurrentAction == "F") {
-			$t03_kelas_list->RowIndex++;
-			$objForm->Index = $t03_kelas_list->RowIndex;
-			if ($objForm->HasValue($t03_kelas_list->FormActionName))
-				$t03_kelas_list->RowAction = strval($objForm->GetValue($t03_kelas_list->FormActionName));
-			elseif ($t03_kelas->CurrentAction == "gridadd")
-				$t03_kelas_list->RowAction = "insert";
-			else
-				$t03_kelas_list->RowAction = "";
-		}
 
 		// Set up key count
 		$t03_kelas_list->KeyCount = $t03_kelas_list->RowIndex;
@@ -2945,28 +1961,10 @@ while ($t03_kelas_list->RecCnt < $t03_kelas_list->StopRec) {
 		$t03_kelas->ResetAttrs();
 		$t03_kelas->CssClass = "";
 		if ($t03_kelas->CurrentAction == "gridadd") {
-			$t03_kelas_list->LoadDefaultValues(); // Load default values
 		} else {
 			$t03_kelas_list->LoadRowValues($t03_kelas_list->Recordset); // Load row values
 		}
 		$t03_kelas->RowType = EW_ROWTYPE_VIEW; // Render view
-		if ($t03_kelas->CurrentAction == "gridadd") // Grid add
-			$t03_kelas->RowType = EW_ROWTYPE_ADD; // Render add
-		if ($t03_kelas->CurrentAction == "gridadd" && $t03_kelas->EventCancelled && !$objForm->HasValue("k_blankrow")) // Insert failed
-			$t03_kelas_list->RestoreCurrentRowFormValues($t03_kelas_list->RowIndex); // Restore form values
-		if ($t03_kelas->CurrentAction == "gridedit") { // Grid edit
-			if ($t03_kelas->EventCancelled) {
-				$t03_kelas_list->RestoreCurrentRowFormValues($t03_kelas_list->RowIndex); // Restore form values
-			}
-			if ($t03_kelas_list->RowAction == "insert")
-				$t03_kelas->RowType = EW_ROWTYPE_ADD; // Render add
-			else
-				$t03_kelas->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
-		if ($t03_kelas->CurrentAction == "gridedit" && ($t03_kelas->RowType == EW_ROWTYPE_EDIT || $t03_kelas->RowType == EW_ROWTYPE_ADD) && $t03_kelas->EventCancelled) // Update failed
-			$t03_kelas_list->RestoreCurrentRowFormValues($t03_kelas_list->RowIndex); // Restore form values
-		if ($t03_kelas->RowType == EW_ROWTYPE_EDIT) // Edit row
-			$t03_kelas_list->EditRowCnt++;
 
 		// Set up row id / data-rowindex
 		$t03_kelas->RowAttrs = array_merge($t03_kelas->RowAttrs, array('data-rowindex'=>$t03_kelas_list->RowCnt, 'id'=>'r' . $t03_kelas_list->RowCnt . '_t03_kelas', 'data-rowtype'=>$t03_kelas->RowType));
@@ -2976,9 +1974,6 @@ while ($t03_kelas_list->RecCnt < $t03_kelas_list->StopRec) {
 
 		// Render list options
 		$t03_kelas_list->RenderListOptions();
-
-		// Skip delete row / empty row for confirm page
-		if ($t03_kelas_list->RowAction <> "delete" && $t03_kelas_list->RowAction <> "insertdelete" && !($t03_kelas_list->RowAction == "insert" && $t03_kelas->CurrentAction == "F" && $t03_kelas_list->EmptyRow())) {
 ?>
 	<tr<?php echo $t03_kelas->RowAttributes() ?>>
 <?php
@@ -2988,73 +1983,18 @@ $t03_kelas_list->ListOptions->Render("body", "left", $t03_kelas_list->RowCnt);
 ?>
 	<?php if ($t03_kelas->sekolah_id->Visible) { // sekolah_id ?>
 		<td data-name="sekolah_id"<?php echo $t03_kelas->sekolah_id->CellAttributes() ?>>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<?php if ($t03_kelas->sekolah_id->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<span<?php echo $t03_kelas->sekolah_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t03_kelas->sekolah_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<select data-table="t03_kelas" data-field="x_sekolah_id" data-value-separator="<?php echo $t03_kelas->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
-<?php echo $t03_kelas->sekolah_id->SelectOptionListHtml("x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" id="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo $t03_kelas->sekolah_id->LookupFilterQuery() ?>">
-</span>
-<?php } ?>
-<input type="hidden" data-table="t03_kelas" data-field="x_sekolah_id" name="o<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" id="o<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->OldValue) ?>">
-<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($t03_kelas->sekolah_id->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<span<?php echo $t03_kelas->sekolah_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t03_kelas->sekolah_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<select data-table="t03_kelas" data-field="x_sekolah_id" data-value-separator="<?php echo $t03_kelas->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
-<?php echo $t03_kelas->sekolah_id->SelectOptionListHtml("x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" id="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo $t03_kelas->sekolah_id->LookupFilterQuery() ?>">
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_sekolah_id" class="t03_kelas_sekolah_id">
 <span<?php echo $t03_kelas->sekolah_id->ViewAttributes() ?>>
 <?php echo $t03_kelas->sekolah_id->ListViewValue() ?></span>
 </span>
-<?php } ?>
 <a id="<?php echo $t03_kelas_list->PageObjName . "_row_" . $t03_kelas_list->RowCnt ?>"></a></td>
 	<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t03_kelas" data-field="x_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_id" id="x<?php echo $t03_kelas_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t03_kelas->id->CurrentValue) ?>">
-<input type="hidden" data-table="t03_kelas" data-field="x_id" name="o<?php echo $t03_kelas_list->RowIndex ?>_id" id="o<?php echo $t03_kelas_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t03_kelas->id->OldValue) ?>">
-<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_EDIT || $t03_kelas->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t03_kelas" data-field="x_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_id" id="x<?php echo $t03_kelas_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t03_kelas->id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t03_kelas->Kelas->Visible) { // Kelas ?>
 		<td data-name="Kelas"<?php echo $t03_kelas->Kelas->CellAttributes() ?>>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_Kelas" class="form-group t03_kelas_Kelas">
-<input type="text" data-table="t03_kelas" data-field="x_Kelas" name="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" id="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t03_kelas->Kelas->getPlaceHolder()) ?>" value="<?php echo $t03_kelas->Kelas->EditValue ?>"<?php echo $t03_kelas->Kelas->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t03_kelas" data-field="x_Kelas" name="o<?php echo $t03_kelas_list->RowIndex ?>_Kelas" id="o<?php echo $t03_kelas_list->RowIndex ?>_Kelas" value="<?php echo ew_HtmlEncode($t03_kelas->Kelas->OldValue) ?>">
-<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_Kelas" class="form-group t03_kelas_Kelas">
-<input type="text" data-table="t03_kelas" data-field="x_Kelas" name="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" id="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t03_kelas->Kelas->getPlaceHolder()) ?>" value="<?php echo $t03_kelas->Kelas->EditValue ?>"<?php echo $t03_kelas->Kelas->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t03_kelas_list->RowCnt ?>_t03_kelas_Kelas" class="t03_kelas_Kelas">
 <span<?php echo $t03_kelas->Kelas->ViewAttributes() ?>>
 <?php echo $t03_kelas->Kelas->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 <?php
@@ -3063,93 +2003,14 @@ $t03_kelas_list->ListOptions->Render("body", "left", $t03_kelas_list->RowCnt);
 $t03_kelas_list->ListOptions->Render("body", "right", $t03_kelas_list->RowCnt);
 ?>
 	</tr>
-<?php if ($t03_kelas->RowType == EW_ROWTYPE_ADD || $t03_kelas->RowType == EW_ROWTYPE_EDIT) { ?>
-<script type="text/javascript">
-ft03_kelaslist.UpdateOpts(<?php echo $t03_kelas_list->RowIndex ?>);
-</script>
-<?php } ?>
 <?php
 	}
-	} // End delete row checking
 	if ($t03_kelas->CurrentAction <> "gridadd")
-		if (!$t03_kelas_list->Recordset->EOF) $t03_kelas_list->Recordset->MoveNext();
-}
-?>
-<?php
-	if ($t03_kelas->CurrentAction == "gridadd" || $t03_kelas->CurrentAction == "gridedit") {
-		$t03_kelas_list->RowIndex = '$rowindex$';
-		$t03_kelas_list->LoadDefaultValues();
-
-		// Set row properties
-		$t03_kelas->ResetAttrs();
-		$t03_kelas->RowAttrs = array_merge($t03_kelas->RowAttrs, array('data-rowindex'=>$t03_kelas_list->RowIndex, 'id'=>'r0_t03_kelas', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		ew_AppendClass($t03_kelas->RowAttrs["class"], "ewTemplate");
-		$t03_kelas->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t03_kelas_list->RenderRow();
-
-		// Render list options
-		$t03_kelas_list->RenderListOptions();
-		$t03_kelas_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t03_kelas->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t03_kelas_list->ListOptions->Render("body", "left", $t03_kelas_list->RowIndex);
-?>
-	<?php if ($t03_kelas->sekolah_id->Visible) { // sekolah_id ?>
-		<td data-name="sekolah_id">
-<?php if ($t03_kelas->sekolah_id->getSessionValue() <> "") { ?>
-<span id="el$rowindex$_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<span<?php echo $t03_kelas->sekolah_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t03_kelas->sekolah_id->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el$rowindex$_t03_kelas_sekolah_id" class="form-group t03_kelas_sekolah_id">
-<select data-table="t03_kelas" data-field="x_sekolah_id" data-value-separator="<?php echo $t03_kelas->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" name="x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
-<?php echo $t03_kelas->sekolah_id->SelectOptionListHtml("x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" id="s_x<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo $t03_kelas->sekolah_id->LookupFilterQuery() ?>">
-</span>
-<?php } ?>
-<input type="hidden" data-table="t03_kelas" data-field="x_sekolah_id" name="o<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" id="o<?php echo $t03_kelas_list->RowIndex ?>_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t03_kelas->Kelas->Visible) { // Kelas ?>
-		<td data-name="Kelas">
-<span id="el$rowindex$_t03_kelas_Kelas" class="form-group t03_kelas_Kelas">
-<input type="text" data-table="t03_kelas" data-field="x_Kelas" name="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" id="x<?php echo $t03_kelas_list->RowIndex ?>_Kelas" size="30" maxlength="100" placeholder="<?php echo ew_HtmlEncode($t03_kelas->Kelas->getPlaceHolder()) ?>" value="<?php echo $t03_kelas->Kelas->EditValue ?>"<?php echo $t03_kelas->Kelas->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t03_kelas" data-field="x_Kelas" name="o<?php echo $t03_kelas_list->RowIndex ?>_Kelas" id="o<?php echo $t03_kelas_list->RowIndex ?>_Kelas" value="<?php echo ew_HtmlEncode($t03_kelas->Kelas->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t03_kelas_list->ListOptions->Render("body", "right", $t03_kelas_list->RowCnt);
-?>
-<script type="text/javascript">
-ft03_kelaslist.UpdateOpts(<?php echo $t03_kelas_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
+		$t03_kelas_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
-<?php } ?>
-<?php if ($t03_kelas->CurrentAction == "gridadd") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridinsert">
-<input type="hidden" name="<?php echo $t03_kelas_list->FormKeyCountName ?>" id="<?php echo $t03_kelas_list->FormKeyCountName ?>" value="<?php echo $t03_kelas_list->KeyCount ?>">
-<?php echo $t03_kelas_list->MultiSelectKey ?>
-<?php } ?>
-<?php if ($t03_kelas->CurrentAction == "gridedit") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridupdate">
-<input type="hidden" name="<?php echo $t03_kelas_list->FormKeyCountName ?>" id="<?php echo $t03_kelas_list->FormKeyCountName ?>" value="<?php echo $t03_kelas_list->KeyCount ?>">
-<?php echo $t03_kelas_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($t03_kelas->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">

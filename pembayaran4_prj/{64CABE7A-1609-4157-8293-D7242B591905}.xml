@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2018/11/12" author="e.World Technology Ltd.">
-  <project id="{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}" file="C:\xampp\htdocs\pembayaran4\pembayaran4_prj.pmp" name="pembayaran4_prj" product="PHPMaker" version="13.0" datetime="2018/11/12 03:17:23" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
+  <project id="{64CABE7A-1609-4157-8293-D7242B591905}" file="C:\xampp\htdocs\pembayaran4\pembayaran4_prj.pmp" name="pembayaran4_prj" product="PHPMaker" version="13.0" datetime="2018/11/12 16:28:31" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="t01_tahunajaran" name="t01_tahunajaran" caption="Tahun Ajaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t02_sekolah" name="t02_sekolah" caption="Sekolah" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t03_kelas" name="t03_kelas" caption="Kelas" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t04_siswa" name="t04_siswa" caption="Siswa" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t05_rutin" name="t05_rutin" caption="Jenis Pembayaran Rutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t05_rutin" name="t05_rutin" caption="Pembayaran Rutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t06_siswarutin" name="t06_siswarutin" caption="Pembayaran Rutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
-    <table id="t07_siswarutinbayar" name="t07_siswarutinbayar" caption="Rincian Pembayaran Rutin Siswa" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t07_siswarutinbayar" name="t07_siswarutinbayar" caption="Rincian Pembayaran Rutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t99_audittrail" name="t99_audittrail" caption="t 99 audittrail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>

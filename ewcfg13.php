@@ -22,10 +22,10 @@ $EW_ROOT_RELATIVE_PATH = "."; // Relative path of app root
 define("EW_UNFORMAT_YEAR", 50, TRUE); // Unformat year
 define("EW_PROJECT_NAME", "pembayaran4_prj", TRUE); // Project name
 define("EW_CONFIG_FILE_FOLDER", EW_PROJECT_NAME, TRUE); // Config file name
-define("EW_PROJECT_ID", "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}", TRUE); // Project ID (GUID)
+define("EW_PROJECT_ID", "{64CABE7A-1609-4157-8293-D7242B591905}", TRUE); // Project ID (GUID)
 $EW_RELATED_PROJECT_ID = "";
 $EW_RELATED_LANGUAGE_FOLDER = "";
-define("EW_RANDOM_KEY", 'VPTbV1eB18WJr614', TRUE); // Random key for encryption
+define("EW_RANDOM_KEY", 'aRD5EqyjE0es05v1', TRUE); // Random key for encryption
 define("EW_PROJECT_STYLESHEET_FILENAME", "phpcss/pembayaran4_prj.css", TRUE); // Project stylesheet file name
 define("EW_CHARSET", "", TRUE); // Project charset
 define("EW_EMAIL_CHARSET", EW_CHARSET, TRUE); // Email charset
@@ -48,7 +48,7 @@ if (!defined("EW_ADODB_TZ_OFFSET"))
 	define("EW_ADODB_TZ_OFFSET", FALSE, TRUE); // Use ADOdb time zone offset
 if (!defined("EW_USE_MYSQLI"))
 	define('EW_USE_MYSQLI', extension_loaded("mysqli"), TRUE); // Use MySQLi
-$EW_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3307, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
+$EW_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3306, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
 $EW_CONN[0] = &$EW_CONN["DB"];
 
 // Set up database error function
@@ -203,19 +203,19 @@ define("EW_TABLE_EXPORT_RETURN_URL", "exportreturn", TRUE); // Export return URL
 define("EW_TABLE_GRID_ADD_ROW_COUNT", "gridaddcnt", TRUE); // Grid add row count
 
 // Audit Trail
-define("EW_AUDIT_TRAIL_TO_DATABASE", FALSE, TRUE); // Write audit trail to DB
+define("EW_AUDIT_TRAIL_TO_DATABASE", TRUE, TRUE); // Write audit trail to DB
 define("EW_AUDIT_TRAIL_DBID", "DB", TRUE); // Audit trail DBID
-define("EW_AUDIT_TRAIL_TABLE_NAME", "", TRUE); // Audit trail table name
-define("EW_AUDIT_TRAIL_TABLE_VAR", "", TRUE); // Audit trail table var
-define("EW_AUDIT_TRAIL_FIELD_NAME_DATETIME", "", TRUE); // Audit trail DateTime field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_SCRIPT", "", TRUE); // Audit trail Script field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_USER", "", TRUE); // Audit trail User field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_ACTION", "", TRUE); // Audit trail Action field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_TABLE", "", TRUE); // Audit trail Table field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_FIELD", "", TRUE); // Audit trail Field field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_KEYVALUE", "", TRUE); // Audit trail Key Value field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_OLDVALUE", "", TRUE); // Audit trail Old Value field name
-define("EW_AUDIT_TRAIL_FIELD_NAME_NEWVALUE", "", TRUE); // Audit trail New Value field name
+define("EW_AUDIT_TRAIL_TABLE_NAME", "t99_audittrail", TRUE); // Audit trail table name
+define("EW_AUDIT_TRAIL_TABLE_VAR", "t99_audittrail", TRUE); // Audit trail table var
+define("EW_AUDIT_TRAIL_FIELD_NAME_DATETIME", "datetime", TRUE); // Audit trail DateTime field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_SCRIPT", "script", TRUE); // Audit trail Script field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_USER", "user", TRUE); // Audit trail User field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_ACTION", "action", TRUE); // Audit trail Action field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_TABLE", "table", TRUE); // Audit trail Table field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_FIELD", "field", TRUE); // Audit trail Field field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_KEYVALUE", "keyvalue", TRUE); // Audit trail Key Value field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_OLDVALUE", "oldvalue", TRUE); // Audit trail Old Value field name
+define("EW_AUDIT_TRAIL_FIELD_NAME_NEWVALUE", "newvalue", TRUE); // Audit trail New Value field name
 
 // Security
 define("EW_ADMIN_USER_NAME", "", TRUE); // Administrator user name

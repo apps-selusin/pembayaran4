@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t04_siswainfo.php" ?>
-<?php include_once "t03_kelasinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -22,7 +21,7 @@ class ct04_siswa_delete extends ct04_siswa {
 	var $PageID = 'delete';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't04_siswa';
@@ -231,9 +230,6 @@ class ct04_siswa_delete extends ct04_siswa {
 			$GLOBALS["Table"] = &$GLOBALS["t04_siswa"];
 		}
 
-		// Table object (t03_kelas)
-		if (!isset($GLOBALS['t03_kelas'])) $GLOBALS['t03_kelas'] = new ct03_kelas();
-
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'delete', TRUE);
@@ -255,6 +251,7 @@ class ct04_siswa_delete extends ct04_siswa {
 	function Page_Init() {
 		global $gsExport, $gsCustomExport, $gsExportFile, $UserProfile, $Language, $Security, $objForm;
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
+		$this->sekolah_id->SetVisibility();
 		$this->kelas_id->SetVisibility();
 		$this->NIS->SetVisibility();
 		$this->Nama->SetVisibility();
@@ -333,9 +330,6 @@ class ct04_siswa_delete extends ct04_siswa {
 	//
 	function Page_Main() {
 		global $Language;
-
-		// Set up master/detail parameters
-		$this->SetUpMasterParms();
 
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
@@ -436,6 +430,7 @@ class ct04_siswa_delete extends ct04_siswa {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
+		$this->sekolah_id->setDbValue($rs->fields('sekolah_id'));
 		$this->kelas_id->setDbValue($rs->fields('kelas_id'));
 		$this->NIS->setDbValue($rs->fields('NIS'));
 		$this->Nama->setDbValue($rs->fields('Nama'));
@@ -446,6 +441,7 @@ class ct04_siswa_delete extends ct04_siswa {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
+		$this->sekolah_id->DbValue = $row['sekolah_id'];
 		$this->kelas_id->DbValue = $row['kelas_id'];
 		$this->NIS->DbValue = $row['NIS'];
 		$this->Nama->DbValue = $row['Nama'];
@@ -462,6 +458,7 @@ class ct04_siswa_delete extends ct04_siswa {
 
 		// Common render codes for all row types
 		// id
+		// sekolah_id
 		// kelas_id
 		// NIS
 		// Nama
@@ -471,6 +468,29 @@ class ct04_siswa_delete extends ct04_siswa {
 		// id
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
+
+		// sekolah_id
+		if (strval($this->sekolah_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
+		$sWhereWrk = "";
+		$this->sekolah_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
+			}
+		} else {
+			$this->sekolah_id->ViewValue = NULL;
+		}
+		$this->sekolah_id->ViewCustomAttributes = "";
 
 		// kelas_id
 		if (strval($this->kelas_id->CurrentValue) <> "") {
@@ -502,6 +522,11 @@ class ct04_siswa_delete extends ct04_siswa {
 		// Nama
 		$this->Nama->ViewValue = $this->Nama->CurrentValue;
 		$this->Nama->ViewCustomAttributes = "";
+
+			// sekolah_id
+			$this->sekolah_id->LinkCustomAttributes = "";
+			$this->sekolah_id->HrefValue = "";
+			$this->sekolah_id->TooltipValue = "";
 
 			// kelas_id
 			$this->kelas_id->LinkCustomAttributes = "";
@@ -548,6 +573,7 @@ class ct04_siswa_delete extends ct04_siswa {
 		}
 		$rows = ($rs) ? $rs->GetRows() : array();
 		$conn->BeginTrans();
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
 
 		// Clone old rows
 		$rsold = $rows;
@@ -590,8 +616,10 @@ class ct04_siswa_delete extends ct04_siswa {
 		}
 		if ($DeleteRows) {
 			$conn->CommitTrans(); // Commit the changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
 		} else {
 			$conn->RollbackTrans(); // Rollback changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteRollback")); // Batch delete rollback
 		}
 
 		// Call Row Deleted event
@@ -601,66 +629,6 @@ class ct04_siswa_delete extends ct04_siswa {
 			}
 		}
 		return $DeleteRows;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t03_kelas") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_id"] <> "") {
-					$GLOBALS["t03_kelas"]->id->setQueryStringValue($_GET["fk_id"]);
-					$this->kelas_id->setQueryStringValue($GLOBALS["t03_kelas"]->id->QueryStringValue);
-					$this->kelas_id->setSessionValue($this->kelas_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t03_kelas"]->id->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t03_kelas") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_id"] <> "") {
-					$GLOBALS["t03_kelas"]->id->setFormValue($_POST["fk_id"]);
-					$this->kelas_id->setFormValue($GLOBALS["t03_kelas"]->id->FormValue);
-					$this->kelas_id->setSessionValue($this->kelas_id->FormValue);
-					if (!is_numeric($GLOBALS["t03_kelas"]->id->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t03_kelas") {
-				if ($this->kelas_id->CurrentValue == "") $this->kelas_id->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Set up Breadcrumb
@@ -791,6 +759,7 @@ ft04_siswadelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft04_siswadelete.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":["x_kelas_id"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
 ft04_siswadelete.Lists["x_kelas_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kelas","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t03_kelas"};
 
 // Form object for search
@@ -824,6 +793,9 @@ $t04_siswa_delete->ShowMessage();
 <?php echo $t04_siswa->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
+<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<th><span id="elh_t04_siswa_sekolah_id" class="t04_siswa_sekolah_id"><?php echo $t04_siswa->sekolah_id->FldCaption() ?></span></th>
+<?php } ?>
 <?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 		<th><span id="elh_t04_siswa_kelas_id" class="t04_siswa_kelas_id"><?php echo $t04_siswa->kelas_id->FldCaption() ?></span></th>
 <?php } ?>
@@ -854,6 +826,14 @@ while (!$t04_siswa_delete->Recordset->EOF) {
 	$t04_siswa_delete->RenderRow();
 ?>
 	<tr<?php echo $t04_siswa->RowAttributes() ?>>
+<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<td<?php echo $t04_siswa->sekolah_id->CellAttributes() ?>>
+<span id="el<?php echo $t04_siswa_delete->RowCnt ?>_t04_siswa_sekolah_id" class="t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 		<td<?php echo $t04_siswa->kelas_id->CellAttributes() ?>>
 <span id="el<?php echo $t04_siswa_delete->RowCnt ?>_t04_siswa_kelas_id" class="t04_siswa_kelas_id">

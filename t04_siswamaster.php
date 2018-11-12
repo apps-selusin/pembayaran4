@@ -1,5 +1,6 @@
 <?php
 
+// sekolah_id
 // kelas_id
 // NIS
 // Nama
@@ -10,6 +11,17 @@
 <table id="tbl_t04_siswamaster" class="table table-bordered table-striped ewViewTable">
 <?php echo $t04_siswa->TableCustomInnerHtml ?>
 	<tbody>
+<?php if ($t04_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<tr id="r_sekolah_id">
+			<td><?php echo $t04_siswa->sekolah_id->FldCaption() ?></td>
+			<td<?php echo $t04_siswa->sekolah_id->CellAttributes() ?>>
+<span id="el_t04_siswa_sekolah_id">
+<span<?php echo $t04_siswa->sekolah_id->ViewAttributes() ?>>
+<?php echo $t04_siswa->sekolah_id->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
 <?php if ($t04_siswa->kelas_id->Visible) { // kelas_id ?>
 		<tr id="r_kelas_id">
 			<td><?php echo $t04_siswa->kelas_id->FldCaption() ?></td>

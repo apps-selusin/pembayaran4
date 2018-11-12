@@ -43,9 +43,6 @@ ft06_siswarutingrid.Validate = function() {
 			elm = this.GetElements("x" + infix + "_siswa_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->siswa_id->FldCaption(), $t06_siswarutin->siswa_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_siswa_id");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutin->siswa_id->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_rutin_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutin->rutin_id->FldCaption(), $t06_siswarutin->rutin_id->ReqErrMsg)) ?>");
@@ -89,6 +86,7 @@ ft06_siswarutingrid.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+ft06_siswarutingrid.Lists["x_siswa_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_NIS","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_siswa"};
 ft06_siswarutingrid.Lists["x_rutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_rutin"};
 
 // Form object for search
@@ -308,7 +306,10 @@ $t06_siswarutin_grid->ListOptions->Render("body", "left", $t06_siswarutin_grid->
 <input type="hidden" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?php echo $t06_siswarutin_grid->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<select data-table="t06_siswarutin" data-field="x_siswa_id" data-value-separator="<?php echo $t06_siswarutin->siswa_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<?php echo $t06_siswarutin->siswa_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo $t06_siswarutin->siswa_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
 <input type="hidden" data-table="t06_siswarutin" data-field="x_siswa_id" name="o<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="o<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->OldValue) ?>">
@@ -322,7 +323,10 @@ $t06_siswarutin_grid->ListOptions->Render("body", "left", $t06_siswarutin_grid->
 <input type="hidden" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?php echo $t06_siswarutin_grid->RowCnt ?>_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<select data-table="t06_siswarutin" data-field="x_siswa_id" data-value-separator="<?php echo $t06_siswarutin->siswa_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<?php echo $t06_siswarutin->siswa_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo $t06_siswarutin->siswa_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
 <?php } ?>
@@ -463,7 +467,10 @@ $t06_siswarutin_grid->ListOptions->Render("body", "left", $t06_siswarutin_grid->
 <input type="hidden" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el$rowindex$_t06_siswarutin_siswa_id" class="form-group t06_siswarutin_siswa_id">
-<input type="text" data-table="t06_siswarutin" data-field="x_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutin->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutin->siswa_id->EditValue ?>"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<select data-table="t06_siswarutin" data-field="x_siswa_id" data-value-separator="<?php echo $t06_siswarutin->siswa_id->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" name="x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id"<?php echo $t06_siswarutin->siswa_id->EditAttributes() ?>>
+<?php echo $t06_siswarutin->siswa_id->SelectOptionListHtml("x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id") ?>
+</select>
+<input type="hidden" name="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" id="s_x<?php echo $t06_siswarutin_grid->RowIndex ?>_siswa_id" value="<?php echo $t06_siswarutin->siswa_id->LookupFilterQuery() ?>">
 </span>
 <?php } ?>
 <?php } else { ?>

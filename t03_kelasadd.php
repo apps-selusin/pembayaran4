@@ -6,8 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t03_kelasinfo.php" ?>
-<?php include_once "t02_sekolahinfo.php" ?>
-<?php include_once "t04_siswagridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -23,7 +21,7 @@ class ct03_kelas_add extends ct03_kelas {
 	var $PageID = 'add';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't03_kelas';
@@ -232,9 +230,6 @@ class ct03_kelas_add extends ct03_kelas {
 			$GLOBALS["Table"] = &$GLOBALS["t03_kelas"];
 		}
 
-		// Table object (t02_sekolah)
-		if (!isset($GLOBALS['t02_sekolah'])) $GLOBALS['t02_sekolah'] = new ct02_sekolah();
-
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'add', TRUE);
@@ -277,14 +272,6 @@ class ct03_kelas_add extends ct03_kelas {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Process auto fill for detail table 't04_siswa'
-			if (@$_POST["grid"] == "ft04_siswagrid") {
-				if (!isset($GLOBALS["t04_siswa_grid"])) $GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid;
-				$GLOBALS["t04_siswa_grid"]->Page_Init();
-				$this->Page_Terminate();
-				exit();
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -372,9 +359,6 @@ class ct03_kelas_add extends ct03_kelas {
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
 
-		// Set up master/detail parameters
-		$this->SetUpMasterParms();
-
 		// Process form if post back
 		if (@$_POST["a_add"] <> "") {
 			$this->CurrentAction = $_POST["a_add"]; // Get form action
@@ -401,9 +385,6 @@ class ct03_kelas_add extends ct03_kelas {
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
 
-		// Set up detail parameters
-		$this->SetUpDetailParms();
-
 		// Validate form if post back
 		if (@$_POST["a_add"] <> "") {
 			if (!$this->ValidateForm()) {
@@ -426,19 +407,13 @@ class ct03_kelas_add extends ct03_kelas {
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
 					$this->Page_Terminate("t03_kelaslist.php"); // No matching record, return to list
 				}
-
-				// Set up detail parameters
-				$this->SetUpDetailParms();
 				break;
 			case "A": // Add new record
 				$this->SendEmail = TRUE; // Send email on add success
 				if ($this->AddRow($this->OldRecordset)) { // Add successful
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
-					if ($this->getCurrentDetailTable() <> "") // Master/detail add
-						$sReturnUrl = $this->GetDetailUrl();
-					else
-						$sReturnUrl = $this->getReturnUrl();
+					$sReturnUrl = $this->getReturnUrl();
 					if (ew_GetPageName($sReturnUrl) == "t03_kelaslist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 					elseif (ew_GetPageName($sReturnUrl) == "t03_kelasview.php")
@@ -447,9 +422,6 @@ class ct03_kelas_add extends ct03_kelas {
 				} else {
 					$this->EventCancelled = TRUE; // Event cancelled
 					$this->RestoreFormValues(); // Add failed, restore form values
-
-					// Set up detail parameters
-					$this->SetUpDetailParms();
 				}
 		}
 
@@ -584,7 +556,26 @@ class ct03_kelas_add extends ct03_kelas {
 		$this->id->ViewCustomAttributes = "";
 
 		// sekolah_id
-		$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
+		if (strval($this->sekolah_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
+		$sWhereWrk = "";
+		$this->sekolah_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
+			}
+		} else {
+			$this->sekolah_id->ViewValue = NULL;
+		}
 		$this->sekolah_id->ViewCustomAttributes = "";
 
 		// Kelas
@@ -605,14 +596,21 @@ class ct03_kelas_add extends ct03_kelas {
 			// sekolah_id
 			$this->sekolah_id->EditAttrs["class"] = "form-control";
 			$this->sekolah_id->EditCustomAttributes = "";
-			if ($this->sekolah_id->getSessionValue() <> "") {
-				$this->sekolah_id->CurrentValue = $this->sekolah_id->getSessionValue();
-			$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
-			$this->sekolah_id->ViewCustomAttributes = "";
+			if (trim(strval($this->sekolah_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
 			} else {
-			$this->sekolah_id->EditValue = ew_HtmlEncode($this->sekolah_id->CurrentValue);
-			$this->sekolah_id->PlaceHolder = ew_RemoveHtml($this->sekolah_id->FldCaption());
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
 			}
+			$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t02_sekolah`";
+			$sWhereWrk = "";
+			$this->sekolah_id->LookupFilters = array();
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$this->sekolah_id->EditValue = $arwrk;
 
 			// Kelas
 			$this->Kelas->EditAttrs["class"] = "form-control";
@@ -654,18 +652,8 @@ class ct03_kelas_add extends ct03_kelas {
 		if (!$this->sekolah_id->FldIsDetailKey && !is_null($this->sekolah_id->FormValue) && $this->sekolah_id->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->sekolah_id->FldCaption(), $this->sekolah_id->ReqErrMsg));
 		}
-		if (!ew_CheckInteger($this->sekolah_id->FormValue)) {
-			ew_AddMessage($gsFormError, $this->sekolah_id->FldErrMsg());
-		}
 		if (!$this->Kelas->FldIsDetailKey && !is_null($this->Kelas->FormValue) && $this->Kelas->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->Kelas->FldCaption(), $this->Kelas->ReqErrMsg));
-		}
-
-		// Validate detail grid
-		$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-		if (in_array("t04_siswa", $DetailTblVar) && $GLOBALS["t04_siswa"]->DetailAdd) {
-			if (!isset($GLOBALS["t04_siswa_grid"])) $GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid(); // get detail page object
-			$GLOBALS["t04_siswa_grid"]->ValidateGridForm();
 		}
 
 		// Return validate result
@@ -683,31 +671,7 @@ class ct03_kelas_add extends ct03_kelas {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
-
-		// Check referential integrity for master table 't02_sekolah'
-		$bValidMasterRecord = TRUE;
-		$sMasterFilter = $this->SqlMasterFilter_t02_sekolah();
-		if (strval($this->sekolah_id->CurrentValue) <> "") {
-			$sMasterFilter = str_replace("@id@", ew_AdjustSql($this->sekolah_id->CurrentValue, "DB"), $sMasterFilter);
-		} else {
-			$bValidMasterRecord = FALSE;
-		}
-		if ($bValidMasterRecord) {
-			if (!isset($GLOBALS["t02_sekolah"])) $GLOBALS["t02_sekolah"] = new ct02_sekolah();
-			$rsmaster = $GLOBALS["t02_sekolah"]->LoadRs($sMasterFilter);
-			$bValidMasterRecord = ($rsmaster && !$rsmaster->EOF);
-			$rsmaster->Close();
-		}
-		if (!$bValidMasterRecord) {
-			$sRelatedRecordMsg = str_replace("%t", "t02_sekolah", $Language->Phrase("RelatedRecordRequired"));
-			$this->setFailureMessage($sRelatedRecordMsg);
-			return FALSE;
-		}
 		$conn = &$this->Connection();
-
-		// Begin transaction
-		if ($this->getCurrentDetailTable() <> "")
-			$conn->BeginTrans();
 
 		// Load db values from rsold
 		if ($rsold) {
@@ -742,27 +706,6 @@ class ct03_kelas_add extends ct03_kelas {
 			}
 			$AddRow = FALSE;
 		}
-
-		// Add detail records
-		if ($AddRow) {
-			$DetailTblVar = explode(",", $this->getCurrentDetailTable());
-			if (in_array("t04_siswa", $DetailTblVar) && $GLOBALS["t04_siswa"]->DetailAdd) {
-				$GLOBALS["t04_siswa"]->kelas_id->setSessionValue($this->id->CurrentValue); // Set master key
-				if (!isset($GLOBALS["t04_siswa_grid"])) $GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid(); // Get detail page object
-				$AddRow = $GLOBALS["t04_siswa_grid"]->GridInsert();
-				if (!$AddRow)
-					$GLOBALS["t04_siswa"]->kelas_id->setSessionValue(""); // Clear master key if insert failed
-			}
-		}
-
-		// Commit/Rollback transaction
-		if ($this->getCurrentDetailTable() <> "") {
-			if ($AddRow) {
-				$conn->CommitTrans(); // Commit transaction
-			} else {
-				$conn->RollbackTrans(); // Rollback transaction
-			}
-		}
 		if ($AddRow) {
 
 			// Call Row Inserted event
@@ -770,99 +713,6 @@ class ct03_kelas_add extends ct03_kelas {
 			$this->Row_Inserted($rs, $rsnew);
 		}
 		return $AddRow;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setQueryStringValue($_GET["fk_id"]);
-					$this->sekolah_id->setQueryStringValue($GLOBALS["t02_sekolah"]->id->QueryStringValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setFormValue($_POST["fk_id"]);
-					$this->sekolah_id->setFormValue($GLOBALS["t02_sekolah"]->id->FormValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->FormValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t02_sekolah") {
-				if ($this->sekolah_id->CurrentValue == "") $this->sekolah_id->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
-	}
-
-	// Set up detail parms based on QueryString
-	function SetUpDetailParms() {
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_DETAIL])) {
-			$sDetailTblVar = $_GET[EW_TABLE_SHOW_DETAIL];
-			$this->setCurrentDetailTable($sDetailTblVar);
-		} else {
-			$sDetailTblVar = $this->getCurrentDetailTable();
-		}
-		if ($sDetailTblVar <> "") {
-			$DetailTblVar = explode(",", $sDetailTblVar);
-			if (in_array("t04_siswa", $DetailTblVar)) {
-				if (!isset($GLOBALS["t04_siswa_grid"]))
-					$GLOBALS["t04_siswa_grid"] = new ct04_siswa_grid;
-				if ($GLOBALS["t04_siswa_grid"]->DetailAdd) {
-					if ($this->CopyRecord)
-						$GLOBALS["t04_siswa_grid"]->CurrentMode = "copy";
-					else
-						$GLOBALS["t04_siswa_grid"]->CurrentMode = "add";
-					$GLOBALS["t04_siswa_grid"]->CurrentAction = "gridadd";
-
-					// Save current master table to detail table
-					$GLOBALS["t04_siswa_grid"]->setCurrentMasterTable($this->TableVar);
-					$GLOBALS["t04_siswa_grid"]->setStartRecordNumber(1);
-					$GLOBALS["t04_siswa_grid"]->kelas_id->FldIsDetailKey = TRUE;
-					$GLOBALS["t04_siswa_grid"]->kelas_id->CurrentValue = $this->id->CurrentValue;
-					$GLOBALS["t04_siswa_grid"]->kelas_id->setSessionValue($GLOBALS["t04_siswa_grid"]->kelas_id->CurrentValue);
-				}
-			}
-		}
 	}
 
 	// Set up Breadcrumb
@@ -880,6 +730,18 @@ class ct03_kelas_add extends ct03_kelas {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_sekolah_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
+			$sWhereWrk = "";
+			$this->sekolah_id->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -1002,9 +864,6 @@ ft03_kelasadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_sekolah_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t03_kelas->sekolah_id->FldCaption(), $t03_kelas->sekolah_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_sekolah_id");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t03_kelas->sekolah_id->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_Kelas");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t03_kelas->Kelas->FldCaption(), $t03_kelas->Kelas->ReqErrMsg)) ?>");
@@ -1041,8 +900,9 @@ ft03_kelasadd.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+ft03_kelasadd.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1068,26 +928,17 @@ $t03_kelas_add->ShowMessage();
 <?php if ($t03_kelas_add->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($t03_kelas->getCurrentMasterTable() == "t02_sekolah") { ?>
-<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t02_sekolah">
-<input type="hidden" name="fk_id" value="<?php echo $t03_kelas->sekolah_id->getSessionValue() ?>">
-<?php } ?>
 <div>
 <?php if ($t03_kelas->sekolah_id->Visible) { // sekolah_id ?>
 	<div id="r_sekolah_id" class="form-group">
 		<label id="elh_t03_kelas_sekolah_id" for="x_sekolah_id" class="col-sm-2 control-label ewLabel"><?php echo $t03_kelas->sekolah_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="col-sm-10"><div<?php echo $t03_kelas->sekolah_id->CellAttributes() ?>>
-<?php if ($t03_kelas->sekolah_id->getSessionValue() <> "") { ?>
 <span id="el_t03_kelas_sekolah_id">
-<span<?php echo $t03_kelas->sekolah_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t03_kelas->sekolah_id->ViewValue ?></p></span>
+<select data-table="t03_kelas" data-field="x_sekolah_id" data-value-separator="<?php echo $t03_kelas->sekolah_id->DisplayValueSeparatorAttribute() ?>" id="x_sekolah_id" name="x_sekolah_id"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
+<?php echo $t03_kelas->sekolah_id->SelectOptionListHtml("x_sekolah_id") ?>
+</select>
+<input type="hidden" name="s_x_sekolah_id" id="s_x_sekolah_id" value="<?php echo $t03_kelas->sekolah_id->LookupFilterQuery() ?>">
 </span>
-<input type="hidden" id="x_sekolah_id" name="x_sekolah_id" value="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el_t03_kelas_sekolah_id">
-<input type="text" data-table="t03_kelas" data-field="x_sekolah_id" name="x_sekolah_id" id="x_sekolah_id" size="30" placeholder="<?php echo ew_HtmlEncode($t03_kelas->sekolah_id->getPlaceHolder()) ?>" value="<?php echo $t03_kelas->sekolah_id->EditValue ?>"<?php echo $t03_kelas->sekolah_id->EditAttributes() ?>>
-</span>
-<?php } ?>
 <?php echo $t03_kelas->sekolah_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
@@ -1102,14 +953,6 @@ $t03_kelas_add->ShowMessage();
 	</div>
 <?php } ?>
 </div>
-<?php
-	if (in_array("t04_siswa", explode(",", $t03_kelas->getCurrentDetailTable())) && $t04_siswa->DetailAdd) {
-?>
-<?php if ($t03_kelas->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t04_siswa", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "t04_siswagrid.php" ?>
-<?php } ?>
 <?php if (!$t03_kelas_add->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">

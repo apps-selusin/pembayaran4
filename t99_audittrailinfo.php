@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$t05_rutin = NULL;
+$t99_audittrail = NULL;
 
 //
-// Table class for t05_rutin
+// Table class for t99_audittrail
 //
-class ct05_rutin extends cTable {
+class ct99_audittrail extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
@@ -14,7 +14,15 @@ class ct05_rutin extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
-	var $Jenis;
+	var $datetime;
+	var $script;
+	var $user;
+	var $action;
+	var $_table;
+	var $_field;
+	var $keyvalue;
+	var $oldvalue;
+	var $newvalue;
 
 	//
 	// Table class constructor
@@ -24,12 +32,12 @@ class ct05_rutin extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't05_rutin';
-		$this->TableName = 't05_rutin';
+		$this->TableVar = 't99_audittrail';
+		$this->TableName = 't99_audittrail';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t05_rutin`";
+		$this->UpdateTable = "`t99_audittrail`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -47,15 +55,56 @@ class ct05_rutin extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('t05_rutin', 't05_rutin', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id = new cField('t99_audittrail', 't99_audittrail', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
-		// Jenis
-		$this->Jenis = new cField('t05_rutin', 't05_rutin', 'x_Jenis', 'Jenis', '`Jenis`', '`Jenis`', 200, -1, FALSE, '`Jenis`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Jenis->Sortable = TRUE; // Allow sort
-		$this->fields['Jenis'] = &$this->Jenis;
+		// datetime
+		$this->datetime = new cField('t99_audittrail', 't99_audittrail', 'x_datetime', 'datetime', '`datetime`', ew_CastDateFieldForLike('`datetime`', 0, "DB"), 135, 0, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->datetime->Sortable = TRUE; // Allow sort
+		$this->datetime->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_FORMAT"], $Language->Phrase("IncorrectDate"));
+		$this->fields['datetime'] = &$this->datetime;
+
+		// script
+		$this->script = new cField('t99_audittrail', 't99_audittrail', 'x_script', 'script', '`script`', '`script`', 200, -1, FALSE, '`script`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->script->Sortable = TRUE; // Allow sort
+		$this->fields['script'] = &$this->script;
+
+		// user
+		$this->user = new cField('t99_audittrail', 't99_audittrail', 'x_user', 'user', '`user`', '`user`', 200, -1, FALSE, '`user`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->user->Sortable = TRUE; // Allow sort
+		$this->fields['user'] = &$this->user;
+
+		// action
+		$this->action = new cField('t99_audittrail', 't99_audittrail', 'x_action', 'action', '`action`', '`action`', 200, -1, FALSE, '`action`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->action->Sortable = TRUE; // Allow sort
+		$this->fields['action'] = &$this->action;
+
+		// table
+		$this->_table = new cField('t99_audittrail', 't99_audittrail', 'x__table', 'table', '`table`', '`table`', 200, -1, FALSE, '`table`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->_table->Sortable = TRUE; // Allow sort
+		$this->fields['table'] = &$this->_table;
+
+		// field
+		$this->_field = new cField('t99_audittrail', 't99_audittrail', 'x__field', 'field', '`field`', '`field`', 200, -1, FALSE, '`field`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->_field->Sortable = TRUE; // Allow sort
+		$this->fields['field'] = &$this->_field;
+
+		// keyvalue
+		$this->keyvalue = new cField('t99_audittrail', 't99_audittrail', 'x_keyvalue', 'keyvalue', '`keyvalue`', '`keyvalue`', 201, -1, FALSE, '`keyvalue`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
+		$this->keyvalue->Sortable = TRUE; // Allow sort
+		$this->fields['keyvalue'] = &$this->keyvalue;
+
+		// oldvalue
+		$this->oldvalue = new cField('t99_audittrail', 't99_audittrail', 'x_oldvalue', 'oldvalue', '`oldvalue`', '`oldvalue`', 201, -1, FALSE, '`oldvalue`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
+		$this->oldvalue->Sortable = TRUE; // Allow sort
+		$this->fields['oldvalue'] = &$this->oldvalue;
+
+		// newvalue
+		$this->newvalue = new cField('t99_audittrail', 't99_audittrail', 'x_newvalue', 'newvalue', '`newvalue`', '`newvalue`', 201, -1, FALSE, '`newvalue`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
+		$this->newvalue->Sortable = TRUE; // Allow sort
+		$this->fields['newvalue'] = &$this->newvalue;
 	}
 
 	// Set Field Visibility
@@ -96,7 +145,7 @@ class ct05_rutin extends cTable {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t05_rutin`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t99_audittrail`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -410,7 +459,7 @@ class ct05_rutin extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t05_rutinlist.php";
+			return "t99_audittraillist.php";
 		}
 	}
 
@@ -420,30 +469,30 @@ class ct05_rutin extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t05_rutinlist.php";
+		return "t99_audittraillist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t05_rutinview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t99_audittrailview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t05_rutinview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t99_audittrailview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t05_rutinadd.php?" . $this->UrlParm($parm);
+			$url = "t99_audittrailadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t05_rutinadd.php";
+			$url = "t99_audittrailadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t05_rutinedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t99_audittrailedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -455,7 +504,7 @@ class ct05_rutin extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t05_rutinadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t99_audittrailadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -467,7 +516,7 @@ class ct05_rutin extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t05_rutindelete.php", $this->UrlParm());
+		return $this->KeyUrl("t99_audittraildelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -569,7 +618,15 @@ class ct05_rutin extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
-		$this->Jenis->setDbValue($rs->fields('Jenis'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->script->setDbValue($rs->fields('script'));
+		$this->user->setDbValue($rs->fields('user'));
+		$this->action->setDbValue($rs->fields('action'));
+		$this->_table->setDbValue($rs->fields('table'));
+		$this->_field->setDbValue($rs->fields('field'));
+		$this->keyvalue->setDbValue($rs->fields('keyvalue'));
+		$this->oldvalue->setDbValue($rs->fields('oldvalue'));
+		$this->newvalue->setDbValue($rs->fields('newvalue'));
 	}
 
 	// Render list row values
@@ -581,25 +638,106 @@ class ct05_rutin extends cTable {
 
    // Common render codes
 		// id
-		// Jenis
+		// datetime
+		// script
+		// user
+		// action
+		// table
+		// field
+		// keyvalue
+		// oldvalue
+		// newvalue
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// Jenis
-		$this->Jenis->ViewValue = $this->Jenis->CurrentValue;
-		$this->Jenis->ViewCustomAttributes = "";
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewValue = ew_FormatDateTime($this->datetime->ViewValue, 0);
+		$this->datetime->ViewCustomAttributes = "";
+
+		// script
+		$this->script->ViewValue = $this->script->CurrentValue;
+		$this->script->ViewCustomAttributes = "";
+
+		// user
+		$this->user->ViewValue = $this->user->CurrentValue;
+		$this->user->ViewCustomAttributes = "";
+
+		// action
+		$this->action->ViewValue = $this->action->CurrentValue;
+		$this->action->ViewCustomAttributes = "";
+
+		// table
+		$this->_table->ViewValue = $this->_table->CurrentValue;
+		$this->_table->ViewCustomAttributes = "";
+
+		// field
+		$this->_field->ViewValue = $this->_field->CurrentValue;
+		$this->_field->ViewCustomAttributes = "";
+
+		// keyvalue
+		$this->keyvalue->ViewValue = $this->keyvalue->CurrentValue;
+		$this->keyvalue->ViewCustomAttributes = "";
+
+		// oldvalue
+		$this->oldvalue->ViewValue = $this->oldvalue->CurrentValue;
+		$this->oldvalue->ViewCustomAttributes = "";
+
+		// newvalue
+		$this->newvalue->ViewValue = $this->newvalue->CurrentValue;
+		$this->newvalue->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
-		// Jenis
-		$this->Jenis->LinkCustomAttributes = "";
-		$this->Jenis->HrefValue = "";
-		$this->Jenis->TooltipValue = "";
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
+
+		// script
+		$this->script->LinkCustomAttributes = "";
+		$this->script->HrefValue = "";
+		$this->script->TooltipValue = "";
+
+		// user
+		$this->user->LinkCustomAttributes = "";
+		$this->user->HrefValue = "";
+		$this->user->TooltipValue = "";
+
+		// action
+		$this->action->LinkCustomAttributes = "";
+		$this->action->HrefValue = "";
+		$this->action->TooltipValue = "";
+
+		// table
+		$this->_table->LinkCustomAttributes = "";
+		$this->_table->HrefValue = "";
+		$this->_table->TooltipValue = "";
+
+		// field
+		$this->_field->LinkCustomAttributes = "";
+		$this->_field->HrefValue = "";
+		$this->_field->TooltipValue = "";
+
+		// keyvalue
+		$this->keyvalue->LinkCustomAttributes = "";
+		$this->keyvalue->HrefValue = "";
+		$this->keyvalue->TooltipValue = "";
+
+		// oldvalue
+		$this->oldvalue->LinkCustomAttributes = "";
+		$this->oldvalue->HrefValue = "";
+		$this->oldvalue->TooltipValue = "";
+
+		// newvalue
+		$this->newvalue->LinkCustomAttributes = "";
+		$this->newvalue->HrefValue = "";
+		$this->newvalue->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -618,11 +756,59 @@ class ct05_rutin extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// Jenis
-		$this->Jenis->EditAttrs["class"] = "form-control";
-		$this->Jenis->EditCustomAttributes = "";
-		$this->Jenis->EditValue = $this->Jenis->CurrentValue;
-		$this->Jenis->PlaceHolder = ew_RemoveHtml($this->Jenis->FldCaption());
+		// datetime
+		$this->datetime->EditAttrs["class"] = "form-control";
+		$this->datetime->EditCustomAttributes = "";
+		$this->datetime->EditValue = ew_FormatDateTime($this->datetime->CurrentValue, 8);
+		$this->datetime->PlaceHolder = ew_RemoveHtml($this->datetime->FldCaption());
+
+		// script
+		$this->script->EditAttrs["class"] = "form-control";
+		$this->script->EditCustomAttributes = "";
+		$this->script->EditValue = $this->script->CurrentValue;
+		$this->script->PlaceHolder = ew_RemoveHtml($this->script->FldCaption());
+
+		// user
+		$this->user->EditAttrs["class"] = "form-control";
+		$this->user->EditCustomAttributes = "";
+		$this->user->EditValue = $this->user->CurrentValue;
+		$this->user->PlaceHolder = ew_RemoveHtml($this->user->FldCaption());
+
+		// action
+		$this->action->EditAttrs["class"] = "form-control";
+		$this->action->EditCustomAttributes = "";
+		$this->action->EditValue = $this->action->CurrentValue;
+		$this->action->PlaceHolder = ew_RemoveHtml($this->action->FldCaption());
+
+		// table
+		$this->_table->EditAttrs["class"] = "form-control";
+		$this->_table->EditCustomAttributes = "";
+		$this->_table->EditValue = $this->_table->CurrentValue;
+		$this->_table->PlaceHolder = ew_RemoveHtml($this->_table->FldCaption());
+
+		// field
+		$this->_field->EditAttrs["class"] = "form-control";
+		$this->_field->EditCustomAttributes = "";
+		$this->_field->EditValue = $this->_field->CurrentValue;
+		$this->_field->PlaceHolder = ew_RemoveHtml($this->_field->FldCaption());
+
+		// keyvalue
+		$this->keyvalue->EditAttrs["class"] = "form-control";
+		$this->keyvalue->EditCustomAttributes = "";
+		$this->keyvalue->EditValue = $this->keyvalue->CurrentValue;
+		$this->keyvalue->PlaceHolder = ew_RemoveHtml($this->keyvalue->FldCaption());
+
+		// oldvalue
+		$this->oldvalue->EditAttrs["class"] = "form-control";
+		$this->oldvalue->EditCustomAttributes = "";
+		$this->oldvalue->EditValue = $this->oldvalue->CurrentValue;
+		$this->oldvalue->PlaceHolder = ew_RemoveHtml($this->oldvalue->FldCaption());
+
+		// newvalue
+		$this->newvalue->EditAttrs["class"] = "form-control";
+		$this->newvalue->EditCustomAttributes = "";
+		$this->newvalue->EditValue = $this->newvalue->CurrentValue;
+		$this->newvalue->PlaceHolder = ew_RemoveHtml($this->newvalue->FldCaption());
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -651,10 +837,24 @@ class ct05_rutin extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->Jenis->Exportable) $Doc->ExportCaption($this->Jenis);
+					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+					if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+					if ($this->script->Exportable) $Doc->ExportCaption($this->script);
+					if ($this->user->Exportable) $Doc->ExportCaption($this->user);
+					if ($this->action->Exportable) $Doc->ExportCaption($this->action);
+					if ($this->_table->Exportable) $Doc->ExportCaption($this->_table);
+					if ($this->_field->Exportable) $Doc->ExportCaption($this->_field);
+					if ($this->keyvalue->Exportable) $Doc->ExportCaption($this->keyvalue);
+					if ($this->oldvalue->Exportable) $Doc->ExportCaption($this->oldvalue);
+					if ($this->newvalue->Exportable) $Doc->ExportCaption($this->newvalue);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->Jenis->Exportable) $Doc->ExportCaption($this->Jenis);
+					if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+					if ($this->script->Exportable) $Doc->ExportCaption($this->script);
+					if ($this->user->Exportable) $Doc->ExportCaption($this->user);
+					if ($this->action->Exportable) $Doc->ExportCaption($this->action);
+					if ($this->_table->Exportable) $Doc->ExportCaption($this->_table);
+					if ($this->_field->Exportable) $Doc->ExportCaption($this->_field);
 				}
 				$Doc->EndExportRow();
 			}
@@ -686,10 +886,24 @@ class ct05_rutin extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->Jenis->Exportable) $Doc->ExportField($this->Jenis);
+						if ($this->id->Exportable) $Doc->ExportField($this->id);
+						if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+						if ($this->script->Exportable) $Doc->ExportField($this->script);
+						if ($this->user->Exportable) $Doc->ExportField($this->user);
+						if ($this->action->Exportable) $Doc->ExportField($this->action);
+						if ($this->_table->Exportable) $Doc->ExportField($this->_table);
+						if ($this->_field->Exportable) $Doc->ExportField($this->_field);
+						if ($this->keyvalue->Exportable) $Doc->ExportField($this->keyvalue);
+						if ($this->oldvalue->Exportable) $Doc->ExportField($this->oldvalue);
+						if ($this->newvalue->Exportable) $Doc->ExportField($this->newvalue);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->Jenis->Exportable) $Doc->ExportField($this->Jenis);
+						if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+						if ($this->script->Exportable) $Doc->ExportField($this->script);
+						if ($this->user->Exportable) $Doc->ExportField($this->user);
+						if ($this->action->Exportable) $Doc->ExportField($this->action);
+						if ($this->_table->Exportable) $Doc->ExportField($this->_table);
+						if ($this->_field->Exportable) $Doc->ExportField($this->_field);
 					}
 					$Doc->EndExportRow();
 				}
@@ -733,7 +947,7 @@ class ct05_rutin extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't05_rutin';
+		$table = 't99_audittrail';
 		$usr = CurrentUserName();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -742,7 +956,7 @@ class ct05_rutin extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't05_rutin';
+		$table = 't99_audittrail';
 
 		// Get key value
 		$key = "";
@@ -776,7 +990,7 @@ class ct05_rutin extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't05_rutin';
+		$table = 't99_audittrail';
 
 		// Get key value
 		$key = "";
@@ -823,7 +1037,7 @@ class ct05_rutin extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't05_rutin';
+		$table = 't99_audittrail';
 
 		// Get key value
 		$key = "";

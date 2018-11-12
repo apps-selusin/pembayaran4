@@ -50,7 +50,7 @@ function CurrentLanguageID() {
 function CurrentProjectID() {
 	if (isset($GLOBALS["Page"]))
 		return $GLOBALS["Page"]->ProjectID;
-	return "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	return "{64CABE7A-1609-4157-8293-D7242B591905}";
 }
 
 // Get current page object
@@ -3831,6 +3831,8 @@ class cAdvancedSecurity {
 			$enc = !empty($_SESSION[EW_PROJECT_NAME . "_Encrypted"]);
 			$autologin = $this->ValidateUser($usr, $pwd, TRUE, $enc);
 		}
+		if ($autologin)
+			ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $GLOBALS["Language"]->Phrase("AuditTrailAutoLogin"), ew_CurrentUserIP(), "", "", "", "");
 		return $autologin;
 	}
 

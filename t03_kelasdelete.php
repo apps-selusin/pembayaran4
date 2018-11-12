@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t03_kelasinfo.php" ?>
-<?php include_once "t02_sekolahinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -22,7 +21,7 @@ class ct03_kelas_delete extends ct03_kelas {
 	var $PageID = 'delete';
 
 	// Project ID
-	var $ProjectID = "{3CC5FCD2-65F0-4648-A01D-A5AAE379AF1E}";
+	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
 	var $TableName = 't03_kelas';
@@ -231,9 +230,6 @@ class ct03_kelas_delete extends ct03_kelas {
 			$GLOBALS["Table"] = &$GLOBALS["t03_kelas"];
 		}
 
-		// Table object (t02_sekolah)
-		if (!isset($GLOBALS['t02_sekolah'])) $GLOBALS['t02_sekolah'] = new ct02_sekolah();
-
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'delete', TRUE);
@@ -332,9 +328,6 @@ class ct03_kelas_delete extends ct03_kelas {
 	//
 	function Page_Main() {
 		global $Language;
-
-		// Set up master/detail parameters
-		$this->SetUpMasterParms();
 
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
@@ -535,6 +528,7 @@ class ct03_kelas_delete extends ct03_kelas {
 		}
 		$rows = ($rs) ? $rs->GetRows() : array();
 		$conn->BeginTrans();
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
 
 		// Clone old rows
 		$rsold = $rows;
@@ -577,8 +571,10 @@ class ct03_kelas_delete extends ct03_kelas {
 		}
 		if ($DeleteRows) {
 			$conn->CommitTrans(); // Commit the changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
 		} else {
 			$conn->RollbackTrans(); // Rollback changes
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteRollback")); // Batch delete rollback
 		}
 
 		// Call Row Deleted event
@@ -588,66 +584,6 @@ class ct03_kelas_delete extends ct03_kelas {
 			}
 		}
 		return $DeleteRows;
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setQueryStringValue($_GET["fk_id"]);
-					$this->sekolah_id->setQueryStringValue($GLOBALS["t02_sekolah"]->id->QueryStringValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t02_sekolah") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_id"] <> "") {
-					$GLOBALS["t02_sekolah"]->id->setFormValue($_POST["fk_id"]);
-					$this->sekolah_id->setFormValue($GLOBALS["t02_sekolah"]->id->FormValue);
-					$this->sekolah_id->setSessionValue($this->sekolah_id->FormValue);
-					if (!is_numeric($GLOBALS["t02_sekolah"]->id->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t02_sekolah") {
-				if ($this->sekolah_id->CurrentValue == "") $this->sekolah_id->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Set up Breadcrumb
