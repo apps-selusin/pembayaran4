@@ -583,11 +583,17 @@
   <project>
     <phrase id="bodytitle" value="PEMBAYARAN" />
     <phrase id="footertext" value="&amp;copy;2018 Selaras Solusindo. All rights reserved." />
-    <menu id="9">
-      <phrase id="menutext" value="Pembayaran Rutin 2" />
+    <menu id="21">
+      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10">
-      <phrase id="menutext" value="Siswa 2" />
+      <phrase id="menutext" value="Pembayaran" />
+    </menu>
+    <menu id="9">
+      <phrase id="menutext" value="Rutin" />
+    </menu>
+    <menu id="19">
+      <phrase id="menutext" value="Setup" />
     </menu>
     <menu id="1">
       <phrase id="menutext" value="Tahun Ajaran" />
@@ -607,12 +613,24 @@
     <menu id="7">
       <phrase id="menutext" value="Rincian Pembayaran Rutin" />
     </menu>
+    <menu id="23">
+      <phrase id="menutext" value="Pembayaran Non-Rutin" />
+    </menu>
     <menu id="5">
       <phrase id="menutext" value="Pembayaran Rutin" />
     </menu>
-    <menu id="8">
-      <phrase id="menutext" value="t 99 audittrail" />
+    <menu id="22">
+      <phrase id="menutext" value="Pembayaran Non-Rutin" />
     </menu>
+    <menu id="20">
+      <phrase id="menutext" value="Laporan" />
+    </menu>
+    <menu id="8">
+      <phrase id="menutext" value="Log Aktifitas" />
+    </menu>
+    <table id="cf01_home_php">
+      <phrase id="tblcaption" value="Home" />
+    </table>
     <table id="t01_tahunajaran">
       <phrase id="tblcaption" value="Tahun Ajaran" />
       <field id="id">
@@ -705,7 +723,7 @@
       </field>
     </table>
     <table id="t06_siswarutintemp">
-      <phrase id="tblcaption" value="Pembayaran Rutin 2" />
+      <phrase id="tblcaption" value="Rutin" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -760,8 +778,32 @@
         <phrase id="fldcaption" value="Periode Text" />
       </field>
     </table>
+    <table id="t08_nonrutin">
+      <phrase id="tblcaption" value="Pembayaran Non-Rutin" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+    </table>
+    <table id="t09_siswanonrutin">
+      <phrase id="tblcaption" value="Pembayaran Non-Rutin" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="nonrutin_id">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+    </table>
     <table id="t99_audittrail">
-      <phrase id="tblcaption" value="t 99 audittrail" />
+      <phrase id="tblcaption" value="Log Aktifitas" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -794,21 +836,21 @@
       </field>
     </table>
     <table id="v01_siswa">
-      <phrase id="tblcaption" value="Siswa 2" />
+      <phrase id="tblcaption" value="Pembayaran" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="sekolah_id">
-        <phrase id="fldcaption" value="sekolah id" />
-      </field>
-      <field id="kelas_id">
-        <phrase id="fldcaption" value="kelas id" />
       </field>
       <field id="nis">
         <phrase id="fldcaption" value="NIS" />
       </field>
       <field id="nama">
         <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="Sekolah" />
       </field>
     </table>
   </project>

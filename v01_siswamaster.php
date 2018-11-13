@@ -1,10 +1,9 @@
 <?php
 
-// id
-// sekolah_id
-// kelas_id
 // NIS
 // Nama
+// kelas_id
+// sekolah_id
 
 ?>
 <?php if ($v01_siswa->Visible) { ?>
@@ -12,39 +11,6 @@
 <table id="tbl_v01_siswamaster" class="table table-bordered table-striped ewViewTable">
 <?php echo $v01_siswa->TableCustomInnerHtml ?>
 	<tbody>
-<?php if ($v01_siswa->id->Visible) { // id ?>
-		<tr id="r_id">
-			<td><?php echo $v01_siswa->id->FldCaption() ?></td>
-			<td<?php echo $v01_siswa->id->CellAttributes() ?>>
-<span id="el_v01_siswa_id">
-<span<?php echo $v01_siswa->id->ViewAttributes() ?>>
-<?php echo $v01_siswa->id->ListViewValue() ?></span>
-</span>
-</td>
-		</tr>
-<?php } ?>
-<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
-		<tr id="r_sekolah_id">
-			<td><?php echo $v01_siswa->sekolah_id->FldCaption() ?></td>
-			<td<?php echo $v01_siswa->sekolah_id->CellAttributes() ?>>
-<span id="el_v01_siswa_sekolah_id">
-<span<?php echo $v01_siswa->sekolah_id->ViewAttributes() ?>>
-<?php echo $v01_siswa->sekolah_id->ListViewValue() ?></span>
-</span>
-</td>
-		</tr>
-<?php } ?>
-<?php if ($v01_siswa->kelas_id->Visible) { // kelas_id ?>
-		<tr id="r_kelas_id">
-			<td><?php echo $v01_siswa->kelas_id->FldCaption() ?></td>
-			<td<?php echo $v01_siswa->kelas_id->CellAttributes() ?>>
-<span id="el_v01_siswa_kelas_id">
-<span<?php echo $v01_siswa->kelas_id->ViewAttributes() ?>>
-<?php echo $v01_siswa->kelas_id->ListViewValue() ?></span>
-</span>
-</td>
-		</tr>
-<?php } ?>
 <?php if ($v01_siswa->NIS->Visible) { // NIS ?>
 		<tr id="r_NIS">
 			<td><?php echo $v01_siswa->NIS->FldCaption() ?></td>
@@ -63,6 +29,28 @@
 <span id="el_v01_siswa_Nama">
 <span<?php echo $v01_siswa->Nama->ViewAttributes() ?>>
 <?php echo $v01_siswa->Nama->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($v01_siswa->kelas_id->Visible) { // kelas_id ?>
+		<tr id="r_kelas_id">
+			<td><?php echo $v01_siswa->kelas_id->FldCaption() ?></td>
+			<td<?php echo $v01_siswa->kelas_id->CellAttributes() ?>>
+<span id="el_v01_siswa_kelas_id">
+<span<?php echo $v01_siswa->kelas_id->ViewAttributes() ?>>
+<?php echo $v01_siswa->kelas_id->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<tr id="r_sekolah_id">
+			<td><?php echo $v01_siswa->sekolah_id->FldCaption() ?></td>
+			<td<?php echo $v01_siswa->sekolah_id->CellAttributes() ?>>
+<span id="el_v01_siswa_sekolah_id">
+<span<?php echo $v01_siswa->sekolah_id->ViewAttributes() ?>>
+<?php echo $v01_siswa->sekolah_id->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

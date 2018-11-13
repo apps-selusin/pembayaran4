@@ -675,6 +675,7 @@ class ct06_siswarutintemp_list extends ct06_siswarutintemp {
 
 		// Begin transaction
 		$conn->BeginTrans();
+		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
 		$sKey = "";
 
 		// Update row index and get row key
@@ -741,11 +742,13 @@ class ct06_siswarutintemp_list extends ct06_siswarutintemp {
 
 			// Call Grid_Updated event
 			$this->Grid_Updated($rsold, $rsnew);
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
 			if ($this->getSuccessMessage() == "")
 				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
 			$this->ClearInlineMode(); // Clear inline edit mode
 		} else {
 			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
 			if ($this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
 		}
@@ -2032,6 +2035,7 @@ class ct06_siswarutintemp_list extends ct06_siswarutintemp {
 
 		}
 		$rows = ($rs) ? $rs->GetRows() : array();
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
 
 		// Clone old rows
 		$rsold = $rows;
@@ -2073,6 +2077,7 @@ class ct06_siswarutintemp_list extends ct06_siswarutintemp {
 			}
 		}
 		if ($DeleteRows) {
+			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
 		} else {
 		}
 

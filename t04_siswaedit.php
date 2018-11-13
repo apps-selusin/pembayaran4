@@ -7,6 +7,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t04_siswainfo.php" ?>
 <?php include_once "t06_siswarutingridcls.php" ?>
+<?php include_once "t09_siswanonrutingridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -260,6 +261,9 @@ class ct04_siswa_edit extends ct04_siswa {
 		$this->NIS->SetVisibility();
 		$this->Nama->SetVisibility();
 
+		// Set up detail page object
+		$this->SetupDetailPages();
+
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
 
@@ -280,6 +284,14 @@ class ct04_siswa_edit extends ct04_siswa {
 			if (@$_POST["grid"] == "ft06_siswarutingrid") {
 				if (!isset($GLOBALS["t06_siswarutin_grid"])) $GLOBALS["t06_siswarutin_grid"] = new ct06_siswarutin_grid;
 				$GLOBALS["t06_siswarutin_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
+
+			// Process auto fill for detail table 't09_siswanonrutin'
+			if (@$_POST["grid"] == "ft09_siswanonrutingrid") {
+				if (!isset($GLOBALS["t09_siswanonrutin_grid"])) $GLOBALS["t09_siswanonrutin_grid"] = new ct09_siswanonrutin_grid;
+				$GLOBALS["t09_siswanonrutin_grid"]->Page_Init();
 				$this->Page_Terminate();
 				exit();
 			}
@@ -353,6 +365,7 @@ class ct04_siswa_edit extends ct04_siswa {
 	var $IsModal = FALSE;
 	var $DbMasterFilter;
 	var $DbDetailFilter;
+	var $DetailPages; // Detail pages object
 
 	// 
 	// Page main
@@ -765,6 +778,10 @@ class ct04_siswa_edit extends ct04_siswa {
 			if (!isset($GLOBALS["t06_siswarutin_grid"])) $GLOBALS["t06_siswarutin_grid"] = new ct06_siswarutin_grid(); // get detail page object
 			$GLOBALS["t06_siswarutin_grid"]->ValidateGridForm();
 		}
+		if (in_array("t09_siswanonrutin", $DetailTblVar) && $GLOBALS["t09_siswanonrutin"]->DetailEdit) {
+			if (!isset($GLOBALS["t09_siswanonrutin_grid"])) $GLOBALS["t09_siswanonrutin_grid"] = new ct09_siswanonrutin_grid(); // get detail page object
+			$GLOBALS["t09_siswanonrutin_grid"]->ValidateGridForm();
+		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -837,6 +854,12 @@ class ct04_siswa_edit extends ct04_siswa {
 						$EditRow = $GLOBALS["t06_siswarutin_grid"]->GridUpdate();
 					}
 				}
+				if ($EditRow) {
+					if (in_array("t09_siswanonrutin", $DetailTblVar) && $GLOBALS["t09_siswanonrutin"]->DetailEdit) {
+						if (!isset($GLOBALS["t09_siswanonrutin_grid"])) $GLOBALS["t09_siswanonrutin_grid"] = new ct09_siswanonrutin_grid(); // Get detail page object
+						$EditRow = $GLOBALS["t09_siswanonrutin_grid"]->GridUpdate();
+					}
+				}
 
 				// Commit/Rollback transaction
 				if ($this->getCurrentDetailTable() <> "") {
@@ -894,6 +917,21 @@ class ct04_siswa_edit extends ct04_siswa {
 					$GLOBALS["t06_siswarutin_grid"]->siswa_id->setSessionValue($GLOBALS["t06_siswarutin_grid"]->siswa_id->CurrentValue);
 				}
 			}
+			if (in_array("t09_siswanonrutin", $DetailTblVar)) {
+				if (!isset($GLOBALS["t09_siswanonrutin_grid"]))
+					$GLOBALS["t09_siswanonrutin_grid"] = new ct09_siswanonrutin_grid;
+				if ($GLOBALS["t09_siswanonrutin_grid"]->DetailEdit) {
+					$GLOBALS["t09_siswanonrutin_grid"]->CurrentMode = "edit";
+					$GLOBALS["t09_siswanonrutin_grid"]->CurrentAction = "gridedit";
+
+					// Save current master table to detail table
+					$GLOBALS["t09_siswanonrutin_grid"]->setCurrentMasterTable($this->TableVar);
+					$GLOBALS["t09_siswanonrutin_grid"]->setStartRecordNumber(1);
+					$GLOBALS["t09_siswanonrutin_grid"]->siswa_id->FldIsDetailKey = TRUE;
+					$GLOBALS["t09_siswanonrutin_grid"]->siswa_id->CurrentValue = $this->id->CurrentValue;
+					$GLOBALS["t09_siswanonrutin_grid"]->siswa_id->setSessionValue($GLOBALS["t09_siswanonrutin_grid"]->siswa_id->CurrentValue);
+				}
+			}
 		}
 	}
 
@@ -905,6 +943,15 @@ class ct04_siswa_edit extends ct04_siswa {
 		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t04_siswalist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
+	}
+
+	// Set up detail pages
+	function SetupDetailPages() {
+		$pages = new cSubPages();
+		$pages->Style = "tabs";
+		$pages->Add('t06_siswarutin');
+		$pages->Add('t09_siswanonrutin');
+		$this->DetailPages = $pages;
 	}
 
 	// Setup lookup filters of a field
@@ -1179,13 +1226,59 @@ $t04_siswa_edit->ShowMessage();
 <?php } ?>
 </div>
 <input type="hidden" data-table="t04_siswa" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t04_siswa->id->CurrentValue) ?>">
+<?php if ($t04_siswa->getCurrentDetailTable() <> "") { ?>
+<?php
+	$t04_siswa_edit->DetailPages->ValidKeys = explode(",", $t04_siswa->getCurrentDetailTable());
+	$FirstActiveDetailTable = $t04_siswa_edit->DetailPages->ActivePageIndex();
+?>
+<div class="ewDetailPages">
+<div class="tabbable" id="t04_siswa_edit_details">
+	<ul class="nav<?php echo $t04_siswa_edit->DetailPages->NavStyle() ?>">
 <?php
 	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailEdit) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
+			$FirstActiveDetailTable = "t06_siswarutin";
+		}
 ?>
-<?php if ($t04_siswa->getCurrentDetailTable() <> "") { ?>
-<h4 class="ewDetailCaption"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></h4>
-<?php } ?>
+		<li<?php echo $t04_siswa_edit->DetailPages->TabStyle("t06_siswarutin") ?>><a href="#tab_t06_siswarutin" data-toggle="tab"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></a></li>
+<?php
+	}
+?>
+<?php
+	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailEdit) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t09_siswanonrutin") {
+			$FirstActiveDetailTable = "t09_siswanonrutin";
+		}
+?>
+		<li<?php echo $t04_siswa_edit->DetailPages->TabStyle("t09_siswanonrutin") ?>><a href="#tab_t09_siswanonrutin" data-toggle="tab"><?php echo $Language->TablePhrase("t09_siswanonrutin", "TblCaption") ?></a></li>
+<?php
+	}
+?>
+	</ul>
+	<div class="tab-content">
+<?php
+	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailEdit) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
+			$FirstActiveDetailTable = "t06_siswarutin";
+		}
+?>
+		<div class="tab-pane<?php echo $t04_siswa_edit->DetailPages->PageStyle("t06_siswarutin") ?>" id="tab_t06_siswarutin">
 <?php include_once "t06_siswarutingrid.php" ?>
+		</div>
+<?php } ?>
+<?php
+	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailEdit) {
+		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t09_siswanonrutin") {
+			$FirstActiveDetailTable = "t09_siswanonrutin";
+		}
+?>
+		<div class="tab-pane<?php echo $t04_siswa_edit->DetailPages->PageStyle("t09_siswanonrutin") ?>" id="tab_t09_siswanonrutin">
+<?php include_once "t09_siswanonrutingrid.php" ?>
+		</div>
+<?php } ?>
+	</div>
+</div>
+</div>
 <?php } ?>
 <?php if (!$t04_siswa_edit->IsModal) { ?>
 <div class="form-group">

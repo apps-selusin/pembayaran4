@@ -343,12 +343,10 @@ class cv01_siswa_list extends cv01_siswa {
 
 		// Set up list options
 		$this->SetupListOptions();
-		$this->id->SetVisibility();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
-		$this->sekolah_id->SetVisibility();
-		$this->kelas_id->SetVisibility();
 		$this->NIS->SetVisibility();
 		$this->Nama->SetVisibility();
+		$this->kelas_id->SetVisibility();
+		$this->sekolah_id->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -680,10 +678,10 @@ class cv01_siswa_list extends cv01_siswa {
 		// Initialize
 		$sFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->sekolah_id->AdvancedSearch->ToJSON(), ","); // Field sekolah_id
-		$sFilterList = ew_Concat($sFilterList, $this->kelas_id->AdvancedSearch->ToJSON(), ","); // Field kelas_id
 		$sFilterList = ew_Concat($sFilterList, $this->NIS->AdvancedSearch->ToJSON(), ","); // Field NIS
 		$sFilterList = ew_Concat($sFilterList, $this->Nama->AdvancedSearch->ToJSON(), ","); // Field Nama
+		$sFilterList = ew_Concat($sFilterList, $this->kelas_id->AdvancedSearch->ToJSON(), ","); // Field kelas_id
+		$sFilterList = ew_Concat($sFilterList, $this->sekolah_id->AdvancedSearch->ToJSON(), ","); // Field sekolah_id
 		$sFilterList = preg_replace('/,$/', "", $sFilterList);
 
 		// Return filter list in json
@@ -732,22 +730,6 @@ class cv01_siswa_list extends cv01_siswa {
 		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
 		$this->id->AdvancedSearch->Save();
 
-		// Field sekolah_id
-		$this->sekolah_id->AdvancedSearch->SearchValue = @$filter["x_sekolah_id"];
-		$this->sekolah_id->AdvancedSearch->SearchOperator = @$filter["z_sekolah_id"];
-		$this->sekolah_id->AdvancedSearch->SearchCondition = @$filter["v_sekolah_id"];
-		$this->sekolah_id->AdvancedSearch->SearchValue2 = @$filter["y_sekolah_id"];
-		$this->sekolah_id->AdvancedSearch->SearchOperator2 = @$filter["w_sekolah_id"];
-		$this->sekolah_id->AdvancedSearch->Save();
-
-		// Field kelas_id
-		$this->kelas_id->AdvancedSearch->SearchValue = @$filter["x_kelas_id"];
-		$this->kelas_id->AdvancedSearch->SearchOperator = @$filter["z_kelas_id"];
-		$this->kelas_id->AdvancedSearch->SearchCondition = @$filter["v_kelas_id"];
-		$this->kelas_id->AdvancedSearch->SearchValue2 = @$filter["y_kelas_id"];
-		$this->kelas_id->AdvancedSearch->SearchOperator2 = @$filter["w_kelas_id"];
-		$this->kelas_id->AdvancedSearch->Save();
-
 		// Field NIS
 		$this->NIS->AdvancedSearch->SearchValue = @$filter["x_NIS"];
 		$this->NIS->AdvancedSearch->SearchOperator = @$filter["z_NIS"];
@@ -763,6 +745,22 @@ class cv01_siswa_list extends cv01_siswa {
 		$this->Nama->AdvancedSearch->SearchValue2 = @$filter["y_Nama"];
 		$this->Nama->AdvancedSearch->SearchOperator2 = @$filter["w_Nama"];
 		$this->Nama->AdvancedSearch->Save();
+
+		// Field kelas_id
+		$this->kelas_id->AdvancedSearch->SearchValue = @$filter["x_kelas_id"];
+		$this->kelas_id->AdvancedSearch->SearchOperator = @$filter["z_kelas_id"];
+		$this->kelas_id->AdvancedSearch->SearchCondition = @$filter["v_kelas_id"];
+		$this->kelas_id->AdvancedSearch->SearchValue2 = @$filter["y_kelas_id"];
+		$this->kelas_id->AdvancedSearch->SearchOperator2 = @$filter["w_kelas_id"];
+		$this->kelas_id->AdvancedSearch->Save();
+
+		// Field sekolah_id
+		$this->sekolah_id->AdvancedSearch->SearchValue = @$filter["x_sekolah_id"];
+		$this->sekolah_id->AdvancedSearch->SearchOperator = @$filter["z_sekolah_id"];
+		$this->sekolah_id->AdvancedSearch->SearchCondition = @$filter["v_sekolah_id"];
+		$this->sekolah_id->AdvancedSearch->SearchValue2 = @$filter["y_sekolah_id"];
+		$this->sekolah_id->AdvancedSearch->SearchOperator2 = @$filter["w_sekolah_id"];
+		$this->sekolah_id->AdvancedSearch->Save();
 	}
 
 	// Advanced search WHERE clause based on QueryString
@@ -770,10 +768,10 @@ class cv01_siswa_list extends cv01_siswa {
 		global $Security;
 		$sWhere = "";
 		$this->BuildSearchSql($sWhere, $this->id, $Default, FALSE); // id
-		$this->BuildSearchSql($sWhere, $this->sekolah_id, $Default, FALSE); // sekolah_id
-		$this->BuildSearchSql($sWhere, $this->kelas_id, $Default, FALSE); // kelas_id
 		$this->BuildSearchSql($sWhere, $this->NIS, $Default, FALSE); // NIS
 		$this->BuildSearchSql($sWhere, $this->Nama, $Default, FALSE); // Nama
+		$this->BuildSearchSql($sWhere, $this->kelas_id, $Default, FALSE); // kelas_id
+		$this->BuildSearchSql($sWhere, $this->sekolah_id, $Default, FALSE); // sekolah_id
 
 		// Set up search parm
 		if (!$Default && $sWhere <> "") {
@@ -781,10 +779,10 @@ class cv01_siswa_list extends cv01_siswa {
 		}
 		if (!$Default && $this->Command == "search") {
 			$this->id->AdvancedSearch->Save(); // id
-			$this->sekolah_id->AdvancedSearch->Save(); // sekolah_id
-			$this->kelas_id->AdvancedSearch->Save(); // kelas_id
 			$this->NIS->AdvancedSearch->Save(); // NIS
 			$this->Nama->AdvancedSearch->Save(); // Nama
+			$this->kelas_id->AdvancedSearch->Save(); // kelas_id
+			$this->sekolah_id->AdvancedSearch->Save(); // sekolah_id
 		}
 		return $sWhere;
 	}
@@ -841,13 +839,13 @@ class cv01_siswa_list extends cv01_siswa {
 	function CheckSearchParms() {
 		if ($this->id->AdvancedSearch->IssetSession())
 			return TRUE;
-		if ($this->sekolah_id->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->kelas_id->AdvancedSearch->IssetSession())
-			return TRUE;
 		if ($this->NIS->AdvancedSearch->IssetSession())
 			return TRUE;
 		if ($this->Nama->AdvancedSearch->IssetSession())
+			return TRUE;
+		if ($this->kelas_id->AdvancedSearch->IssetSession())
+			return TRUE;
+		if ($this->sekolah_id->AdvancedSearch->IssetSession())
 			return TRUE;
 		return FALSE;
 	}
@@ -871,10 +869,10 @@ class cv01_siswa_list extends cv01_siswa {
 	// Clear all advanced search parameters
 	function ResetAdvancedSearchParms() {
 		$this->id->AdvancedSearch->UnsetSession();
-		$this->sekolah_id->AdvancedSearch->UnsetSession();
-		$this->kelas_id->AdvancedSearch->UnsetSession();
 		$this->NIS->AdvancedSearch->UnsetSession();
 		$this->Nama->AdvancedSearch->UnsetSession();
+		$this->kelas_id->AdvancedSearch->UnsetSession();
+		$this->sekolah_id->AdvancedSearch->UnsetSession();
 	}
 
 	// Restore all search parameters
@@ -883,10 +881,10 @@ class cv01_siswa_list extends cv01_siswa {
 
 		// Restore advanced search values
 		$this->id->AdvancedSearch->Load();
-		$this->sekolah_id->AdvancedSearch->Load();
-		$this->kelas_id->AdvancedSearch->Load();
 		$this->NIS->AdvancedSearch->Load();
 		$this->Nama->AdvancedSearch->Load();
+		$this->kelas_id->AdvancedSearch->Load();
+		$this->sekolah_id->AdvancedSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -899,11 +897,10 @@ class cv01_siswa_list extends cv01_siswa {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->id, $bCtrl); // id
-			$this->UpdateSort($this->sekolah_id, $bCtrl); // sekolah_id
-			$this->UpdateSort($this->kelas_id, $bCtrl); // kelas_id
 			$this->UpdateSort($this->NIS, $bCtrl); // NIS
 			$this->UpdateSort($this->Nama, $bCtrl); // Nama
+			$this->UpdateSort($this->kelas_id, $bCtrl); // kelas_id
+			$this->UpdateSort($this->sekolah_id, $bCtrl); // sekolah_id
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -936,11 +933,10 @@ class cv01_siswa_list extends cv01_siswa {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->id->setSort("");
-				$this->sekolah_id->setSort("");
-				$this->kelas_id->setSort("");
 				$this->NIS->setSort("");
 				$this->Nama->setSort("");
+				$this->kelas_id->setSort("");
+				$this->sekolah_id->setSort("");
 			}
 
 			// Reset start position
@@ -1330,16 +1326,6 @@ class cv01_siswa_list extends cv01_siswa {
 		if ($this->id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
 		$this->id->AdvancedSearch->SearchOperator = @$_GET["z_id"];
 
-		// sekolah_id
-		$this->sekolah_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_sekolah_id"]);
-		if ($this->sekolah_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->sekolah_id->AdvancedSearch->SearchOperator = @$_GET["z_sekolah_id"];
-
-		// kelas_id
-		$this->kelas_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_kelas_id"]);
-		if ($this->kelas_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->kelas_id->AdvancedSearch->SearchOperator = @$_GET["z_kelas_id"];
-
 		// NIS
 		$this->NIS->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_NIS"]);
 		if ($this->NIS->AdvancedSearch->SearchValue <> "") $this->Command = "search";
@@ -1349,6 +1335,16 @@ class cv01_siswa_list extends cv01_siswa {
 		$this->Nama->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Nama"]);
 		if ($this->Nama->AdvancedSearch->SearchValue <> "") $this->Command = "search";
 		$this->Nama->AdvancedSearch->SearchOperator = @$_GET["z_Nama"];
+
+		// kelas_id
+		$this->kelas_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_kelas_id"]);
+		if ($this->kelas_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->kelas_id->AdvancedSearch->SearchOperator = @$_GET["z_kelas_id"];
+
+		// sekolah_id
+		$this->sekolah_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_sekolah_id"]);
+		if ($this->sekolah_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->sekolah_id->AdvancedSearch->SearchOperator = @$_GET["z_sekolah_id"];
 	}
 
 	// Load recordset
@@ -1407,10 +1403,10 @@ class cv01_siswa_list extends cv01_siswa {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
-		$this->sekolah_id->setDbValue($rs->fields('sekolah_id'));
-		$this->kelas_id->setDbValue($rs->fields('kelas_id'));
 		$this->NIS->setDbValue($rs->fields('NIS'));
 		$this->Nama->setDbValue($rs->fields('Nama'));
+		$this->kelas_id->setDbValue($rs->fields('kelas_id'));
+		$this->sekolah_id->setDbValue($rs->fields('sekolah_id'));
 	}
 
 	// Load DbValue from recordset
@@ -1418,10 +1414,10 @@ class cv01_siswa_list extends cv01_siswa {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->sekolah_id->DbValue = $row['sekolah_id'];
-		$this->kelas_id->DbValue = $row['kelas_id'];
 		$this->NIS->DbValue = $row['NIS'];
 		$this->Nama->DbValue = $row['Nama'];
+		$this->kelas_id->DbValue = $row['kelas_id'];
+		$this->sekolah_id->DbValue = $row['sekolah_id'];
 	}
 
 	// Load old record
@@ -1464,24 +1460,16 @@ class cv01_siswa_list extends cv01_siswa {
 
 		// Common render codes for all row types
 		// id
-		// sekolah_id
-		// kelas_id
 		// NIS
 		// Nama
+		// kelas_id
+		// sekolah_id
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 		// id
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
-
-		// sekolah_id
-		$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
-		$this->sekolah_id->ViewCustomAttributes = "";
-
-		// kelas_id
-		$this->kelas_id->ViewValue = $this->kelas_id->CurrentValue;
-		$this->kelas_id->ViewCustomAttributes = "";
 
 		// NIS
 		$this->NIS->ViewValue = $this->NIS->CurrentValue;
@@ -1491,20 +1479,53 @@ class cv01_siswa_list extends cv01_siswa {
 		$this->Nama->ViewValue = $this->Nama->CurrentValue;
 		$this->Nama->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
+		// kelas_id
+		$this->kelas_id->ViewValue = $this->kelas_id->CurrentValue;
+		if (strval($this->kelas_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->kelas_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Kelas` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t03_kelas`";
+		$sWhereWrk = "";
+		$this->kelas_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->kelas_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->kelas_id->ViewValue = $this->kelas_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->kelas_id->ViewValue = $this->kelas_id->CurrentValue;
+			}
+		} else {
+			$this->kelas_id->ViewValue = NULL;
+		}
+		$this->kelas_id->ViewCustomAttributes = "";
 
-			// sekolah_id
-			$this->sekolah_id->LinkCustomAttributes = "";
-			$this->sekolah_id->HrefValue = "";
-			$this->sekolah_id->TooltipValue = "";
-
-			// kelas_id
-			$this->kelas_id->LinkCustomAttributes = "";
-			$this->kelas_id->HrefValue = "";
-			$this->kelas_id->TooltipValue = "";
+		// sekolah_id
+		$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
+		if (strval($this->sekolah_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->sekolah_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Sekolah` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_sekolah`";
+		$sWhereWrk = "";
+		$this->sekolah_id->LookupFilters = array();
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->sekolah_id, $sWhereWrk); // Call Lookup selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->sekolah_id->ViewValue = $this->sekolah_id->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->sekolah_id->ViewValue = $this->sekolah_id->CurrentValue;
+			}
+		} else {
+			$this->sekolah_id->ViewValue = NULL;
+		}
+		$this->sekolah_id->ViewCustomAttributes = "";
 
 			// NIS
 			$this->NIS->LinkCustomAttributes = "";
@@ -1515,25 +1536,17 @@ class cv01_siswa_list extends cv01_siswa {
 			$this->Nama->LinkCustomAttributes = "";
 			$this->Nama->HrefValue = "";
 			$this->Nama->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
-
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = ew_HtmlEncode($this->id->AdvancedSearch->SearchValue);
-			$this->id->PlaceHolder = ew_RemoveHtml($this->id->FldCaption());
-
-			// sekolah_id
-			$this->sekolah_id->EditAttrs["class"] = "form-control";
-			$this->sekolah_id->EditCustomAttributes = "";
-			$this->sekolah_id->EditValue = ew_HtmlEncode($this->sekolah_id->AdvancedSearch->SearchValue);
-			$this->sekolah_id->PlaceHolder = ew_RemoveHtml($this->sekolah_id->FldCaption());
 
 			// kelas_id
-			$this->kelas_id->EditAttrs["class"] = "form-control";
-			$this->kelas_id->EditCustomAttributes = "";
-			$this->kelas_id->EditValue = ew_HtmlEncode($this->kelas_id->AdvancedSearch->SearchValue);
-			$this->kelas_id->PlaceHolder = ew_RemoveHtml($this->kelas_id->FldCaption());
+			$this->kelas_id->LinkCustomAttributes = "";
+			$this->kelas_id->HrefValue = "";
+			$this->kelas_id->TooltipValue = "";
+
+			// sekolah_id
+			$this->sekolah_id->LinkCustomAttributes = "";
+			$this->sekolah_id->HrefValue = "";
+			$this->sekolah_id->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
 
 			// NIS
 			$this->NIS->EditAttrs["class"] = "form-control";
@@ -1546,6 +1559,18 @@ class cv01_siswa_list extends cv01_siswa {
 			$this->Nama->EditCustomAttributes = "";
 			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->AdvancedSearch->SearchValue);
 			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
+
+			// kelas_id
+			$this->kelas_id->EditAttrs["class"] = "form-control";
+			$this->kelas_id->EditCustomAttributes = "";
+			$this->kelas_id->EditValue = ew_HtmlEncode($this->kelas_id->AdvancedSearch->SearchValue);
+			$this->kelas_id->PlaceHolder = ew_RemoveHtml($this->kelas_id->FldCaption());
+
+			// sekolah_id
+			$this->sekolah_id->EditAttrs["class"] = "form-control";
+			$this->sekolah_id->EditCustomAttributes = "";
+			$this->sekolah_id->EditValue = ew_HtmlEncode($this->sekolah_id->AdvancedSearch->SearchValue);
+			$this->sekolah_id->PlaceHolder = ew_RemoveHtml($this->sekolah_id->FldCaption());
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1584,10 +1609,10 @@ class cv01_siswa_list extends cv01_siswa {
 	// Load advanced search
 	function LoadAdvancedSearch() {
 		$this->id->AdvancedSearch->Load();
-		$this->sekolah_id->AdvancedSearch->Load();
-		$this->kelas_id->AdvancedSearch->Load();
 		$this->NIS->AdvancedSearch->Load();
 		$this->Nama->AdvancedSearch->Load();
+		$this->kelas_id->AdvancedSearch->Load();
+		$this->sekolah_id->AdvancedSearch->Load();
 	}
 
 	// Set up Breadcrumb
@@ -1787,8 +1812,10 @@ fv01_siswalist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fv01_siswalist.Lists["x_kelas_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kelas","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t03_kelas"};
+fv01_siswalist.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
 
+// Form object for search
 var CurrentSearchForm = fv01_siswalistsrch = new ew_Form("fv01_siswalistsrch");
 
 // Validate function for search
@@ -1940,33 +1967,6 @@ $v01_siswa_list->RenderListOptions();
 // Render list options (header, left)
 $v01_siswa_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($v01_siswa->id->Visible) { // id ?>
-	<?php if ($v01_siswa->SortUrl($v01_siswa->id) == "") { ?>
-		<th data-name="id"><div id="elh_v01_siswa_id" class="v01_siswa_id"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->id) ?>',2);"><div id="elh_v01_siswa_id" class="v01_siswa_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
-	<?php if ($v01_siswa->SortUrl($v01_siswa->sekolah_id) == "") { ?>
-		<th data-name="sekolah_id"><div id="elh_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->sekolah_id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="sekolah_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->sekolah_id) ?>',2);"><div id="elh_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->sekolah_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->sekolah_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->sekolah_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($v01_siswa->kelas_id->Visible) { // kelas_id ?>
-	<?php if ($v01_siswa->SortUrl($v01_siswa->kelas_id) == "") { ?>
-		<th data-name="kelas_id"><div id="elh_v01_siswa_kelas_id" class="v01_siswa_kelas_id"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->kelas_id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="kelas_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->kelas_id) ?>',2);"><div id="elh_v01_siswa_kelas_id" class="v01_siswa_kelas_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->kelas_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->kelas_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->kelas_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
 <?php if ($v01_siswa->NIS->Visible) { // NIS ?>
 	<?php if ($v01_siswa->SortUrl($v01_siswa->NIS) == "") { ?>
 		<th data-name="NIS"><div id="elh_v01_siswa_NIS" class="v01_siswa_NIS"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->NIS->FldCaption() ?></div></div></th>
@@ -1982,6 +1982,24 @@ $v01_siswa_list->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<th data-name="Nama"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->Nama) ?>',2);"><div id="elh_v01_siswa_Nama" class="v01_siswa_Nama">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->Nama->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->Nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->Nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($v01_siswa->kelas_id->Visible) { // kelas_id ?>
+	<?php if ($v01_siswa->SortUrl($v01_siswa->kelas_id) == "") { ?>
+		<th data-name="kelas_id"><div id="elh_v01_siswa_kelas_id" class="v01_siswa_kelas_id"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->kelas_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="kelas_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->kelas_id) ?>',2);"><div id="elh_v01_siswa_kelas_id" class="v01_siswa_kelas_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->kelas_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->kelas_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->kelas_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
+	<?php if ($v01_siswa->SortUrl($v01_siswa->sekolah_id) == "") { ?>
+		<th data-name="sekolah_id"><div id="elh_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id"><div class="ewTableHeaderCaption"><?php echo $v01_siswa->sekolah_id->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="sekolah_id"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $v01_siswa->SortUrl($v01_siswa->sekolah_id) ?>',2);"><div id="elh_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $v01_siswa->sekolah_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($v01_siswa->sekolah_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($v01_siswa->sekolah_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -2050,19 +2068,19 @@ while ($v01_siswa_list->RecCnt < $v01_siswa_list->StopRec) {
 // Render list options (body, left)
 $v01_siswa_list->ListOptions->Render("body", "left", $v01_siswa_list->RowCnt);
 ?>
-	<?php if ($v01_siswa->id->Visible) { // id ?>
-		<td data-name="id"<?php echo $v01_siswa->id->CellAttributes() ?>>
-<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_id" class="v01_siswa_id">
-<span<?php echo $v01_siswa->id->ViewAttributes() ?>>
-<?php echo $v01_siswa->id->ListViewValue() ?></span>
+	<?php if ($v01_siswa->NIS->Visible) { // NIS ?>
+		<td data-name="NIS"<?php echo $v01_siswa->NIS->CellAttributes() ?>>
+<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_NIS" class="v01_siswa_NIS">
+<span<?php echo $v01_siswa->NIS->ViewAttributes() ?>>
+<?php echo $v01_siswa->NIS->ListViewValue() ?></span>
 </span>
 <a id="<?php echo $v01_siswa_list->PageObjName . "_row_" . $v01_siswa_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
-		<td data-name="sekolah_id"<?php echo $v01_siswa->sekolah_id->CellAttributes() ?>>
-<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id">
-<span<?php echo $v01_siswa->sekolah_id->ViewAttributes() ?>>
-<?php echo $v01_siswa->sekolah_id->ListViewValue() ?></span>
+	<?php if ($v01_siswa->Nama->Visible) { // Nama ?>
+		<td data-name="Nama"<?php echo $v01_siswa->Nama->CellAttributes() ?>>
+<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_Nama" class="v01_siswa_Nama">
+<span<?php echo $v01_siswa->Nama->ViewAttributes() ?>>
+<?php echo $v01_siswa->Nama->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
@@ -2074,19 +2092,11 @@ $v01_siswa_list->ListOptions->Render("body", "left", $v01_siswa_list->RowCnt);
 </span>
 </td>
 	<?php } ?>
-	<?php if ($v01_siswa->NIS->Visible) { // NIS ?>
-		<td data-name="NIS"<?php echo $v01_siswa->NIS->CellAttributes() ?>>
-<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_NIS" class="v01_siswa_NIS">
-<span<?php echo $v01_siswa->NIS->ViewAttributes() ?>>
-<?php echo $v01_siswa->NIS->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($v01_siswa->Nama->Visible) { // Nama ?>
-		<td data-name="Nama"<?php echo $v01_siswa->Nama->CellAttributes() ?>>
-<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_Nama" class="v01_siswa_Nama">
-<span<?php echo $v01_siswa->Nama->ViewAttributes() ?>>
-<?php echo $v01_siswa->Nama->ListViewValue() ?></span>
+	<?php if ($v01_siswa->sekolah_id->Visible) { // sekolah_id ?>
+		<td data-name="sekolah_id"<?php echo $v01_siswa->sekolah_id->CellAttributes() ?>>
+<span id="el<?php echo $v01_siswa_list->RowCnt ?>_v01_siswa_sekolah_id" class="v01_siswa_sekolah_id">
+<span<?php echo $v01_siswa->sekolah_id->ViewAttributes() ?>>
+<?php echo $v01_siswa->sekolah_id->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
