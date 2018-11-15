@@ -19,9 +19,12 @@ function Page_Unloaded() {
 	//echo "Page Unloaded";
 }
 
+// -----------------------------------------------
 function f_update_bayar_nonrutin($rsold, $rsnew) {
 
+// -----------------------------------------------
 	// update pembayaran ke tabel t07_siswarutinbayar
+
 	$awal  = $_SESSION["nonrutin_Periode_Awal"]; // 201807
 	$akhir = $_SESSION["nonrutin_Periode_Akhir"]; // 201906
 	while ($awal <= $akhir) {
@@ -52,9 +55,12 @@ function f_update_bayar_nonrutin($rsold, $rsnew) {
 	}
 }
 
+// --------------------------------------------
 function f_update_bayar_rutin($rsold, $rsnew) {
 
+// --------------------------------------------
 	// update pembayaran ke tabel t07_siswarutinbayar
+
 	$awal  = $_SESSION["rutin_Periode_Awal"]; // 201807
 	$akhir = $_SESSION["rutin_Periode_Akhir"]; // 201906
 	while ($awal <= $akhir) {
@@ -145,11 +151,13 @@ function f_buat_rincian_pembayaran_non_rutin($rsold, $rsnew) {
 		t09_siswanonrutintemp (
 			siswa_id,
 			nonrutin_id,
-			siswanonrutin_id
+			siswanonrutin_id,
+			Nilai_Temp
 		) values (
 		".$rsnew["siswa_id"].",
 		".$rsnew["nonrutin_id"].",
-		".$rsnew["id"]."
+		".$rsnew["id"].",
+		".$rsnew["Nilai"]."
 		)
 		";
 	Conn()->Execute($q);
@@ -231,11 +239,13 @@ function f_buat_rincian_pembayaran($rsold, $rsnew) {
 		t06_siswarutintemp (
 			siswa_id,
 			rutin_id,
-			siswarutin_id
+			siswarutin_id,
+			Nilai_Temp
 		) values (
 		".$rsnew["siswa_id"].",
 		".$rsnew["rutin_id"].",
-		".$rsnew["id"]."
+		".$rsnew["id"].",
+		".$rsnew["Nilai"]."
 		)
 		";
 	Conn()->Execute($q);

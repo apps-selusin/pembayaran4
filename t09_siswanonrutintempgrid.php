@@ -66,6 +66,7 @@ ft09_siswanonrutintempgrid.EmptyRow = function(infix) {
 	if (ew_ValueChanged(fobj, infix, "Periode_Awal", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "Periode_Akhir", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "Nilai", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "Nilai_Temp", false)) return false;
 	return true;
 }
 
@@ -201,6 +202,15 @@ $t09_siswanonrutintemp_grid->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<th data-name="Nilai"><div><div id="elh_t09_siswanonrutintemp_Nilai" class="t09_siswanonrutintemp_Nilai">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Nilai->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Nilai->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Nilai_Temp) == "") { ?>
+		<th data-name="Nilai_Temp"><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Nilai_Temp"><div><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -496,6 +506,34 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <?php } ?>
 </td>
 	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+		<td data-name="Nilai_Temp"<?php echo $t09_siswanonrutintemp->Nilai_Temp->CellAttributes() ?>>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
+<span<?php echo $t09_siswanonrutintemp->Nilai_Temp->ViewAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Nilai_Temp->ListViewValue() ?></span>
+</span>
+<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -642,6 +680,18 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+		<td data-name="Nilai_Temp">
+<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
+<span id="el$rowindex$_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<?php } else { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php

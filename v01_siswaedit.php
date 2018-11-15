@@ -1015,6 +1015,7 @@ class cv01_siswa_edit extends cv01_siswa {
 		// Example:
 		//$header = "your header";
 
+		$_SESSION["siswa_id"] = $this->id->CurrentValue;
 	}
 
 	// Page Data Rendered event

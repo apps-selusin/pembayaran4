@@ -354,6 +354,7 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->Periode_Awal->SetVisibility();
 		$this->Periode_Akhir->SetVisibility();
 		$this->Nilai->SetVisibility();
+		$this->Nilai_Temp->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -805,6 +806,8 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			return FALSE;
 		if ($objForm->HasValue("x_Nilai") && $objForm->HasValue("o_Nilai") && $this->Nilai->CurrentValue <> $this->Nilai->OldValue)
 			return FALSE;
+		if ($objForm->HasValue("x_Nilai_Temp") && $objForm->HasValue("o_Nilai_Temp") && $this->Nilai_Temp->CurrentValue <> $this->Nilai_Temp->OldValue)
+			return FALSE;
 		return TRUE;
 	}
 
@@ -891,6 +894,7 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			$this->UpdateSort($this->Periode_Awal, $bCtrl); // Periode_Awal
 			$this->UpdateSort($this->Periode_Akhir, $bCtrl); // Periode_Akhir
 			$this->UpdateSort($this->Nilai, $bCtrl); // Nilai
+			$this->UpdateSort($this->Nilai_Temp, $bCtrl); // Nilai_Temp
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -932,6 +936,7 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 				$this->Periode_Awal->setSort("");
 				$this->Periode_Akhir->setSort("");
 				$this->Nilai->setSort("");
+				$this->Nilai_Temp->setSort("");
 			}
 
 			// Reset start position
@@ -1336,6 +1341,8 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->Periode_Akhir->OldValue = $this->Periode_Akhir->CurrentValue;
 		$this->Nilai->CurrentValue = 0.00;
 		$this->Nilai->OldValue = $this->Nilai->CurrentValue;
+		$this->Nilai_Temp->CurrentValue = 0.00;
+		$this->Nilai_Temp->OldValue = $this->Nilai_Temp->CurrentValue;
 	}
 
 	// Load form values
@@ -1358,6 +1365,9 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		if (!$this->Nilai->FldIsDetailKey) {
 			$this->Nilai->setFormValue($objForm->GetValue("x_Nilai"));
 		}
+		if (!$this->Nilai_Temp->FldIsDetailKey) {
+			$this->Nilai_Temp->setFormValue($objForm->GetValue("x_Nilai_Temp"));
+		}
 		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
@@ -1372,6 +1382,7 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->Periode_Awal->CurrentValue = $this->Periode_Awal->FormValue;
 		$this->Periode_Akhir->CurrentValue = $this->Periode_Akhir->FormValue;
 		$this->Nilai->CurrentValue = $this->Nilai->FormValue;
+		$this->Nilai_Temp->CurrentValue = $this->Nilai_Temp->FormValue;
 	}
 
 	// Load recordset
@@ -1432,10 +1443,11 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswa_id->setDbValue($rs->fields('siswa_id'));
 		$this->nonrutin_id->setDbValue($rs->fields('nonrutin_id'));
-		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
 		$this->Periode_Awal->setDbValue($rs->fields('Periode_Awal'));
 		$this->Periode_Akhir->setDbValue($rs->fields('Periode_Akhir'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
+		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
+		$this->Nilai_Temp->setDbValue($rs->fields('Nilai_Temp'));
 	}
 
 	// Load DbValue from recordset
@@ -1445,10 +1457,11 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->id->DbValue = $row['id'];
 		$this->siswa_id->DbValue = $row['siswa_id'];
 		$this->nonrutin_id->DbValue = $row['nonrutin_id'];
-		$this->siswanonrutin_id->DbValue = $row['siswanonrutin_id'];
 		$this->Periode_Awal->DbValue = $row['Periode_Awal'];
 		$this->Periode_Akhir->DbValue = $row['Periode_Akhir'];
 		$this->Nilai->DbValue = $row['Nilai'];
+		$this->siswanonrutin_id->DbValue = $row['siswanonrutin_id'];
+		$this->Nilai_Temp->DbValue = $row['Nilai_Temp'];
 	}
 
 	// Load old record
@@ -1497,10 +1510,11 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		// id
 		// siswa_id
 		// nonrutin_id
-		// siswanonrutin_id
 		// Periode_Awal
 		// Periode_Akhir
 		// Nilai
+		// siswanonrutin_id
+		// Nilai_Temp
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1535,10 +1549,6 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			$this->nonrutin_id->ViewValue = NULL;
 		}
 		$this->nonrutin_id->ViewCustomAttributes = "";
-
-		// siswanonrutin_id
-		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
-		$this->siswanonrutin_id->ViewCustomAttributes = "";
 
 		// Periode_Awal
 		if (strval($this->Periode_Awal->CurrentValue) <> "") {
@@ -1596,6 +1606,14 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 		$this->Nilai->CellCssStyle .= "text-align: right;";
 		$this->Nilai->ViewCustomAttributes = "";
 
+		// siswanonrutin_id
+		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
+		$this->siswanonrutin_id->ViewCustomAttributes = "";
+
+		// Nilai_Temp
+		$this->Nilai_Temp->ViewValue = $this->Nilai_Temp->CurrentValue;
+		$this->Nilai_Temp->ViewCustomAttributes = "";
+
 			// siswa_id
 			$this->siswa_id->LinkCustomAttributes = "";
 			$this->siswa_id->HrefValue = "";
@@ -1620,6 +1638,11 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
 			$this->Nilai->TooltipValue = "";
+
+			// Nilai_Temp
+			$this->Nilai_Temp->LinkCustomAttributes = "";
+			$this->Nilai_Temp->HrefValue = "";
+			$this->Nilai_Temp->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// siswa_id
@@ -1709,6 +1732,11 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
 			if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) $this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
 
+			// Nilai_Temp
+			$this->Nilai_Temp->EditAttrs["class"] = "form-control";
+			$this->Nilai_Temp->EditCustomAttributes = "";
+			$this->Nilai_Temp->CurrentValue = 0.00;
+
 			// Add refer script
 			// siswa_id
 
@@ -1730,6 +1758,10 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			// Nilai
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
+
+			// Nilai_Temp
+			$this->Nilai_Temp->LinkCustomAttributes = "";
+			$this->Nilai_Temp->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// siswa_id
@@ -1813,6 +1845,10 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
 			if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) $this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
 
+			// Nilai_Temp
+			$this->Nilai_Temp->EditAttrs["class"] = "form-control";
+			$this->Nilai_Temp->EditCustomAttributes = "";
+
 			// Edit refer script
 			// siswa_id
 
@@ -1836,6 +1872,10 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			// Nilai
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
+
+			// Nilai_Temp
+			$this->Nilai_Temp->LinkCustomAttributes = "";
+			$this->Nilai_Temp->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1990,6 +2030,9 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 			// Nilai
 			$this->Nilai->SetDbValueDef($rsnew, $this->Nilai->CurrentValue, NULL, $this->Nilai->ReadOnly);
 
+			// Nilai_Temp
+			$this->Nilai_Temp->SetDbValueDef($rsnew, $this->Nilai_Temp->CurrentValue, NULL, $this->Nilai_Temp->ReadOnly);
+
 			// Check referential integrity for master table 'v01_siswa'
 			$bValidMasterRecord = TRUE;
 			$sMasterFilter = $this->SqlMasterFilter_v01_siswa();
@@ -2089,6 +2132,9 @@ class ct09_siswanonrutintemp_list extends ct09_siswanonrutintemp {
 
 		// Nilai
 		$this->Nilai->SetDbValueDef($rsnew, $this->Nilai->CurrentValue, NULL, strval($this->Nilai->CurrentValue) == "");
+
+		// Nilai_Temp
+		$this->Nilai_Temp->SetDbValueDef($rsnew, $this->Nilai_Temp->CurrentValue, NULL, strval($this->Nilai_Temp->CurrentValue) == "");
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -2590,6 +2636,15 @@ $t09_siswanonrutintemp_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Nilai_Temp) == "") { ?>
+		<th data-name="Nilai_Temp"><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Nilai_Temp"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Nilai_Temp) ?>',2);"><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -2841,6 +2896,27 @@ ft09_siswanonrutintemplist.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <?php } ?>
 </td>
 	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+		<td data-name="Nilai_Temp"<?php echo $t09_siswanonrutintemp->Nilai_Temp->CellAttributes() ?>>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_list->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_list->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_list->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
+<span<?php echo $t09_siswanonrutintemp->Nilai_Temp->ViewAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Nilai_Temp->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -2947,6 +3023,14 @@ ft09_siswanonrutintemplist.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <input type="text" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai" id="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Nilai->EditValue ?>"<?php echo $t09_siswanonrutintemp->Nilai->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai" id="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
+		<td data-name="Nilai_Temp">
+<span id="el$rowindex$_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_list->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php

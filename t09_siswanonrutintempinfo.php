@@ -16,10 +16,11 @@ class ct09_siswanonrutintemp extends cTable {
 	var $id;
 	var $siswa_id;
 	var $nonrutin_id;
-	var $siswanonrutin_id;
 	var $Periode_Awal;
 	var $Periode_Akhir;
 	var $Nilai;
+	var $siswanonrutin_id;
+	var $Nilai_Temp;
 
 	//
 	// Table class constructor
@@ -69,12 +70,6 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->nonrutin_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['nonrutin_id'] = &$this->nonrutin_id;
 
-		// siswanonrutin_id
-		$this->siswanonrutin_id = new cField('t09_siswanonrutintemp', 't09_siswanonrutintemp', 'x_siswanonrutin_id', 'siswanonrutin_id', '`siswanonrutin_id`', '`siswanonrutin_id`', 3, -1, FALSE, '`siswanonrutin_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->siswanonrutin_id->Sortable = TRUE; // Allow sort
-		$this->siswanonrutin_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['siswanonrutin_id'] = &$this->siswanonrutin_id;
-
 		// Periode_Awal
 		$this->Periode_Awal = new cField('t09_siswanonrutintemp', 't09_siswanonrutintemp', 'x_Periode_Awal', 'Periode_Awal', '`Periode_Awal`', '`Periode_Awal`', 200, -1, FALSE, '`Periode_Awal`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
 		$this->Periode_Awal->Sortable = TRUE; // Allow sort
@@ -94,6 +89,18 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->Nilai->Sortable = TRUE; // Allow sort
 		$this->Nilai->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['Nilai'] = &$this->Nilai;
+
+		// siswanonrutin_id
+		$this->siswanonrutin_id = new cField('t09_siswanonrutintemp', 't09_siswanonrutintemp', 'x_siswanonrutin_id', 'siswanonrutin_id', '`siswanonrutin_id`', '`siswanonrutin_id`', 3, -1, FALSE, '`siswanonrutin_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'HIDDEN');
+		$this->siswanonrutin_id->Sortable = TRUE; // Allow sort
+		$this->siswanonrutin_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['siswanonrutin_id'] = &$this->siswanonrutin_id;
+
+		// Nilai_Temp
+		$this->Nilai_Temp = new cField('t09_siswanonrutintemp', 't09_siswanonrutintemp', 'x_Nilai_Temp', 'Nilai_Temp', '`Nilai_Temp`', '`Nilai_Temp`', 4, -1, FALSE, '`Nilai_Temp`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'HIDDEN');
+		$this->Nilai_Temp->Sortable = TRUE; // Allow sort
+		$this->Nilai_Temp->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Nilai_Temp'] = &$this->Nilai_Temp;
 	}
 
 	// Set Field Visibility
@@ -660,10 +667,11 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswa_id->setDbValue($rs->fields('siswa_id'));
 		$this->nonrutin_id->setDbValue($rs->fields('nonrutin_id'));
-		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
 		$this->Periode_Awal->setDbValue($rs->fields('Periode_Awal'));
 		$this->Periode_Akhir->setDbValue($rs->fields('Periode_Akhir'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
+		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
+		$this->Nilai_Temp->setDbValue($rs->fields('Nilai_Temp'));
 	}
 
 	// Render list row values
@@ -677,10 +685,11 @@ class ct09_siswanonrutintemp extends cTable {
 		// id
 		// siswa_id
 		// nonrutin_id
-		// siswanonrutin_id
 		// Periode_Awal
 		// Periode_Akhir
 		// Nilai
+		// siswanonrutin_id
+		// Nilai_Temp
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -713,10 +722,6 @@ class ct09_siswanonrutintemp extends cTable {
 			$this->nonrutin_id->ViewValue = NULL;
 		}
 		$this->nonrutin_id->ViewCustomAttributes = "";
-
-		// siswanonrutin_id
-		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
-		$this->siswanonrutin_id->ViewCustomAttributes = "";
 
 		// Periode_Awal
 		if (strval($this->Periode_Awal->CurrentValue) <> "") {
@@ -774,6 +779,14 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->Nilai->CellCssStyle .= "text-align: right;";
 		$this->Nilai->ViewCustomAttributes = "";
 
+		// siswanonrutin_id
+		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
+		$this->siswanonrutin_id->ViewCustomAttributes = "";
+
+		// Nilai_Temp
+		$this->Nilai_Temp->ViewValue = $this->Nilai_Temp->CurrentValue;
+		$this->Nilai_Temp->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -789,11 +802,6 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->nonrutin_id->HrefValue = "";
 		$this->nonrutin_id->TooltipValue = "";
 
-		// siswanonrutin_id
-		$this->siswanonrutin_id->LinkCustomAttributes = "";
-		$this->siswanonrutin_id->HrefValue = "";
-		$this->siswanonrutin_id->TooltipValue = "";
-
 		// Periode_Awal
 		$this->Periode_Awal->LinkCustomAttributes = "";
 		$this->Periode_Awal->HrefValue = "";
@@ -808,6 +816,16 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->Nilai->LinkCustomAttributes = "";
 		$this->Nilai->HrefValue = "";
 		$this->Nilai->TooltipValue = "";
+
+		// siswanonrutin_id
+		$this->siswanonrutin_id->LinkCustomAttributes = "";
+		$this->siswanonrutin_id->HrefValue = "";
+		$this->siswanonrutin_id->TooltipValue = "";
+
+		// Nilai_Temp
+		$this->Nilai_Temp->LinkCustomAttributes = "";
+		$this->Nilai_Temp->HrefValue = "";
+		$this->Nilai_Temp->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -858,12 +876,6 @@ class ct09_siswanonrutintemp extends cTable {
 		}
 		$this->nonrutin_id->ViewCustomAttributes = "";
 
-		// siswanonrutin_id
-		$this->siswanonrutin_id->EditAttrs["class"] = "form-control";
-		$this->siswanonrutin_id->EditCustomAttributes = "";
-		$this->siswanonrutin_id->EditValue = $this->siswanonrutin_id->CurrentValue;
-		$this->siswanonrutin_id->PlaceHolder = ew_RemoveHtml($this->siswanonrutin_id->FldCaption());
-
 		// Periode_Awal
 		$this->Periode_Awal->EditAttrs["class"] = "form-control";
 		$this->Periode_Awal->EditCustomAttributes = "";
@@ -878,6 +890,14 @@ class ct09_siswanonrutintemp extends cTable {
 		$this->Nilai->EditValue = $this->Nilai->CurrentValue;
 		$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
 		if (strval($this->Nilai->EditValue) <> "" && is_numeric($this->Nilai->EditValue)) $this->Nilai->EditValue = ew_FormatNumber($this->Nilai->EditValue, -2, -2, -2, -2);
+
+		// siswanonrutin_id
+		$this->siswanonrutin_id->EditAttrs["class"] = "form-control";
+		$this->siswanonrutin_id->EditCustomAttributes = "";
+
+		// Nilai_Temp
+		$this->Nilai_Temp->EditAttrs["class"] = "form-control";
+		$this->Nilai_Temp->EditCustomAttributes = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -911,14 +931,16 @@ class ct09_siswanonrutintemp extends cTable {
 					if ($this->Periode_Awal->Exportable) $Doc->ExportCaption($this->Periode_Awal);
 					if ($this->Periode_Akhir->Exportable) $Doc->ExportCaption($this->Periode_Akhir);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
+					if ($this->Nilai_Temp->Exportable) $Doc->ExportCaption($this->Nilai_Temp);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswa_id->Exportable) $Doc->ExportCaption($this->siswa_id);
 					if ($this->nonrutin_id->Exportable) $Doc->ExportCaption($this->nonrutin_id);
-					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
 					if ($this->Periode_Awal->Exportable) $Doc->ExportCaption($this->Periode_Awal);
 					if ($this->Periode_Akhir->Exportable) $Doc->ExportCaption($this->Periode_Akhir);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
+					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
+					if ($this->Nilai_Temp->Exportable) $Doc->ExportCaption($this->Nilai_Temp);
 				}
 				$Doc->EndExportRow();
 			}
@@ -955,14 +977,16 @@ class ct09_siswanonrutintemp extends cTable {
 						if ($this->Periode_Awal->Exportable) $Doc->ExportField($this->Periode_Awal);
 						if ($this->Periode_Akhir->Exportable) $Doc->ExportField($this->Periode_Akhir);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
+						if ($this->Nilai_Temp->Exportable) $Doc->ExportField($this->Nilai_Temp);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswa_id->Exportable) $Doc->ExportField($this->siswa_id);
 						if ($this->nonrutin_id->Exportable) $Doc->ExportField($this->nonrutin_id);
-						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
 						if ($this->Periode_Awal->Exportable) $Doc->ExportField($this->Periode_Awal);
 						if ($this->Periode_Akhir->Exportable) $Doc->ExportField($this->Periode_Akhir);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
+						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
+						if ($this->Nilai_Temp->Exportable) $Doc->ExportField($this->Nilai_Temp);
 					}
 					$Doc->EndExportRow();
 				}
@@ -1191,6 +1215,7 @@ class ct09_siswanonrutintemp extends cTable {
 		$_SESSION["nonrutin_Periode_Akhir"] = $rsnew["Periode_Akhir"];
 		$rsnew["Periode_Awal"] = null;
 		$rsnew["Periode_Akhir"] = null;
+		$rsnew["Nilai"] = 0;
 		return TRUE;
 	}
 

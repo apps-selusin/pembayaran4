@@ -102,6 +102,9 @@ var EW_SEARCH_FILTER_OPTION = "<?php echo EW_SEARCH_FILTER_OPTION ?>";
 var ewVar = <?php echo json_encode($EW_CLIENT_VAR); ?>;
 <?php echo $Language->ToJSON() ?>
 </script>
+<?php
+	ew_AddClientScript("phpjs/autoNumeric.js");
+?>
 <script type="text/javascript" src="<?php echo $EW_RELATIVE_PATH ?>phpjs/userfn13.js"></script>
 <script type="text/javascript">
 
