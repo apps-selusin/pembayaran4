@@ -286,7 +286,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		$this->SetupListOptions();
 		$this->siswa_id->SetVisibility();
 		$this->nonrutin_id->SetVisibility();
-		$this->siswanonrutin_id->SetVisibility();
 		$this->Periode_Awal->SetVisibility();
 		$this->Periode_Akhir->SetVisibility();
 		$this->Nilai->SetVisibility();
@@ -755,8 +754,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			return FALSE;
 		if ($objForm->HasValue("x_nonrutin_id") && $objForm->HasValue("o_nonrutin_id") && $this->nonrutin_id->CurrentValue <> $this->nonrutin_id->OldValue)
 			return FALSE;
-		if ($objForm->HasValue("x_siswanonrutin_id") && $objForm->HasValue("o_siswanonrutin_id") && $this->siswanonrutin_id->CurrentValue <> $this->siswanonrutin_id->OldValue)
-			return FALSE;
 		if ($objForm->HasValue("x_Periode_Awal") && $objForm->HasValue("o_Periode_Awal") && $this->Periode_Awal->CurrentValue <> $this->Periode_Awal->OldValue)
 			return FALSE;
 		if ($objForm->HasValue("x_Periode_Akhir") && $objForm->HasValue("o_Periode_Akhir") && $this->Periode_Akhir->CurrentValue <> $this->Periode_Akhir->OldValue)
@@ -1070,8 +1067,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		$this->siswa_id->OldValue = $this->siswa_id->CurrentValue;
 		$this->nonrutin_id->CurrentValue = NULL;
 		$this->nonrutin_id->OldValue = $this->nonrutin_id->CurrentValue;
-		$this->siswanonrutin_id->CurrentValue = NULL;
-		$this->siswanonrutin_id->OldValue = $this->siswanonrutin_id->CurrentValue;
 		$this->Periode_Awal->CurrentValue = NULL;
 		$this->Periode_Awal->OldValue = $this->Periode_Awal->CurrentValue;
 		$this->Periode_Akhir->CurrentValue = NULL;
@@ -1094,10 +1089,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$this->nonrutin_id->setFormValue($objForm->GetValue("x_nonrutin_id"));
 		}
 		$this->nonrutin_id->setOldValue($objForm->GetValue("o_nonrutin_id"));
-		if (!$this->siswanonrutin_id->FldIsDetailKey) {
-			$this->siswanonrutin_id->setFormValue($objForm->GetValue("x_siswanonrutin_id"));
-		}
-		$this->siswanonrutin_id->setOldValue($objForm->GetValue("o_siswanonrutin_id"));
 		if (!$this->Periode_Awal->FldIsDetailKey) {
 			$this->Periode_Awal->setFormValue($objForm->GetValue("x_Periode_Awal"));
 		}
@@ -1121,7 +1112,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$this->id->CurrentValue = $this->id->FormValue;
 		$this->siswa_id->CurrentValue = $this->siswa_id->FormValue;
 		$this->nonrutin_id->CurrentValue = $this->nonrutin_id->FormValue;
-		$this->siswanonrutin_id->CurrentValue = $this->siswanonrutin_id->FormValue;
 		$this->Periode_Awal->CurrentValue = $this->Periode_Awal->FormValue;
 		$this->Periode_Akhir->CurrentValue = $this->Periode_Akhir->FormValue;
 		$this->Nilai->CurrentValue = $this->Nilai->FormValue;
@@ -1303,7 +1293,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Awal->LookupFilters = array();
-		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -1328,7 +1318,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Akhir->LookupFilters = array();
-		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -1362,11 +1352,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$this->nonrutin_id->LinkCustomAttributes = "";
 			$this->nonrutin_id->HrefValue = "";
 			$this->nonrutin_id->TooltipValue = "";
-
-			// siswanonrutin_id
-			$this->siswanonrutin_id->LinkCustomAttributes = "";
-			$this->siswanonrutin_id->HrefValue = "";
-			$this->siswanonrutin_id->TooltipValue = "";
 
 			// Periode_Awal
 			$this->Periode_Awal->LinkCustomAttributes = "";
@@ -1423,12 +1408,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			}
 			$this->nonrutin_id->PlaceHolder = ew_RemoveHtml($this->nonrutin_id->FldCaption());
 
-			// siswanonrutin_id
-			$this->siswanonrutin_id->EditAttrs["class"] = "form-control";
-			$this->siswanonrutin_id->EditCustomAttributes = "";
-			$this->siswanonrutin_id->EditValue = ew_HtmlEncode($this->siswanonrutin_id->CurrentValue);
-			$this->siswanonrutin_id->PlaceHolder = ew_RemoveHtml($this->siswanonrutin_id->FldCaption());
-
 			// Periode_Awal
 			$this->Periode_Awal->EditAttrs["class"] = "form-control";
 			$this->Periode_Awal->EditCustomAttributes = "";
@@ -1440,7 +1419,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Awal->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -1461,7 +1440,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Akhir->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -1490,10 +1469,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			// nonrutin_id
 			$this->nonrutin_id->LinkCustomAttributes = "";
 			$this->nonrutin_id->HrefValue = "";
-
-			// siswanonrutin_id
-			$this->siswanonrutin_id->LinkCustomAttributes = "";
-			$this->siswanonrutin_id->HrefValue = "";
 
 			// Periode_Awal
 			$this->Periode_Awal->LinkCustomAttributes = "";
@@ -1540,12 +1515,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			}
 			$this->nonrutin_id->ViewCustomAttributes = "";
 
-			// siswanonrutin_id
-			$this->siswanonrutin_id->EditAttrs["class"] = "form-control";
-			$this->siswanonrutin_id->EditCustomAttributes = "";
-			$this->siswanonrutin_id->EditValue = ew_HtmlEncode($this->siswanonrutin_id->CurrentValue);
-			$this->siswanonrutin_id->PlaceHolder = ew_RemoveHtml($this->siswanonrutin_id->FldCaption());
-
 			// Periode_Awal
 			$this->Periode_Awal->EditAttrs["class"] = "form-control";
 			$this->Periode_Awal->EditCustomAttributes = "";
@@ -1557,7 +1526,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Awal->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -1578,7 +1547,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Akhir->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -1609,10 +1578,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$this->nonrutin_id->LinkCustomAttributes = "";
 			$this->nonrutin_id->HrefValue = "";
 			$this->nonrutin_id->TooltipValue = "";
-
-			// siswanonrutin_id
-			$this->siswanonrutin_id->LinkCustomAttributes = "";
-			$this->siswanonrutin_id->HrefValue = "";
 
 			// Periode_Awal
 			$this->Periode_Awal->LinkCustomAttributes = "";
@@ -1649,12 +1614,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		}
 		if (!$this->nonrutin_id->FldIsDetailKey && !is_null($this->nonrutin_id->FormValue) && $this->nonrutin_id->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->nonrutin_id->FldCaption(), $this->nonrutin_id->ReqErrMsg));
-		}
-		if (!$this->siswanonrutin_id->FldIsDetailKey && !is_null($this->siswanonrutin_id->FormValue) && $this->siswanonrutin_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->siswanonrutin_id->FldCaption(), $this->siswanonrutin_id->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->siswanonrutin_id->FormValue)) {
-			ew_AddMessage($gsFormError, $this->siswanonrutin_id->FldErrMsg());
 		}
 		if (!ew_CheckNumber($this->Nilai->FormValue)) {
 			ew_AddMessage($gsFormError, $this->Nilai->FldErrMsg());
@@ -1773,9 +1732,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// siswanonrutin_id
-			$this->siswanonrutin_id->SetDbValueDef($rsnew, $this->siswanonrutin_id->CurrentValue, 0, $this->siswanonrutin_id->ReadOnly);
-
 			// Periode_Awal
 			$this->Periode_Awal->SetDbValueDef($rsnew, $this->Periode_Awal->CurrentValue, NULL, $this->Periode_Awal->ReadOnly);
 
@@ -1881,9 +1837,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 		// nonrutin_id
 		$this->nonrutin_id->SetDbValueDef($rsnew, $this->nonrutin_id->CurrentValue, 0, FALSE);
 
-		// siswanonrutin_id
-		$this->siswanonrutin_id->SetDbValueDef($rsnew, $this->siswanonrutin_id->CurrentValue, 0, FALSE);
-
 		// Periode_Awal
 		$this->Periode_Awal->SetDbValueDef($rsnew, $this->Periode_Awal->CurrentValue, NULL, FALSE);
 
@@ -1958,7 +1911,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Awal->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`Periode_Tahun_Bulan` = {filter_value}', "t0" => "200", "fn0" => "");
 			$sSqlWrk = "";
@@ -1972,7 +1925,7 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Akhir->LookupFilters = array();
-			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`Periode_Tahun_Bulan` = {filter_value}', "t0" => "200", "fn0" => "");
 			$sSqlWrk = "";
@@ -2009,7 +1962,6 @@ class ct09_siswanonrutintemp_grid extends ct09_siswanonrutintemp {
 	function Page_Load() {
 
 		//echo "Page Load";
-		$this->siswanonrutin_id->Visible = false;
 	}
 
 	// Page Unload event

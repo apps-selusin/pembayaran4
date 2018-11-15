@@ -747,7 +747,7 @@ class ct06_siswarutintemp extends cTable {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Awal->LookupFilters = array();
-		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -772,7 +772,7 @@ class ct06_siswarutintemp extends cTable {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Akhir->LookupFilters = array();
-		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -954,7 +954,6 @@ class ct06_siswarutintemp extends cTable {
 				if ($ExportPageType == "view") {
 					if ($this->siswa_id->Exportable) $Doc->ExportCaption($this->siswa_id);
 					if ($this->rutin_id->Exportable) $Doc->ExportCaption($this->rutin_id);
-					if ($this->siswarutin_id->Exportable) $Doc->ExportCaption($this->siswarutin_id);
 					if ($this->Periode_Awal->Exportable) $Doc->ExportCaption($this->Periode_Awal);
 					if ($this->Periode_Akhir->Exportable) $Doc->ExportCaption($this->Periode_Akhir);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
@@ -999,7 +998,6 @@ class ct06_siswarutintemp extends cTable {
 					if ($ExportPageType == "view") {
 						if ($this->siswa_id->Exportable) $Doc->ExportField($this->siswa_id);
 						if ($this->rutin_id->Exportable) $Doc->ExportField($this->rutin_id);
-						if ($this->siswarutin_id->Exportable) $Doc->ExportField($this->siswarutin_id);
 						if ($this->Periode_Awal->Exportable) $Doc->ExportField($this->Periode_Awal);
 						if ($this->Periode_Akhir->Exportable) $Doc->ExportField($this->Periode_Akhir);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
@@ -1235,6 +1233,10 @@ class ct06_siswarutintemp extends cTable {
 		// Enter your code here
 		// To cancel, set return value to FALSE
 
+		$_SESSION["rutin_Periode_Awal"] = $rsnew["Periode_Awal"];
+		$_SESSION["rutin_Periode_Akhir"] = $rsnew["Periode_Akhir"];
+		$rsnew["Periode_Awal"] = null;
+		$rsnew["Periode_Akhir"] = null;
 		return TRUE;
 	}
 

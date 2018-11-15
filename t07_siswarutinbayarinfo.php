@@ -148,53 +148,6 @@ class ct07_siswarutinbayar extends cTable {
 		}
 	}
 
-	// Current master table name
-	function getCurrentMasterTable() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE];
-	}
-
-	function setCurrentMasterTable($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE] = $v;
-	}
-
-	// Session master WHERE clause
-	function GetMasterFilter() {
-
-		// Master filter
-		$sMasterFilter = "";
-		if ($this->getCurrentMasterTable() == "t06_siswarutin") {
-			if ($this->siswarutin_id->getSessionValue() <> "")
-				$sMasterFilter .= "`id`=" . ew_QuotedValue($this->siswarutin_id->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
-			else
-				return "";
-		}
-		return $sMasterFilter;
-	}
-
-	// Session detail WHERE clause
-	function GetDetailFilter() {
-
-		// Detail filter
-		$sDetailFilter = "";
-		if ($this->getCurrentMasterTable() == "t06_siswarutin") {
-			if ($this->siswarutin_id->getSessionValue() <> "")
-				$sDetailFilter .= "`siswarutin_id`=" . ew_QuotedValue($this->siswarutin_id->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
-			else
-				return "";
-		}
-		return $sDetailFilter;
-	}
-
-	// Master filter
-	function SqlMasterFilter_t06_siswarutin() {
-		return "`id`=@id@";
-	}
-
-	// Detail filter
-	function SqlDetailFilter_t06_siswarutin() {
-		return "`siswarutin_id`=@siswarutin_id@";
-	}
-
 	// Table level SQL
 	var $_SqlFrom = "";
 
@@ -575,10 +528,6 @@ class ct07_siswarutinbayar extends cTable {
 
 	// Add master url
 	function AddMasterUrl($url) {
-		if ($this->getCurrentMasterTable() == "t06_siswarutin" && strpos($url, EW_TABLE_SHOW_MASTER . "=") === FALSE) {
-			$url .= (strpos($url, "?") !== FALSE ? "&" : "?") . EW_TABLE_SHOW_MASTER . "=" . $this->getCurrentMasterTable();
-			$url .= "&fk_id=" . urlencode($this->siswarutin_id->CurrentValue);
-		}
 		return $url;
 	}
 
@@ -894,14 +843,8 @@ class ct07_siswarutinbayar extends cTable {
 		// siswarutin_id
 		$this->siswarutin_id->EditAttrs["class"] = "form-control";
 		$this->siswarutin_id->EditCustomAttributes = "";
-		if ($this->siswarutin_id->getSessionValue() <> "") {
-			$this->siswarutin_id->CurrentValue = $this->siswarutin_id->getSessionValue();
-		$this->siswarutin_id->ViewValue = $this->siswarutin_id->CurrentValue;
-		$this->siswarutin_id->ViewCustomAttributes = "";
-		} else {
 		$this->siswarutin_id->EditValue = $this->siswarutin_id->CurrentValue;
 		$this->siswarutin_id->PlaceHolder = ew_RemoveHtml($this->siswarutin_id->FldCaption());
-		}
 
 		// Periode_Tahun_Bulan
 		$this->Periode_Tahun_Bulan->EditAttrs["class"] = "form-control";

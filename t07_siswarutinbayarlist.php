@@ -6,7 +6,6 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t07_siswarutinbayarinfo.php" ?>
-<?php include_once "t06_siswarutininfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -286,9 +285,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		$this->MultiDeleteUrl = "t07_siswarutinbayardelete.php";
 		$this->MultiUpdateUrl = "t07_siswarutinbayarupdate.php";
 
-		// Table object (t06_siswarutin)
-		if (!isset($GLOBALS['t06_siswarutin'])) $GLOBALS['t06_siswarutin'] = new ct06_siswarutin();
-
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
 			define("EW_PAGE_ID", 'list', TRUE);
@@ -384,9 +380,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 
 		// Create Token
 		$this->CreateToken();
-
-		// Set up master detail parameters
-		$this->SetUpMasterParms();
 
 		// Setup other options
 		$this->SetupOtherOptions();
@@ -539,30 +532,8 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->AdvancedSearchWhere(TRUE));
-
-			// Get and validate search values for advanced search
-			$this->LoadSearchValues(); // Get search values
-
-			// Process filter list
-			$this->ProcessFilterList();
-			if (!$this->ValidateSearch())
-				$this->setFailureMessage($gsSearchError);
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetUpSortOrder();
-
-			// Get search criteria for advanced search
-			if ($gsSearchError == "")
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
 		}
 
 		// Restore display records
@@ -575,55 +546,10 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		// Load Sorting Order
 		$this->LoadSortOrder();
 
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load advanced search from default
-			if ($this->LoadAdvancedSearchDefault()) {
-				$sSrchAdvanced = $this->AdvancedSearchWhere();
-			}
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} else {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
-
 		// Build filter
 		$sFilter = "";
-
-		// Restore master/detail filter
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
-
-		// Load master record
-		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t06_siswarutin") {
-			global $t06_siswarutin;
-			$rsmaster = $t06_siswarutin->LoadRs($this->DbMasterFilter);
-			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
-			if (!$this->MasterRecordExists) {
-				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
-				$this->Page_Terminate("t06_siswarutinlist.php"); // Return to master page
-			} else {
-				$t06_siswarutin->LoadListRowValues($rsmaster);
-				$t06_siswarutin->RowType = EW_ROWTYPE_MASTER; // Master row
-				$t06_siswarutin->RenderListRow();
-				$rsmaster->Close();
-			}
-		}
 
 		// Set up filter in session
 		$this->setSessionWhere($sFilter);
@@ -682,289 +608,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		return TRUE;
 	}
 
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft07_siswarutinbayarlistsrch") : "";
-		} else {
-			$sSavedFilterList = "";
-		}
-
-		// Initialize
-		$sFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJSON(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->siswarutin_id->AdvancedSearch->ToJSON(), ","); // Field siswarutin_id
-		$sFilterList = ew_Concat($sFilterList, $this->Periode_Tahun_Bulan->AdvancedSearch->ToJSON(), ","); // Field Periode_Tahun_Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Nilai->AdvancedSearch->ToJSON(), ","); // Field Nilai
-		$sFilterList = ew_Concat($sFilterList, $this->Tanggal_Bayar->AdvancedSearch->ToJSON(), ","); // Field Tanggal_Bayar
-		$sFilterList = ew_Concat($sFilterList, $this->Nilai_Bayar->AdvancedSearch->ToJSON(), ","); // Field Nilai_Bayar
-		$sFilterList = ew_Concat($sFilterList, $this->Bulan->AdvancedSearch->ToJSON(), ","); // Field Bulan
-		$sFilterList = ew_Concat($sFilterList, $this->Tahun->AdvancedSearch->ToJSON(), ","); // Field Tahun
-		$sFilterList = ew_Concat($sFilterList, $this->Periode_Text->AdvancedSearch->ToJSON(), ","); // Field Periode_Text
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = ew_StripSlashes(@$_POST["filters"]);
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft07_siswarutinbayarlistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(ew_StripSlashes(@$_POST["filter"]), TRUE);
-		$this->Command = "search";
-
-		// Field id
-		$this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-		$this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-		$this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-		$this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-		$this->id->AdvancedSearch->Save();
-
-		// Field siswarutin_id
-		$this->siswarutin_id->AdvancedSearch->SearchValue = @$filter["x_siswarutin_id"];
-		$this->siswarutin_id->AdvancedSearch->SearchOperator = @$filter["z_siswarutin_id"];
-		$this->siswarutin_id->AdvancedSearch->SearchCondition = @$filter["v_siswarutin_id"];
-		$this->siswarutin_id->AdvancedSearch->SearchValue2 = @$filter["y_siswarutin_id"];
-		$this->siswarutin_id->AdvancedSearch->SearchOperator2 = @$filter["w_siswarutin_id"];
-		$this->siswarutin_id->AdvancedSearch->Save();
-
-		// Field Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue = @$filter["x_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchOperator = @$filter["z_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchCondition = @$filter["v_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->Save();
-
-		// Field Nilai
-		$this->Nilai->AdvancedSearch->SearchValue = @$filter["x_Nilai"];
-		$this->Nilai->AdvancedSearch->SearchOperator = @$filter["z_Nilai"];
-		$this->Nilai->AdvancedSearch->SearchCondition = @$filter["v_Nilai"];
-		$this->Nilai->AdvancedSearch->SearchValue2 = @$filter["y_Nilai"];
-		$this->Nilai->AdvancedSearch->SearchOperator2 = @$filter["w_Nilai"];
-		$this->Nilai->AdvancedSearch->Save();
-
-		// Field Tanggal_Bayar
-		$this->Tanggal_Bayar->AdvancedSearch->SearchValue = @$filter["x_Tanggal_Bayar"];
-		$this->Tanggal_Bayar->AdvancedSearch->SearchOperator = @$filter["z_Tanggal_Bayar"];
-		$this->Tanggal_Bayar->AdvancedSearch->SearchCondition = @$filter["v_Tanggal_Bayar"];
-		$this->Tanggal_Bayar->AdvancedSearch->SearchValue2 = @$filter["y_Tanggal_Bayar"];
-		$this->Tanggal_Bayar->AdvancedSearch->SearchOperator2 = @$filter["w_Tanggal_Bayar"];
-		$this->Tanggal_Bayar->AdvancedSearch->Save();
-
-		// Field Nilai_Bayar
-		$this->Nilai_Bayar->AdvancedSearch->SearchValue = @$filter["x_Nilai_Bayar"];
-		$this->Nilai_Bayar->AdvancedSearch->SearchOperator = @$filter["z_Nilai_Bayar"];
-		$this->Nilai_Bayar->AdvancedSearch->SearchCondition = @$filter["v_Nilai_Bayar"];
-		$this->Nilai_Bayar->AdvancedSearch->SearchValue2 = @$filter["y_Nilai_Bayar"];
-		$this->Nilai_Bayar->AdvancedSearch->SearchOperator2 = @$filter["w_Nilai_Bayar"];
-		$this->Nilai_Bayar->AdvancedSearch->Save();
-
-		// Field Bulan
-		$this->Bulan->AdvancedSearch->SearchValue = @$filter["x_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchOperator = @$filter["z_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchCondition = @$filter["v_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchValue2 = @$filter["y_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchOperator2 = @$filter["w_Bulan"];
-		$this->Bulan->AdvancedSearch->Save();
-
-		// Field Tahun
-		$this->Tahun->AdvancedSearch->SearchValue = @$filter["x_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchOperator = @$filter["z_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchCondition = @$filter["v_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchValue2 = @$filter["y_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchOperator2 = @$filter["w_Tahun"];
-		$this->Tahun->AdvancedSearch->Save();
-
-		// Field Periode_Text
-		$this->Periode_Text->AdvancedSearch->SearchValue = @$filter["x_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchOperator = @$filter["z_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchCondition = @$filter["v_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchValue2 = @$filter["y_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchOperator2 = @$filter["w_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->Save();
-	}
-
-	// Advanced search WHERE clause based on QueryString
-	function AdvancedSearchWhere($Default = FALSE) {
-		global $Security;
-		$sWhere = "";
-		$this->BuildSearchSql($sWhere, $this->id, $Default, FALSE); // id
-		$this->BuildSearchSql($sWhere, $this->siswarutin_id, $Default, FALSE); // siswarutin_id
-		$this->BuildSearchSql($sWhere, $this->Periode_Tahun_Bulan, $Default, FALSE); // Periode_Tahun_Bulan
-		$this->BuildSearchSql($sWhere, $this->Nilai, $Default, FALSE); // Nilai
-		$this->BuildSearchSql($sWhere, $this->Tanggal_Bayar, $Default, FALSE); // Tanggal_Bayar
-		$this->BuildSearchSql($sWhere, $this->Nilai_Bayar, $Default, FALSE); // Nilai_Bayar
-		$this->BuildSearchSql($sWhere, $this->Bulan, $Default, FALSE); // Bulan
-		$this->BuildSearchSql($sWhere, $this->Tahun, $Default, FALSE); // Tahun
-		$this->BuildSearchSql($sWhere, $this->Periode_Text, $Default, FALSE); // Periode_Text
-
-		// Set up search parm
-		if (!$Default && $sWhere <> "") {
-			$this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->id->AdvancedSearch->Save(); // id
-			$this->siswarutin_id->AdvancedSearch->Save(); // siswarutin_id
-			$this->Periode_Tahun_Bulan->AdvancedSearch->Save(); // Periode_Tahun_Bulan
-			$this->Nilai->AdvancedSearch->Save(); // Nilai
-			$this->Tanggal_Bayar->AdvancedSearch->Save(); // Tanggal_Bayar
-			$this->Nilai_Bayar->AdvancedSearch->Save(); // Nilai_Bayar
-			$this->Bulan->AdvancedSearch->Save(); // Bulan
-			$this->Tahun->AdvancedSearch->Save(); // Tahun
-			$this->Periode_Text->AdvancedSearch->Save(); // Periode_Text
-		}
-		return $sWhere;
-	}
-
-	// Build search SQL
-	function BuildSearchSql(&$Where, &$Fld, $Default, $MultiValue) {
-		$FldParm = substr($Fld->FldVar, 2);
-		$FldVal = ($Default) ? $Fld->AdvancedSearch->SearchValueDefault : $Fld->AdvancedSearch->SearchValue; // @$_GET["x_$FldParm"]
-		$FldOpr = ($Default) ? $Fld->AdvancedSearch->SearchOperatorDefault : $Fld->AdvancedSearch->SearchOperator; // @$_GET["z_$FldParm"]
-		$FldCond = ($Default) ? $Fld->AdvancedSearch->SearchConditionDefault : $Fld->AdvancedSearch->SearchCondition; // @$_GET["v_$FldParm"]
-		$FldVal2 = ($Default) ? $Fld->AdvancedSearch->SearchValue2Default : $Fld->AdvancedSearch->SearchValue2; // @$_GET["y_$FldParm"]
-		$FldOpr2 = ($Default) ? $Fld->AdvancedSearch->SearchOperator2Default : $Fld->AdvancedSearch->SearchOperator2; // @$_GET["w_$FldParm"]
-		$sWrk = "";
-
-		//$FldVal = ew_StripSlashes($FldVal);
-		if (is_array($FldVal)) $FldVal = implode(",", $FldVal);
-
-		//$FldVal2 = ew_StripSlashes($FldVal2);
-		if (is_array($FldVal2)) $FldVal2 = implode(",", $FldVal2);
-		$FldOpr = strtoupper(trim($FldOpr));
-		if ($FldOpr == "") $FldOpr = "=";
-		$FldOpr2 = strtoupper(trim($FldOpr2));
-		if ($FldOpr2 == "") $FldOpr2 = "=";
-		if (EW_SEARCH_MULTI_VALUE_OPTION == 1)
-			$MultiValue = FALSE;
-		if ($MultiValue) {
-			$sWrk1 = ($FldVal <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr, $FldVal, $this->DBID) : ""; // Field value 1
-			$sWrk2 = ($FldVal2 <> "") ? ew_GetMultiSearchSql($Fld, $FldOpr2, $FldVal2, $this->DBID) : ""; // Field value 2
-			$sWrk = $sWrk1; // Build final SQL
-			if ($sWrk2 <> "")
-				$sWrk = ($sWrk <> "") ? "($sWrk) $FldCond ($sWrk2)" : $sWrk2;
-		} else {
-			$FldVal = $this->ConvertSearchValue($Fld, $FldVal);
-			$FldVal2 = $this->ConvertSearchValue($Fld, $FldVal2);
-			$sWrk = ew_GetSearchSql($Fld, $FldVal, $FldOpr, $FldCond, $FldVal2, $FldOpr2, $this->DBID);
-		}
-		ew_AddFilter($Where, $sWrk);
-	}
-
-	// Convert search value
-	function ConvertSearchValue(&$Fld, $FldVal) {
-		if ($FldVal == EW_NULL_VALUE || $FldVal == EW_NOT_NULL_VALUE)
-			return $FldVal;
-		$Value = $FldVal;
-		if ($Fld->FldDataType == EW_DATATYPE_BOOLEAN) {
-			if ($FldVal <> "") $Value = ($FldVal == "1" || strtolower(strval($FldVal)) == "y" || strtolower(strval($FldVal)) == "t") ? $Fld->TrueValue : $Fld->FalseValue;
-		} elseif ($Fld->FldDataType == EW_DATATYPE_DATE || $Fld->FldDataType == EW_DATATYPE_TIME) {
-			if ($FldVal <> "") $Value = ew_UnFormatDateTime($FldVal, $Fld->FldDateTimeFormat);
-		}
-		return $Value;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-		if ($this->id->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->siswarutin_id->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Periode_Tahun_Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Nilai->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Tanggal_Bayar->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Nilai_Bayar->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Bulan->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Tahun->AdvancedSearch->IssetSession())
-			return TRUE;
-		if ($this->Periode_Text->AdvancedSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear advanced search parameters
-		$this->ResetAdvancedSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all advanced search parameters
-	function ResetAdvancedSearchParms() {
-		$this->id->AdvancedSearch->UnsetSession();
-		$this->siswarutin_id->AdvancedSearch->UnsetSession();
-		$this->Periode_Tahun_Bulan->AdvancedSearch->UnsetSession();
-		$this->Nilai->AdvancedSearch->UnsetSession();
-		$this->Tanggal_Bayar->AdvancedSearch->UnsetSession();
-		$this->Nilai_Bayar->AdvancedSearch->UnsetSession();
-		$this->Bulan->AdvancedSearch->UnsetSession();
-		$this->Tahun->AdvancedSearch->UnsetSession();
-		$this->Periode_Text->AdvancedSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore advanced search values
-		$this->id->AdvancedSearch->Load();
-		$this->siswarutin_id->AdvancedSearch->Load();
-		$this->Periode_Tahun_Bulan->AdvancedSearch->Load();
-		$this->Nilai->AdvancedSearch->Load();
-		$this->Tanggal_Bayar->AdvancedSearch->Load();
-		$this->Nilai_Bayar->AdvancedSearch->Load();
-		$this->Bulan->AdvancedSearch->Load();
-		$this->Tahun->AdvancedSearch->Load();
-		$this->Periode_Text->AdvancedSearch->Load();
-	}
-
 	// Set up sort parameters
 	function SetUpSortOrder() {
 
@@ -1007,18 +650,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
 
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
-
-			// Reset master/detail keys
-			if ($this->Command == "resetall") {
-				$this->setCurrentMasterTable(""); // Clear master table
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-				$this->siswarutin_id->setSessionValue("");
-			}
-
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
@@ -1055,24 +686,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		$item->Visible = TRUE;
 		$item->OnLeft = TRUE;
 
-		// "edit"
-		$item = &$this->ListOptions->Add("edit");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
-
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
-
-		// "delete"
-		$item = &$this->ListOptions->Add("delete");
-		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE;
-
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
 		$item->CssStyle = "white-space: nowrap;";
@@ -1083,7 +696,7 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
@@ -1132,31 +745,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 			$oListOpt->Body = "";
 		}
 
-		// "edit"
-		$oListOpt = &$this->ListOptions->Items["edit"];
-		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if (TRUE) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "delete"
-		$oListOpt = &$this->ListOptions->Items["delete"];
-		if (TRUE)
-			$oListOpt->Body = "<a class=\"ewRowLink ewDelete\"" . "" . " title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("DeleteLink") . "</a>";
-		else
-			$oListOpt->Body = "";
-
 		// Set up list action buttons
 		$oListOpt = &$this->ListOptions->GetItem("listactions");
 		if ($oListOpt && $this->Export == "" && $this->CurrentAction == "") {
@@ -1199,19 +787,7 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 	function SetupOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		$option = $options["addedit"];
-
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
-		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "");
 		$option = $options["action"];
-
-		// Add multi update
-		$item = &$option->Add("multiupdate");
-		$item->Body = "<a class=\"ewAction ewMultiUpdate\" title=\"" . ew_HtmlTitle($Language->Phrase("UpdateSelectedLink")) . "\" data-table=\"t07_siswarutinbayar\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("UpdateSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft07_siswarutinbayarlist,url:'" . $this->MultiUpdateUrl . "'});return false;\">" . $Language->Phrase("UpdateSelectedLink") . "</a>";
-		$item->Visible = (TRUE);
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1230,10 +806,10 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
 		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft07_siswarutinbayarlistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
 		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft07_siswarutinbayarlistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1357,17 +933,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft07_siswarutinbayarlistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1426,74 +991,6 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
 			$this->setStartRecordNumber($this->StartRec);
 		}
-	}
-
-	// Load search values for validation
-	function LoadSearchValues() {
-		global $objForm;
-
-		// Load search values
-		// id
-
-		$this->id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_id"]);
-		if ($this->id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->id->AdvancedSearch->SearchOperator = @$_GET["z_id"];
-
-		// siswarutin_id
-		$this->siswarutin_id->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_siswarutin_id"]);
-		if ($this->siswarutin_id->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->siswarutin_id->AdvancedSearch->SearchOperator = @$_GET["z_siswarutin_id"];
-
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Periode_Tahun_Bulan"]);
-		if ($this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchCondition = @$_GET["v_Periode_Tahun_Bulan"];
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue2 = ew_StripSlashes(@$_GET["y_Periode_Tahun_Bulan"]);
-		if ($this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue2 <> "") $this->Command = "search";
-		$this->Periode_Tahun_Bulan->AdvancedSearch->SearchOperator2 = @$_GET["w_Periode_Tahun_Bulan"];
-
-		// Nilai
-		$this->Nilai->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Nilai"]);
-		if ($this->Nilai->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Nilai->AdvancedSearch->SearchOperator = @$_GET["z_Nilai"];
-
-		// Tanggal_Bayar
-		$this->Tanggal_Bayar->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Tanggal_Bayar"]);
-		if ($this->Tanggal_Bayar->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Tanggal_Bayar->AdvancedSearch->SearchOperator = @$_GET["z_Tanggal_Bayar"];
-
-		// Nilai_Bayar
-		$this->Nilai_Bayar->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Nilai_Bayar"]);
-		if ($this->Nilai_Bayar->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Nilai_Bayar->AdvancedSearch->SearchOperator = @$_GET["z_Nilai_Bayar"];
-
-		// Bulan
-		$this->Bulan->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Bulan"]);
-		if ($this->Bulan->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Bulan->AdvancedSearch->SearchOperator = @$_GET["z_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchCondition = @$_GET["v_Bulan"];
-		$this->Bulan->AdvancedSearch->SearchValue2 = ew_StripSlashes(@$_GET["y_Bulan"]);
-		if ($this->Bulan->AdvancedSearch->SearchValue2 <> "") $this->Command = "search";
-		$this->Bulan->AdvancedSearch->SearchOperator2 = @$_GET["w_Bulan"];
-
-		// Tahun
-		$this->Tahun->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Tahun"]);
-		if ($this->Tahun->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Tahun->AdvancedSearch->SearchOperator = @$_GET["z_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchCondition = @$_GET["v_Tahun"];
-		$this->Tahun->AdvancedSearch->SearchValue2 = ew_StripSlashes(@$_GET["y_Tahun"]);
-		if ($this->Tahun->AdvancedSearch->SearchValue2 <> "") $this->Command = "search";
-		$this->Tahun->AdvancedSearch->SearchOperator2 = @$_GET["w_Tahun"];
-
-		// Periode_Text
-		$this->Periode_Text->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Periode_Text"]);
-		if ($this->Periode_Text->AdvancedSearch->SearchValue <> "") $this->Command = "search";
-		$this->Periode_Text->AdvancedSearch->SearchOperator = @$_GET["z_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchCondition = @$_GET["v_Periode_Text"];
-		$this->Periode_Text->AdvancedSearch->SearchValue2 = ew_StripSlashes(@$_GET["y_Periode_Text"]);
-		if ($this->Periode_Text->AdvancedSearch->SearchValue2 <> "") $this->Command = "search";
-		$this->Periode_Text->AdvancedSearch->SearchOperator2 = @$_GET["w_Periode_Text"];
 	}
 
 	// Load recordset
@@ -1800,201 +1297,11 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 			$this->Periode_Text->LinkCustomAttributes = "";
 			$this->Periode_Text->HrefValue = "";
 			$this->Periode_Text->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
-
-			// siswarutin_id
-			$this->siswarutin_id->EditAttrs["class"] = "form-control";
-			$this->siswarutin_id->EditCustomAttributes = "";
-			$this->siswarutin_id->EditValue = ew_HtmlEncode($this->siswarutin_id->AdvancedSearch->SearchValue);
-			$this->siswarutin_id->PlaceHolder = ew_RemoveHtml($this->siswarutin_id->FldCaption());
-
-			// Periode_Tahun_Bulan
-			$this->Periode_Tahun_Bulan->EditAttrs["class"] = "form-control";
-			$this->Periode_Tahun_Bulan->EditCustomAttributes = "";
-			if (trim(strval($this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue, EW_DATATYPE_STRING, "");
-			}
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_siswarutinbayar`";
-			$sWhereWrk = "";
-			$this->Periode_Tahun_Bulan->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->Periode_Tahun_Bulan, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->Periode_Tahun_Bulan->EditValue = $arwrk;
-			$this->Periode_Tahun_Bulan->EditAttrs["class"] = "form-control";
-			$this->Periode_Tahun_Bulan->EditCustomAttributes = "";
-			if (trim(strval($this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue2)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Tahun_Bulan->AdvancedSearch->SearchValue2, EW_DATATYPE_STRING, "");
-			}
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_siswarutinbayar`";
-			$sWhereWrk = "";
-			$this->Periode_Tahun_Bulan->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->Periode_Tahun_Bulan, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->Periode_Tahun_Bulan->EditValue2 = $arwrk;
-
-			// Nilai
-			$this->Nilai->EditAttrs["class"] = "form-control";
-			$this->Nilai->EditCustomAttributes = "";
-			$this->Nilai->EditValue = ew_HtmlEncode($this->Nilai->AdvancedSearch->SearchValue);
-			$this->Nilai->PlaceHolder = ew_RemoveHtml($this->Nilai->FldCaption());
-
-			// Tanggal_Bayar
-			$this->Tanggal_Bayar->EditAttrs["class"] = "form-control";
-			$this->Tanggal_Bayar->EditCustomAttributes = "";
-			$this->Tanggal_Bayar->EditValue = ew_HtmlEncode(ew_FormatDateTime(ew_UnFormatDateTime($this->Tanggal_Bayar->AdvancedSearch->SearchValue, 7), 7));
-			$this->Tanggal_Bayar->PlaceHolder = ew_RemoveHtml($this->Tanggal_Bayar->FldCaption());
-
-			// Nilai_Bayar
-			$this->Nilai_Bayar->EditAttrs["class"] = "form-control";
-			$this->Nilai_Bayar->EditCustomAttributes = "";
-			$this->Nilai_Bayar->EditValue = ew_HtmlEncode($this->Nilai_Bayar->AdvancedSearch->SearchValue);
-			$this->Nilai_Bayar->PlaceHolder = ew_RemoveHtml($this->Nilai_Bayar->FldCaption());
-
-			// Bulan
-			$this->Bulan->EditAttrs["class"] = "form-control";
-			$this->Bulan->EditCustomAttributes = "";
-			$this->Bulan->EditAttrs["class"] = "form-control";
-			$this->Bulan->EditCustomAttributes = "";
-
-			// Tahun
-			$this->Tahun->EditAttrs["class"] = "form-control";
-			$this->Tahun->EditCustomAttributes = "";
-			$this->Tahun->EditAttrs["class"] = "form-control";
-			$this->Tahun->EditCustomAttributes = "";
-
-			// Periode_Text
-			$this->Periode_Text->EditAttrs["class"] = "form-control";
-			$this->Periode_Text->EditCustomAttributes = "";
-			$this->Periode_Text->EditAttrs["class"] = "form-control";
-			$this->Periode_Text->EditCustomAttributes = "";
-		}
-		if ($this->RowType == EW_ROWTYPE_ADD ||
-			$this->RowType == EW_ROWTYPE_EDIT ||
-			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
-			$this->SetupFieldTitles();
 		}
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
-	}
-
-	// Validate search
-	function ValidateSearch() {
-		global $gsSearchError;
-
-		// Initialize
-		$gsSearchError = "";
-
-		// Check if validation required
-		if (!EW_SERVER_VALIDATE)
-			return TRUE;
-
-		// Return validate result
-		$ValidateSearch = ($gsSearchError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateSearch = $ValidateSearch && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsSearchError, $sFormCustomError);
-		}
-		return $ValidateSearch;
-	}
-
-	// Load advanced search
-	function LoadAdvancedSearch() {
-		$this->id->AdvancedSearch->Load();
-		$this->siswarutin_id->AdvancedSearch->Load();
-		$this->Periode_Tahun_Bulan->AdvancedSearch->Load();
-		$this->Nilai->AdvancedSearch->Load();
-		$this->Tanggal_Bayar->AdvancedSearch->Load();
-		$this->Nilai_Bayar->AdvancedSearch->Load();
-		$this->Bulan->AdvancedSearch->Load();
-		$this->Tahun->AdvancedSearch->Load();
-		$this->Periode_Text->AdvancedSearch->Load();
-	}
-
-	// Set up master/detail based on QueryString
-	function SetUpMasterParms() {
-		$bValidMaster = FALSE;
-
-		// Get the keys for master table
-		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t06_siswarutin") {
-				$bValidMaster = TRUE;
-				if (@$_GET["fk_id"] <> "") {
-					$GLOBALS["t06_siswarutin"]->id->setQueryStringValue($_GET["fk_id"]);
-					$this->siswarutin_id->setQueryStringValue($GLOBALS["t06_siswarutin"]->id->QueryStringValue);
-					$this->siswarutin_id->setSessionValue($this->siswarutin_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t06_siswarutin"]->id->QueryStringValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
-			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
-			if ($sMasterTblVar == "") {
-				$bValidMaster = TRUE;
-				$this->DbMasterFilter = "";
-				$this->DbDetailFilter = "";
-			}
-			if ($sMasterTblVar == "t06_siswarutin") {
-				$bValidMaster = TRUE;
-				if (@$_POST["fk_id"] <> "") {
-					$GLOBALS["t06_siswarutin"]->id->setFormValue($_POST["fk_id"]);
-					$this->siswarutin_id->setFormValue($GLOBALS["t06_siswarutin"]->id->FormValue);
-					$this->siswarutin_id->setSessionValue($this->siswarutin_id->FormValue);
-					if (!is_numeric($GLOBALS["t06_siswarutin"]->id->FormValue)) $bValidMaster = FALSE;
-				} else {
-					$bValidMaster = FALSE;
-				}
-			}
-		}
-		if ($bValidMaster) {
-
-			// Update URL
-			$this->AddUrl = $this->AddMasterUrl($this->AddUrl);
-			$this->InlineAddUrl = $this->AddMasterUrl($this->InlineAddUrl);
-			$this->GridAddUrl = $this->AddMasterUrl($this->GridAddUrl);
-			$this->GridEditUrl = $this->AddMasterUrl($this->GridEditUrl);
-
-			// Save current master table
-			$this->setCurrentMasterTable($sMasterTblVar);
-
-			// Reset start record counter (new master key)
-			$this->StartRec = 1;
-			$this->setStartRecordNumber($this->StartRec);
-
-			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t06_siswarutin") {
-				if ($this->siswarutin_id->CurrentValue == "") $this->siswarutin_id->setSessionValue("");
-			}
-		}
-		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
-		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
 	}
 
 	// Set up Breadcrumb
@@ -2010,40 +1317,16 @@ class ct07_siswarutinbayar_list extends ct07_siswarutinbayar {
 	function SetupLookupFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-		case "x_Periode_Tahun_Bulan":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
-			$sWhereWrk = "";
-			$this->Periode_Tahun_Bulan->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
-			ew_AddFilter($sWhereWrk, $lookuptblfilter);
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`Periode_Tahun_Bulan` = {filter_value}', "t0" => "200", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->Periode_Tahun_Bulan, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Setup AutoSuggest filters of a field
 	function SetupAutoSuggestFilters($fld, $pageId = null) {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
-		if ($pageId == "list") {
-			switch ($fld->FldVar) {
-			}
-		} elseif ($pageId == "extbs") {
-			switch ($fld->FldVar) {
-			}
-		} 
+		switch ($fld->FldVar) {
+		}
 	}
 
 	// Page Load event
@@ -2222,38 +1505,6 @@ ft07_siswarutinbayarlist.Lists["x_Tahun"] = {"LinkField":"x_Tahun","Ajax":true,"
 ft07_siswarutinbayarlist.Lists["x_Periode_Text"] = {"LinkField":"x_Periode_Text","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
 
 // Form object for search
-var CurrentSearchForm = ft07_siswarutinbayarlistsrch = new ew_Form("ft07_siswarutinbayarlistsrch");
-
-// Validate function for search
-ft07_siswarutinbayarlistsrch.Validate = function(fobj) {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	fobj = fobj || this.Form;
-	var infix = "";
-
-	// Fire Form_CustomValidate event
-	if (!this.Form_CustomValidate(fobj))
-		return false;
-	return true;
-}
-
-// Form_CustomValidate event
-ft07_siswarutinbayarlistsrch.Form_CustomValidate = 
- function(fobj) { // DO NOT CHANGE THIS LINE!
-
- 	// Your custom validation code here, return false if invalid. 
- 	return true;
- }
-
-// Use JavaScript validation or not
-<?php if (EW_CLIENT_VALIDATE) { ?>
-ft07_siswarutinbayarlistsrch.ValidateRequired = true; // Use JavaScript validation
-<?php } else { ?>
-ft07_siswarutinbayarlistsrch.ValidateRequired = false; // No JavaScript validation
-<?php } ?>
-
-// Dynamic selection lists
-ft07_siswarutinbayarlistsrch.Lists["x_Periode_Tahun_Bulan"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
 </script>
 <script type="text/javascript">
 
@@ -2264,26 +1515,9 @@ ft07_siswarutinbayarlistsrch.Lists["x_Periode_Tahun_Bulan"] = {"LinkField":"x_Pe
 <?php if ($t07_siswarutinbayar_list->TotalRecs > 0 && $t07_siswarutinbayar_list->ExportOptions->Visible()) { ?>
 <?php $t07_siswarutinbayar_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t07_siswarutinbayar_list->SearchOptions->Visible()) { ?>
-<?php $t07_siswarutinbayar_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t07_siswarutinbayar_list->FilterOptions->Visible()) { ?>
-<?php $t07_siswarutinbayar_list->FilterOptions->Render("body") ?>
-<?php } ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
-<?php if (($t07_siswarutinbayar->Export == "") || (EW_EXPORT_MASTER_RECORD && $t07_siswarutinbayar->Export == "print")) { ?>
-<?php
-if ($t07_siswarutinbayar_list->DbMasterFilter <> "" && $t07_siswarutinbayar->getCurrentMasterTable() == "t06_siswarutin") {
-	if ($t07_siswarutinbayar_list->MasterRecordExists) {
-?>
-<?php include_once "t06_siswarutinmaster.php" ?>
-<?php
-	}
-}
-?>
-<?php } ?>
 <?php
 	$bSelectLimit = $t07_siswarutinbayar_list->UseSelectLimit;
 	if ($bSelectLimit) {
@@ -2308,61 +1542,8 @@ if ($t07_siswarutinbayar_list->DbMasterFilter <> "" && $t07_siswarutinbayar->get
 		else
 			$t07_siswarutinbayar_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-
-	// Audit trail on search
-	if ($t07_siswarutinbayar_list->AuditTrailOnSearch && $t07_siswarutinbayar_list->Command == "search" && !$t07_siswarutinbayar_list->RestoreSearch) {
-		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $t07_siswarutinbayar_list->getSessionWhere();
-		$t07_siswarutinbayar_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
-	}
 $t07_siswarutinbayar_list->RenderOtherOptions();
 ?>
-<?php if ($t07_siswarutinbayar->Export == "" && $t07_siswarutinbayar->CurrentAction == "") { ?>
-<form name="ft07_siswarutinbayarlistsrch" id="ft07_siswarutinbayarlistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t07_siswarutinbayar_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft07_siswarutinbayarlistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t07_siswarutinbayar">
-	<div class="ewBasicSearch">
-<?php
-if ($gsSearchError == "")
-	$t07_siswarutinbayar_list->LoadAdvancedSearch(); // Load advanced search
-
-// Render for search
-$t07_siswarutinbayar->RowType = EW_ROWTYPE_SEARCH;
-
-// Render row
-$t07_siswarutinbayar->ResetAttrs();
-$t07_siswarutinbayar_list->RenderRow();
-?>
-<div id="xsr_1" class="ewRow">
-<?php if ($t07_siswarutinbayar->Periode_Tahun_Bulan->Visible) { // Periode_Tahun_Bulan ?>
-	<div id="xsc_Periode_Tahun_Bulan" class="ewCell form-group">
-		<label for="x_Periode_Tahun_Bulan" class="ewSearchCaption ewLabel"><?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->FldCaption() ?></label>
-		<span class="ewSearchOperator"><?php echo $Language->Phrase("BETWEEN") ?><input type="hidden" name="z_Periode_Tahun_Bulan" id="z_Periode_Tahun_Bulan" value="BETWEEN"></span>
-		<span class="ewSearchField">
-<select data-table="t07_siswarutinbayar" data-field="x_Periode_Tahun_Bulan" data-value-separator="<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->DisplayValueSeparatorAttribute() ?>" id="x_Periode_Tahun_Bulan" name="x_Periode_Tahun_Bulan"<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->EditAttributes() ?>>
-<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->SelectOptionListHtml("x_Periode_Tahun_Bulan") ?>
-</select>
-<input type="hidden" name="s_x_Periode_Tahun_Bulan" id="s_x_Periode_Tahun_Bulan" value="<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->LookupFilterQuery(false, "extbs") ?>">
-</span>
-		<span class="ewSearchCond btw1_Periode_Tahun_Bulan">&nbsp;<?php echo $Language->Phrase("AND") ?>&nbsp;</span>
-		<span class="ewSearchField btw1_Periode_Tahun_Bulan">
-<select data-table="t07_siswarutinbayar" data-field="x_Periode_Tahun_Bulan" data-value-separator="<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->DisplayValueSeparatorAttribute() ?>" id="y_Periode_Tahun_Bulan" name="y_Periode_Tahun_Bulan"<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->EditAttributes() ?>>
-<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->SelectOptionListHtml("y_Periode_Tahun_Bulan") ?>
-</select>
-<input type="hidden" name="s_y_Periode_Tahun_Bulan" id="s_y_Periode_Tahun_Bulan" value="<?php echo $t07_siswarutinbayar->Periode_Tahun_Bulan->LookupFilterQuery(false, "extbs") ?>">
-</span>
-	</div>
-<?php } ?>
-</div>
-<div id="xsr_2" class="ewRow">
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
 <?php $t07_siswarutinbayar_list->ShowPageHeader(); ?>
 <?php
 $t07_siswarutinbayar_list->ShowMessage();
@@ -2374,10 +1555,6 @@ $t07_siswarutinbayar_list->ShowMessage();
 <input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t07_siswarutinbayar_list->Token ?>">
 <?php } ?>
 <input type="hidden" name="t" value="t07_siswarutinbayar">
-<?php if ($t07_siswarutinbayar->getCurrentMasterTable() == "t06_siswarutin" && $t07_siswarutinbayar->CurrentAction <> "") { ?>
-<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t06_siswarutin">
-<input type="hidden" name="fk_id" value="<?php echo $t07_siswarutinbayar->siswarutin_id->getSessionValue() ?>">
-<?php } ?>
 <div id="gmp_t07_siswarutinbayar" class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
 <?php if ($t07_siswarutinbayar_list->TotalRecs > 0 || $t07_siswarutinbayar->CurrentAction == "gridedit") { ?>
 <table id="tbl_t07_siswarutinbayarlist" class="table ewTable">
@@ -2692,8 +1869,6 @@ if ($t07_siswarutinbayar_list->Recordset)
 <div class="clearfix"></div>
 <?php } ?>
 <script type="text/javascript">
-ft07_siswarutinbayarlistsrch.FilterList = <?php echo $t07_siswarutinbayar_list->GetFilterList() ?>;
-ft07_siswarutinbayarlistsrch.Init();
 ft07_siswarutinbayarlist.Init();
 </script>
 <?php

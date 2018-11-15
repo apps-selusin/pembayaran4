@@ -724,7 +724,7 @@ class ct09_siswanonrutintemp extends cTable {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Awal->LookupFilters = array();
-		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -749,7 +749,7 @@ class ct09_siswanonrutintemp extends cTable {
 		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Akhir->LookupFilters = array();
-		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue." and Tanggal_Bayar is null";
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -908,7 +908,6 @@ class ct09_siswanonrutintemp extends cTable {
 				if ($ExportPageType == "view") {
 					if ($this->siswa_id->Exportable) $Doc->ExportCaption($this->siswa_id);
 					if ($this->nonrutin_id->Exportable) $Doc->ExportCaption($this->nonrutin_id);
-					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
 					if ($this->Periode_Awal->Exportable) $Doc->ExportCaption($this->Periode_Awal);
 					if ($this->Periode_Akhir->Exportable) $Doc->ExportCaption($this->Periode_Akhir);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
@@ -953,7 +952,6 @@ class ct09_siswanonrutintemp extends cTable {
 					if ($ExportPageType == "view") {
 						if ($this->siswa_id->Exportable) $Doc->ExportField($this->siswa_id);
 						if ($this->nonrutin_id->Exportable) $Doc->ExportField($this->nonrutin_id);
-						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
 						if ($this->Periode_Awal->Exportable) $Doc->ExportField($this->Periode_Awal);
 						if ($this->Periode_Akhir->Exportable) $Doc->ExportField($this->Periode_Akhir);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
