@@ -958,7 +958,6 @@ class ct04_siswa_add extends ct04_siswa {
 	// Set up detail pages
 	function SetupDetailPages() {
 		$pages = new cSubPages();
-		$pages->Style = "tabs";
 		$pages->Add('t06_siswarutin');
 		$pages->Add('t09_siswanonrutin');
 		$this->DetailPages = $pages;
@@ -1241,39 +1240,25 @@ $t04_siswa_add->ShowMessage();
 	$FirstActiveDetailTable = $t04_siswa_add->DetailPages->ActivePageIndex();
 ?>
 <div class="ewDetailPages">
-<div class="tabbable" id="t04_siswa_add_details">
-	<ul class="nav<?php echo $t04_siswa_add->DetailPages->NavStyle() ?>">
+<div class="panel-group" id="t04_siswa_add_details">
 <?php
 	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailAdd) {
 		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
 			$FirstActiveDetailTable = "t06_siswarutin";
 		}
 ?>
-		<li<?php echo $t04_siswa_add->DetailPages->TabStyle("t06_siswarutin") ?>><a href="#tab_t06_siswarutin" data-toggle="tab"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></a></li>
-<?php
-	}
-?>
-<?php
-	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailAdd) {
-		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t09_siswanonrutin") {
-			$FirstActiveDetailTable = "t09_siswanonrutin";
-		}
-?>
-		<li<?php echo $t04_siswa_add->DetailPages->TabStyle("t09_siswanonrutin") ?>><a href="#tab_t09_siswanonrutin" data-toggle="tab"><?php echo $Language->TablePhrase("t09_siswanonrutin", "TblCaption") ?></a></li>
-<?php
-	}
-?>
-	</ul>
-	<div class="tab-content">
-<?php
-	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailAdd) {
-		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
-			$FirstActiveDetailTable = "t06_siswarutin";
-		}
-?>
-		<div class="tab-pane<?php echo $t04_siswa_add->DetailPages->PageStyle("t06_siswarutin") ?>" id="tab_t06_siswarutin">
+	<div class="panel panel-default<?php echo $t04_siswa_add->DetailPages->PageStyle("t06_siswarutin") ?>">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a class="panel-toggle" data-toggle="collapse" data-parent="#t04_siswa_add_details" href="#tab_t06_siswarutin"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></a>
+			</h4>
+		</div>
+		<div class="panel-collapse collapse<?php echo $t04_siswa_add->DetailPages->PageStyle("t06_siswarutin") ?>" id="tab_t06_siswarutin">
+			<div class="panel-body">
 <?php include_once "t06_siswarutingrid.php" ?>
+			</div>
 		</div>
+	</div>
 <?php } ?>
 <?php
 	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailAdd) {
@@ -1281,11 +1266,19 @@ $t04_siswa_add->ShowMessage();
 			$FirstActiveDetailTable = "t09_siswanonrutin";
 		}
 ?>
-		<div class="tab-pane<?php echo $t04_siswa_add->DetailPages->PageStyle("t09_siswanonrutin") ?>" id="tab_t09_siswanonrutin">
-<?php include_once "t09_siswanonrutingrid.php" ?>
+	<div class="panel panel-default<?php echo $t04_siswa_add->DetailPages->PageStyle("t09_siswanonrutin") ?>">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a class="panel-toggle" data-toggle="collapse" data-parent="#t04_siswa_add_details" href="#tab_t09_siswanonrutin"><?php echo $Language->TablePhrase("t09_siswanonrutin", "TblCaption") ?></a>
+			</h4>
 		</div>
-<?php } ?>
+		<div class="panel-collapse collapse<?php echo $t04_siswa_add->DetailPages->PageStyle("t09_siswanonrutin") ?>" id="tab_t09_siswanonrutin">
+			<div class="panel-body">
+<?php include_once "t09_siswanonrutingrid.php" ?>
+			</div>
+		</div>
 	</div>
+<?php } ?>
 </div>
 </div>
 <?php } ?>

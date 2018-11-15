@@ -7,6 +7,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "phpfn13.php" ?>
 <?php include_once "v01_siswainfo.php" ?>
 <?php include_once "t06_siswarutintempgridcls.php" ?>
+<?php include_once "t09_siswanonrutintempgridcls.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -368,6 +369,14 @@ class cv01_siswa_list extends cv01_siswa {
 			if (@$_POST["grid"] == "ft06_siswarutintempgrid") {
 				if (!isset($GLOBALS["t06_siswarutintemp_grid"])) $GLOBALS["t06_siswarutintemp_grid"] = new ct06_siswarutintemp_grid;
 				$GLOBALS["t06_siswarutintemp_grid"]->Page_Init();
+				$this->Page_Terminate();
+				exit();
+			}
+
+			// Process auto fill for detail table 't09_siswanonrutintemp'
+			if (@$_POST["grid"] == "ft09_siswanonrutintempgrid") {
+				if (!isset($GLOBALS["t09_siswanonrutintemp_grid"])) $GLOBALS["t09_siswanonrutintemp_grid"] = new ct09_siswanonrutintemp_grid;
+				$GLOBALS["t09_siswanonrutintemp_grid"]->Page_Init();
 				$this->Page_Terminate();
 				exit();
 			}
@@ -955,6 +964,12 @@ class cv01_siswa_list extends cv01_siswa {
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
+		// "edit"
+		$item = &$this->ListOptions->Add("edit");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE;
+
 		// "detail_t06_siswarutintemp"
 		$item = &$this->ListOptions->Add("detail_t06_siswarutintemp");
 		$item->CssStyle = "white-space: nowrap;";
@@ -962,6 +977,14 @@ class cv01_siswa_list extends cv01_siswa {
 		$item->OnLeft = TRUE;
 		$item->ShowInButtonGroup = FALSE;
 		if (!isset($GLOBALS["t06_siswarutintemp_grid"])) $GLOBALS["t06_siswarutintemp_grid"] = new ct06_siswarutintemp_grid;
+
+		// "detail_t09_siswanonrutintemp"
+		$item = &$this->ListOptions->Add("detail_t09_siswanonrutintemp");
+		$item->CssStyle = "white-space: nowrap;";
+		$item->Visible = TRUE && !$this->ShowMultipleDetails;
+		$item->OnLeft = TRUE;
+		$item->ShowInButtonGroup = FALSE;
+		if (!isset($GLOBALS["t09_siswanonrutintemp_grid"])) $GLOBALS["t09_siswanonrutintemp_grid"] = new ct09_siswanonrutintemp_grid;
 
 		// Multiple details
 		if ($this->ShowMultipleDetails) {
@@ -975,6 +998,7 @@ class cv01_siswa_list extends cv01_siswa {
 		// Set up detail pages
 		$pages = new cSubPages();
 		$pages->Add("t06_siswarutintemp");
+		$pages->Add("t09_siswanonrutintemp");
 		$this->DetailPages = $pages;
 
 		// List actions
@@ -1015,6 +1039,15 @@ class cv01_siswa_list extends cv01_siswa {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
 
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
+		if (TRUE) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
 		// Set up list action buttons
 		$oListOpt = &$this->ListOptions->GetItem("listactions");
 		if ($oListOpt && $this->Export == "" && $this->CurrentAction == "") {
@@ -1053,6 +1086,31 @@ class cv01_siswa_list extends cv01_siswa {
 			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t06_siswarutintemp", "TblCaption");
 			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t06_siswarutintemplist.php?" . EW_TABLE_SHOW_MASTER . "=v01_siswa&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
 			$links = "";
+			if ($GLOBALS["t06_siswarutintemp_grid"]->DetailEdit) {
+				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=t06_siswarutintemp")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
+				$DetailEditTblVar .= "t06_siswarutintemp";
+			}
+			if ($links <> "") {
+				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
+				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
+			}
+			$body = "<div class=\"btn-group\">" . $body . "</div>";
+			$oListOpt->Body = $body;
+			if ($this->ShowMultipleDetails) $oListOpt->Visible = FALSE;
+		}
+
+		// "detail_t09_siswanonrutintemp"
+		$oListOpt = &$this->ListOptions->Items["detail_t09_siswanonrutintemp"];
+		if (TRUE) {
+			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t09_siswanonrutintemp", "TblCaption");
+			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t09_siswanonrutintemplist.php?" . EW_TABLE_SHOW_MASTER . "=v01_siswa&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
+			$links = "";
+			if ($GLOBALS["t09_siswanonrutintemp_grid"]->DetailEdit) {
+				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=t09_siswanonrutintemp")) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
+				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
+				$DetailEditTblVar .= "t09_siswanonrutintemp";
+			}
 			if ($links <> "") {
 				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
 				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
@@ -1734,6 +1792,7 @@ class cv01_siswa_list extends cv01_siswa {
 		// Example: 
 		//$this->ListOptions->Items["new"]->Body = "xxx";
 
+		$this->ListOptions->Items["edit"]->Body = "";
 	}
 
 	// Row Custom Action event
@@ -1889,6 +1948,13 @@ fv01_siswalistsrch.ValidateRequired = false; // No JavaScript validation
 			$v01_siswa_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$v01_siswa_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($v01_siswa_list->AuditTrailOnSearch && $v01_siswa_list->Command == "search" && !$v01_siswa_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $v01_siswa_list->getSessionWhere();
+		$v01_siswa_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $v01_siswa_list->RenderOtherOptions();
 ?>

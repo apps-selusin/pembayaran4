@@ -394,7 +394,6 @@ class ct04_siswa_view extends ct04_siswa {
 	var $StopRec;
 	var $TotalRecs = 0;
 	var $RecRange = 10;
-	var $Pager;
 	var $RecCnt;
 	var $RecKey = array();
 	var $IsModal = FALSE;
@@ -412,9 +411,6 @@ class ct04_siswa_view extends ct04_siswa {
 		$this->IsModal = (@$_GET["modal"] == "1" || @$_POST["modal"] == "1");
 		if ($this->IsModal)
 			$gbSkipHeaderFooter = TRUE;
-
-		// Load current record
-		$bLoadCurrentRecord = FALSE;
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
 		if ($this->IsPageRequest()) { // Validate request
@@ -425,46 +421,17 @@ class ct04_siswa_view extends ct04_siswa {
 				$this->id->setFormValue($_POST["id"]);
 				$this->RecKey["id"] = $this->id->FormValue;
 			} else {
-				$bLoadCurrentRecord = TRUE;
+				$sReturnUrl = "t04_siswalist.php"; // Return to list
 			}
 
 			// Get action
 			$this->CurrentAction = "I"; // Display form
 			switch ($this->CurrentAction) {
 				case "I": // Get a record to display
-					$this->StartRec = 1; // Initialize start position
-					if ($this->Recordset = $this->LoadRecordset()) // Load records
-						$this->TotalRecs = $this->Recordset->RecordCount(); // Get record count
-					if ($this->TotalRecs <= 0) { // No record found
-						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
-							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("t04_siswalist.php"); // Return to list page
-					} elseif ($bLoadCurrentRecord) { // Load current record position
-						$this->SetUpStartRec(); // Set up start record position
-
-						// Point to current record
-						if (intval($this->StartRec) <= intval($this->TotalRecs)) {
-							$bMatchRecord = TRUE;
-							$this->Recordset->Move($this->StartRec-1);
-						}
-					} else { // Match key values
-						while (!$this->Recordset->EOF) {
-							if (strval($this->id->CurrentValue) == strval($this->Recordset->fields('id'))) {
-								$this->setStartRecordNumber($this->StartRec); // Save record position
-								$bMatchRecord = TRUE;
-								break;
-							} else {
-								$this->StartRec++;
-								$this->Recordset->MoveNext();
-							}
-						}
-					}
-					if (!$bMatchRecord) {
+					if (!$this->LoadRow()) { // Load record based on key
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
 						$sReturnUrl = "t04_siswalist.php"; // No matching record, return to list
-					} else {
-						$this->LoadRowValues($this->Recordset); // Load row values
 					}
 			}
 		} else {
@@ -682,32 +649,6 @@ class ct04_siswa_view extends ct04_siswa {
 		}
 	}
 
-	// Load recordset
-	function LoadRecordset($offset = -1, $rowcnt = -1) {
-
-		// Load List page SQL
-		$sSql = $this->SelectSQL();
-		$conn = &$this->Connection();
-
-		// Load recordset
-		$dbtype = ew_GetConnectionType($this->DBID);
-		if ($this->UseSelectLimit) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
-			} else {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
-			}
-			$conn->raiseErrorFn = '';
-		} else {
-			$rs = ew_LoadRecordset($sSql, $conn);
-		}
-
-		// Call Recordset Selected event
-		$this->Recordset_Selected($rs);
-		return $rs;
-	}
-
 	// Load row based on key values
 	function LoadRow() {
 		global $Security, $Language;
@@ -920,7 +861,6 @@ class ct04_siswa_view extends ct04_siswa {
 	// Set up detail pages
 	function SetupDetailPages() {
 		$pages = new cSubPages();
-		$pages->Style = "tabs";
 		$pages->Add('t06_siswarutin');
 		$pages->Add('t09_siswanonrutin');
 		$this->DetailPages = $pages;
@@ -1151,88 +1091,31 @@ $t04_siswa_view->ShowMessage();
 	</tr>
 <?php } ?>
 </table>
-<?php if (!$t04_siswa_view->IsModal) { ?>
-<?php if (!isset($t04_siswa_view->Pager)) $t04_siswa_view->Pager = new cPrevNextPager($t04_siswa_view->StartRec, $t04_siswa_view->DisplayRecs, $t04_siswa_view->TotalRecs) ?>
-<?php if ($t04_siswa_view->Pager->RecordCount > 0 && $t04_siswa_view->Pager->Visible) { ?>
-<div class="ewPager">
-<span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
-<div class="ewPrevNext"><div class="input-group">
-<div class="input-group-btn">
-<!--first page button-->
-	<?php if ($t04_siswa_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
-	<?php } else { ?>
-	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
-	<?php } ?>
-<!--previous page button-->
-	<?php if ($t04_siswa_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
-	<?php } else { ?>
-	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
-	<?php } ?>
-</div>
-<!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t04_siswa_view->Pager->CurrentPage ?>">
-<div class="input-group-btn">
-<!--next page button-->
-	<?php if ($t04_siswa_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
-	<?php } else { ?>
-	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
-	<?php } ?>
-<!--last page button-->
-	<?php if ($t04_siswa_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t04_siswa_view->PageUrl() ?>start=<?php echo $t04_siswa_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
-	<?php } else { ?>
-	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
-	<?php } ?>
-</div>
-</div>
-</div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t04_siswa_view->Pager->PageCount ?></span>
-</div>
-<?php } ?>
-<div class="clearfix"></div>
-<?php } ?>
 <?php if ($t04_siswa->getCurrentDetailTable() <> "") { ?>
 <?php
 	$t04_siswa_view->DetailPages->ValidKeys = explode(",", $t04_siswa->getCurrentDetailTable());
 	$FirstActiveDetailTable = $t04_siswa_view->DetailPages->ActivePageIndex();
 ?>
 <div class="ewDetailPages">
-<div class="tabbable" id="t04_siswa_view_details">
-	<ul class="nav<?php echo $t04_siswa_view->DetailPages->NavStyle() ?>">
+<div class="panel-group" id="t04_siswa_view_details">
 <?php
 	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailView) {
 		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
 			$FirstActiveDetailTable = "t06_siswarutin";
 		}
 ?>
-		<li<?php echo $t04_siswa_view->DetailPages->TabStyle("t06_siswarutin") ?>><a href="#tab_t06_siswarutin" data-toggle="tab"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></a></li>
-<?php
-	}
-?>
-<?php
-	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailView) {
-		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t09_siswanonrutin") {
-			$FirstActiveDetailTable = "t09_siswanonrutin";
-		}
-?>
-		<li<?php echo $t04_siswa_view->DetailPages->TabStyle("t09_siswanonrutin") ?>><a href="#tab_t09_siswanonrutin" data-toggle="tab"><?php echo $Language->TablePhrase("t09_siswanonrutin", "TblCaption") ?></a></li>
-<?php
-	}
-?>
-	</ul>
-	<div class="tab-content">
-<?php
-	if (in_array("t06_siswarutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t06_siswarutin->DetailView) {
-		if ($FirstActiveDetailTable == "" || $FirstActiveDetailTable == "t06_siswarutin") {
-			$FirstActiveDetailTable = "t06_siswarutin";
-		}
-?>
-		<div class="tab-pane<?php echo $t04_siswa_view->DetailPages->PageStyle("t06_siswarutin") ?>" id="tab_t06_siswarutin">
+	<div class="panel panel-default<?php echo $t04_siswa_view->DetailPages->PageStyle("t06_siswarutin") ?>">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a class="panel-toggle" data-toggle="collapse" data-parent="#t04_siswa_view_details" href="#tab_t06_siswarutin"><?php echo $Language->TablePhrase("t06_siswarutin", "TblCaption") ?></a>
+			</h4>
+		</div>
+		<div class="panel-collapse collapse<?php echo $t04_siswa_view->DetailPages->PageStyle("t06_siswarutin") ?>" id="tab_t06_siswarutin">
+			<div class="panel-body">
 <?php include_once "t06_siswarutingrid.php" ?>
+			</div>
 		</div>
+	</div>
 <?php } ?>
 <?php
 	if (in_array("t09_siswanonrutin", explode(",", $t04_siswa->getCurrentDetailTable())) && $t09_siswanonrutin->DetailView) {
@@ -1240,11 +1123,19 @@ $t04_siswa_view->ShowMessage();
 			$FirstActiveDetailTable = "t09_siswanonrutin";
 		}
 ?>
-		<div class="tab-pane<?php echo $t04_siswa_view->DetailPages->PageStyle("t09_siswanonrutin") ?>" id="tab_t09_siswanonrutin">
-<?php include_once "t09_siswanonrutingrid.php" ?>
+	<div class="panel panel-default<?php echo $t04_siswa_view->DetailPages->PageStyle("t09_siswanonrutin") ?>">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a class="panel-toggle" data-toggle="collapse" data-parent="#t04_siswa_view_details" href="#tab_t09_siswanonrutin"><?php echo $Language->TablePhrase("t09_siswanonrutin", "TblCaption") ?></a>
+			</h4>
 		</div>
-<?php } ?>
+		<div class="panel-collapse collapse<?php echo $t04_siswa_view->DetailPages->PageStyle("t09_siswanonrutin") ?>" id="tab_t09_siswanonrutin">
+			<div class="panel-body">
+<?php include_once "t09_siswanonrutingrid.php" ?>
+			</div>
+		</div>
 	</div>
+<?php } ?>
 </div>
 </div>
 <?php } ?>

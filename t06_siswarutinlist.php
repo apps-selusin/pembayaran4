@@ -1546,10 +1546,10 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 		//$opt->OnLeft = TRUE; // Link on left
 		//$opt->MoveTo(0); // Move to first column
 
-		$opt = &$this->ListOptions->Add("bayar");
+		/*$opt = &$this->ListOptions->Add("bayar");
 		$opt->Header = "Bayar";
 		$opt->OnLeft = TRUE; // Link on left
-		$opt->MoveTo(0); // Move to first column
+		$opt->MoveTo(0); // Move to first column*/
 	}
 
 	// ListOptions Rendered event
@@ -1557,8 +1557,8 @@ class ct06_siswarutin_list extends ct06_siswarutin {
 
 		// Example: 
 		//$this->ListOptions->Items["new"]->Body = "xxx";
+		//$this->ListOptions->Items["bayar"]->Body = "<a class=\"ewAddEdit ewAdd\" title=\"Bayar\" data-caption=\"Bayar\" href=\"t07_siswarutinbayaredit.php?id=25&showmaster=t06_siswarutin&fk_id=3\">Proses</a>"; // definisikan link, style, dan caption tombol //"xxx";
 
-		$this->ListOptions->Items["bayar"]->Body = "<a class=\"ewAddEdit ewAdd\" title=\"Bayar\" data-caption=\"Bayar\" href=\"t07_siswarutinbayaredit.php?id=25&showmaster=t06_siswarutin&fk_id=3\">Proses</a>"; // definisikan link, style, dan caption tombol //"xxx";
 	}
 
 	// Row Custom Action event

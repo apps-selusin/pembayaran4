@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t06_siswarutintempinfo.php" ?>
+<?php include_once "t09_siswanonrutintempinfo.php" ?>
 <?php include_once "v01_siswainfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t06_siswarutintemp_edit = NULL; // Initialize page object first
+$t09_siswanonrutintemp_edit = NULL; // Initialize page object first
 
-class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
+class ct09_siswanonrutintemp_edit extends ct09_siswanonrutintemp {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -25,10 +25,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 	var $ProjectID = "{64CABE7A-1609-4157-8293-D7242B591905}";
 
 	// Table name
-	var $TableName = 't06_siswarutintemp';
+	var $TableName = 't09_siswanonrutintemp';
 
 	// Page object name
-	var $PageObjName = 't06_siswarutintemp_edit';
+	var $PageObjName = 't09_siswanonrutintemp_edit';
 
 	// Page name
 	function PageName() {
@@ -225,10 +225,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t06_siswarutintemp)
-		if (!isset($GLOBALS["t06_siswarutintemp"]) || get_class($GLOBALS["t06_siswarutintemp"]) == "ct06_siswarutintemp") {
-			$GLOBALS["t06_siswarutintemp"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t06_siswarutintemp"];
+		// Table object (t09_siswanonrutintemp)
+		if (!isset($GLOBALS["t09_siswanonrutintemp"]) || get_class($GLOBALS["t09_siswanonrutintemp"]) == "ct09_siswanonrutintemp") {
+			$GLOBALS["t09_siswanonrutintemp"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t09_siswanonrutintemp"];
 		}
 
 		// Table object (v01_siswa)
@@ -240,7 +240,7 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't06_siswarutintemp', TRUE);
+			define("EW_TABLE_NAME", 't09_siswanonrutintemp', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -259,8 +259,8 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->siswa_id->SetVisibility();
-		$this->rutin_id->SetVisibility();
-		$this->siswarutin_id->SetVisibility();
+		$this->nonrutin_id->SetVisibility();
+		$this->siswanonrutin_id->SetVisibility();
 		$this->Periode_Awal->SetVisibility();
 		$this->Periode_Akhir->SetVisibility();
 		$this->Nilai->SetVisibility();
@@ -309,13 +309,13 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t06_siswarutintemp;
+		global $EW_EXPORT, $t09_siswanonrutintemp;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t06_siswarutintemp);
+				$doc = new $class($t09_siswanonrutintemp);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -381,7 +381,7 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 
 		// Check if valid key
 		if ($this->id->CurrentValue == "") {
-			$this->Page_Terminate("t06_siswarutintemplist.php"); // Invalid key, return to list
+			$this->Page_Terminate("t09_siswanonrutintemplist.php"); // Invalid key, return to list
 		}
 
 		// Validate form if post back
@@ -397,12 +397,12 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			case "I": // Get a record to display
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("t06_siswarutintemplist.php"); // No matching record, return to list
+					$this->Page_Terminate("t09_siswanonrutintemplist.php"); // No matching record, return to list
 				}
 				break;
 			Case "U": // Update
 				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "t06_siswarutintemplist.php")
+				if (ew_GetPageName($sReturnUrl) == "t09_siswanonrutintemplist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to list page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -477,11 +477,11 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		if (!$this->siswa_id->FldIsDetailKey) {
 			$this->siswa_id->setFormValue($objForm->GetValue("x_siswa_id"));
 		}
-		if (!$this->rutin_id->FldIsDetailKey) {
-			$this->rutin_id->setFormValue($objForm->GetValue("x_rutin_id"));
+		if (!$this->nonrutin_id->FldIsDetailKey) {
+			$this->nonrutin_id->setFormValue($objForm->GetValue("x_nonrutin_id"));
 		}
-		if (!$this->siswarutin_id->FldIsDetailKey) {
-			$this->siswarutin_id->setFormValue($objForm->GetValue("x_siswarutin_id"));
+		if (!$this->siswanonrutin_id->FldIsDetailKey) {
+			$this->siswanonrutin_id->setFormValue($objForm->GetValue("x_siswanonrutin_id"));
 		}
 		if (!$this->Periode_Awal->FldIsDetailKey) {
 			$this->Periode_Awal->setFormValue($objForm->GetValue("x_Periode_Awal"));
@@ -502,8 +502,8 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		$this->LoadRow();
 		$this->id->CurrentValue = $this->id->FormValue;
 		$this->siswa_id->CurrentValue = $this->siswa_id->FormValue;
-		$this->rutin_id->CurrentValue = $this->rutin_id->FormValue;
-		$this->siswarutin_id->CurrentValue = $this->siswarutin_id->FormValue;
+		$this->nonrutin_id->CurrentValue = $this->nonrutin_id->FormValue;
+		$this->siswanonrutin_id->CurrentValue = $this->siswanonrutin_id->FormValue;
 		$this->Periode_Awal->CurrentValue = $this->Periode_Awal->FormValue;
 		$this->Periode_Akhir->CurrentValue = $this->Periode_Akhir->FormValue;
 		$this->Nilai->CurrentValue = $this->Nilai->FormValue;
@@ -540,8 +540,8 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswa_id->setDbValue($rs->fields('siswa_id'));
-		$this->rutin_id->setDbValue($rs->fields('rutin_id'));
-		$this->siswarutin_id->setDbValue($rs->fields('siswarutin_id'));
+		$this->nonrutin_id->setDbValue($rs->fields('nonrutin_id'));
+		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
 		$this->Periode_Awal->setDbValue($rs->fields('Periode_Awal'));
 		$this->Periode_Akhir->setDbValue($rs->fields('Periode_Akhir'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
@@ -553,8 +553,8 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->siswa_id->DbValue = $row['siswa_id'];
-		$this->rutin_id->DbValue = $row['rutin_id'];
-		$this->siswarutin_id->DbValue = $row['siswarutin_id'];
+		$this->nonrutin_id->DbValue = $row['nonrutin_id'];
+		$this->siswanonrutin_id->DbValue = $row['siswanonrutin_id'];
 		$this->Periode_Awal->DbValue = $row['Periode_Awal'];
 		$this->Periode_Akhir->DbValue = $row['Periode_Akhir'];
 		$this->Nilai->DbValue = $row['Nilai'];
@@ -576,8 +576,8 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		// Common render codes for all row types
 		// id
 		// siswa_id
-		// rutin_id
-		// siswarutin_id
+		// nonrutin_id
+		// siswanonrutin_id
 		// Periode_Awal
 		// Periode_Akhir
 		// Nilai
@@ -590,66 +590,43 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 
 		// siswa_id
 		$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
-		if (strval($this->siswa_id->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->siswa_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `NIS` AS `DispFld`, `Nama` AS `Disp2Fld`, `kelas_id` AS `Disp3Fld`, `sekolah_id` AS `Disp4Fld` FROM `t04_siswa`";
-		$sWhereWrk = "";
-		$this->siswa_id->LookupFilters = array();
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->siswa_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$arwrk[3] = $rswrk->fields('Disp3Fld');
-				$arwrk[4] = $rswrk->fields('Disp4Fld');
-				$this->siswa_id->ViewValue = $this->siswa_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
-			}
-		} else {
-			$this->siswa_id->ViewValue = NULL;
-		}
 		$this->siswa_id->ViewCustomAttributes = "";
 
-		// rutin_id
-		$this->rutin_id->ViewValue = $this->rutin_id->CurrentValue;
-		if (strval($this->rutin_id->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_rutin`";
+		// nonrutin_id
+		$this->nonrutin_id->ViewValue = $this->nonrutin_id->CurrentValue;
+		if (strval($this->nonrutin_id->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->nonrutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_nonrutin`";
 		$sWhereWrk = "";
-		$this->rutin_id->LookupFilters = array();
+		$this->nonrutin_id->LookupFilters = array();
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
+		$this->Lookup_Selecting($this->nonrutin_id, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->rutin_id->ViewValue = $this->rutin_id->DisplayValue($arwrk);
+				$this->nonrutin_id->ViewValue = $this->nonrutin_id->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->rutin_id->ViewValue = $this->rutin_id->CurrentValue;
+				$this->nonrutin_id->ViewValue = $this->nonrutin_id->CurrentValue;
 			}
 		} else {
-			$this->rutin_id->ViewValue = NULL;
+			$this->nonrutin_id->ViewValue = NULL;
 		}
-		$this->rutin_id->ViewCustomAttributes = "";
+		$this->nonrutin_id->ViewCustomAttributes = "";
 
-		// siswarutin_id
-		$this->siswarutin_id->ViewValue = $this->siswarutin_id->CurrentValue;
-		$this->siswarutin_id->ViewCustomAttributes = "";
+		// siswanonrutin_id
+		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
+		$this->siswanonrutin_id->ViewCustomAttributes = "";
 
 		// Periode_Awal
 		if (strval($this->Periode_Awal->CurrentValue) <> "") {
 			$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Awal->CurrentValue, EW_DATATYPE_STRING, "");
-		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Awal->LookupFilters = array();
-		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -671,10 +648,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		// Periode_Akhir
 		if (strval($this->Periode_Akhir->CurrentValue) <> "") {
 			$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Akhir->CurrentValue, EW_DATATYPE_STRING, "");
-		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+		$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 		$sWhereWrk = "";
 		$this->Periode_Akhir->LookupFilters = array();
-		$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+		$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 		ew_AddFilter($sWhereWrk, $lookuptblfilter);
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -704,15 +681,15 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			$this->siswa_id->HrefValue = "";
 			$this->siswa_id->TooltipValue = "";
 
-			// rutin_id
-			$this->rutin_id->LinkCustomAttributes = "";
-			$this->rutin_id->HrefValue = "";
-			$this->rutin_id->TooltipValue = "";
+			// nonrutin_id
+			$this->nonrutin_id->LinkCustomAttributes = "";
+			$this->nonrutin_id->HrefValue = "";
+			$this->nonrutin_id->TooltipValue = "";
 
-			// siswarutin_id
-			$this->siswarutin_id->LinkCustomAttributes = "";
-			$this->siswarutin_id->HrefValue = "";
-			$this->siswarutin_id->TooltipValue = "";
+			// siswanonrutin_id
+			$this->siswanonrutin_id->LinkCustomAttributes = "";
+			$this->siswanonrutin_id->HrefValue = "";
+			$this->siswanonrutin_id->TooltipValue = "";
 
 			// Periode_Awal
 			$this->Periode_Awal->LinkCustomAttributes = "";
@@ -733,63 +710,46 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			// siswa_id
 			$this->siswa_id->EditAttrs["class"] = "form-control";
 			$this->siswa_id->EditCustomAttributes = "";
-			$this->siswa_id->EditValue = $this->siswa_id->CurrentValue;
-			if (strval($this->siswa_id->CurrentValue) <> "") {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->siswa_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `id`, `NIS` AS `DispFld`, `Nama` AS `Disp2Fld`, `kelas_id` AS `Disp3Fld`, `sekolah_id` AS `Disp4Fld` FROM `t04_siswa`";
-			$sWhereWrk = "";
-			$this->siswa_id->LookupFilters = array();
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->siswa_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$arwrk[2] = $rswrk->fields('Disp2Fld');
-					$arwrk[3] = $rswrk->fields('Disp3Fld');
-					$arwrk[4] = $rswrk->fields('Disp4Fld');
-					$this->siswa_id->EditValue = $this->siswa_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->siswa_id->EditValue = $this->siswa_id->CurrentValue;
-				}
-			} else {
-				$this->siswa_id->EditValue = NULL;
-			}
+			if ($this->siswa_id->getSessionValue() <> "") {
+				$this->siswa_id->CurrentValue = $this->siswa_id->getSessionValue();
+			$this->siswa_id->ViewValue = $this->siswa_id->CurrentValue;
 			$this->siswa_id->ViewCustomAttributes = "";
+			} else {
+			$this->siswa_id->EditValue = ew_HtmlEncode($this->siswa_id->CurrentValue);
+			$this->siswa_id->PlaceHolder = ew_RemoveHtml($this->siswa_id->FldCaption());
+			}
 
-			// rutin_id
-			$this->rutin_id->EditAttrs["class"] = "form-control";
-			$this->rutin_id->EditCustomAttributes = "";
-			$this->rutin_id->EditValue = $this->rutin_id->CurrentValue;
-			if (strval($this->rutin_id->CurrentValue) <> "") {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->rutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_rutin`";
+			// nonrutin_id
+			$this->nonrutin_id->EditAttrs["class"] = "form-control";
+			$this->nonrutin_id->EditCustomAttributes = "";
+			$this->nonrutin_id->EditValue = ew_HtmlEncode($this->nonrutin_id->CurrentValue);
+			if (strval($this->nonrutin_id->CurrentValue) <> "") {
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->nonrutin_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_nonrutin`";
 			$sWhereWrk = "";
-			$this->rutin_id->LookupFilters = array();
+			$this->nonrutin_id->LookupFilters = array();
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->rutin_id, $sWhereWrk); // Call Lookup selecting
+			$this->Lookup_Selecting($this->nonrutin_id, $sWhereWrk); // Call Lookup selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 				$rswrk = Conn()->Execute($sSqlWrk);
 				if ($rswrk && !$rswrk->EOF) { // Lookup values found
 					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->rutin_id->EditValue = $this->rutin_id->DisplayValue($arwrk);
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->nonrutin_id->EditValue = $this->nonrutin_id->DisplayValue($arwrk);
 					$rswrk->Close();
 				} else {
-					$this->rutin_id->EditValue = $this->rutin_id->CurrentValue;
+					$this->nonrutin_id->EditValue = ew_HtmlEncode($this->nonrutin_id->CurrentValue);
 				}
 			} else {
-				$this->rutin_id->EditValue = NULL;
+				$this->nonrutin_id->EditValue = NULL;
 			}
-			$this->rutin_id->ViewCustomAttributes = "";
+			$this->nonrutin_id->PlaceHolder = ew_RemoveHtml($this->nonrutin_id->FldCaption());
 
-			// siswarutin_id
-			$this->siswarutin_id->EditAttrs["class"] = "form-control";
-			$this->siswarutin_id->EditCustomAttributes = "";
-			$this->siswarutin_id->EditValue = ew_HtmlEncode($this->siswarutin_id->CurrentValue);
-			$this->siswarutin_id->PlaceHolder = ew_RemoveHtml($this->siswarutin_id->FldCaption());
+			// siswanonrutin_id
+			$this->siswanonrutin_id->EditAttrs["class"] = "form-control";
+			$this->siswanonrutin_id->EditCustomAttributes = "";
+			$this->siswanonrutin_id->EditValue = ew_HtmlEncode($this->siswanonrutin_id->CurrentValue);
+			$this->siswanonrutin_id->PlaceHolder = ew_RemoveHtml($this->siswanonrutin_id->FldCaption());
 
 			// Periode_Awal
 			$this->Periode_Awal->EditAttrs["class"] = "form-control";
@@ -799,10 +759,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			} else {
 				$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Awal->CurrentValue, EW_DATATYPE_STRING, "");
 			}
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_siswarutinbayar`";
+			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Awal->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Awal, $sWhereWrk); // Call Lookup selecting
@@ -820,10 +780,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			} else {
 				$sFilterWrk = "`Periode_Tahun_Bulan`" . ew_SearchString("=", $this->Periode_Akhir->CurrentValue, EW_DATATYPE_STRING, "");
 			}
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_siswarutinbayar`";
+			$sSqlWrk = "SELECT `Periode_Tahun_Bulan`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Akhir->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->Periode_Akhir, $sWhereWrk); // Call Lookup selecting
@@ -845,16 +805,14 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 
 			$this->siswa_id->LinkCustomAttributes = "";
 			$this->siswa_id->HrefValue = "";
-			$this->siswa_id->TooltipValue = "";
 
-			// rutin_id
-			$this->rutin_id->LinkCustomAttributes = "";
-			$this->rutin_id->HrefValue = "";
-			$this->rutin_id->TooltipValue = "";
+			// nonrutin_id
+			$this->nonrutin_id->LinkCustomAttributes = "";
+			$this->nonrutin_id->HrefValue = "";
 
-			// siswarutin_id
-			$this->siswarutin_id->LinkCustomAttributes = "";
-			$this->siswarutin_id->HrefValue = "";
+			// siswanonrutin_id
+			$this->siswanonrutin_id->LinkCustomAttributes = "";
+			$this->siswanonrutin_id->HrefValue = "";
 
 			// Periode_Awal
 			$this->Periode_Awal->LinkCustomAttributes = "";
@@ -889,11 +847,23 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->siswarutin_id->FldIsDetailKey && !is_null($this->siswarutin_id->FormValue) && $this->siswarutin_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->siswarutin_id->FldCaption(), $this->siswarutin_id->ReqErrMsg));
+		if (!$this->siswa_id->FldIsDetailKey && !is_null($this->siswa_id->FormValue) && $this->siswa_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->siswa_id->FldCaption(), $this->siswa_id->ReqErrMsg));
 		}
-		if (!ew_CheckInteger($this->siswarutin_id->FormValue)) {
-			ew_AddMessage($gsFormError, $this->siswarutin_id->FldErrMsg());
+		if (!ew_CheckInteger($this->siswa_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->siswa_id->FldErrMsg());
+		}
+		if (!$this->nonrutin_id->FldIsDetailKey && !is_null($this->nonrutin_id->FormValue) && $this->nonrutin_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->nonrutin_id->FldCaption(), $this->nonrutin_id->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->nonrutin_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->nonrutin_id->FldErrMsg());
+		}
+		if (!$this->siswanonrutin_id->FldIsDetailKey && !is_null($this->siswanonrutin_id->FormValue) && $this->siswanonrutin_id->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->siswanonrutin_id->FldCaption(), $this->siswanonrutin_id->ReqErrMsg));
+		}
+		if (!ew_CheckInteger($this->siswanonrutin_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->siswanonrutin_id->FldErrMsg());
 		}
 		if (!ew_CheckNumber($this->Nilai->FormValue)) {
 			ew_AddMessage($gsFormError, $this->Nilai->FldErrMsg());
@@ -934,8 +904,14 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// siswarutin_id
-			$this->siswarutin_id->SetDbValueDef($rsnew, $this->siswarutin_id->CurrentValue, 0, $this->siswarutin_id->ReadOnly);
+			// siswa_id
+			$this->siswa_id->SetDbValueDef($rsnew, $this->siswa_id->CurrentValue, 0, $this->siswa_id->ReadOnly);
+
+			// nonrutin_id
+			$this->nonrutin_id->SetDbValueDef($rsnew, $this->nonrutin_id->CurrentValue, 0, $this->nonrutin_id->ReadOnly);
+
+			// siswanonrutin_id
+			$this->siswanonrutin_id->SetDbValueDef($rsnew, $this->siswanonrutin_id->CurrentValue, 0, $this->siswanonrutin_id->ReadOnly);
 
 			// Periode_Awal
 			$this->Periode_Awal->SetDbValueDef($rsnew, $this->Periode_Awal->CurrentValue, NULL, $this->Periode_Awal->ReadOnly);
@@ -1066,7 +1042,7 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t06_siswarutintemplist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t09_siswanonrutintemplist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -1076,12 +1052,24 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_nonrutin_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Jenis` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_nonrutin`";
+			$sWhereWrk = "{filter}";
+			$this->nonrutin_id->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` = {filter_value}', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->nonrutin_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		case "x_Periode_Awal":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Awal->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`Periode_Tahun_Bulan` = {filter_value}', "t0" => "200", "fn0" => "");
 			$sSqlWrk = "";
@@ -1092,10 +1080,10 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 			break;
 		case "x_Periode_Akhir":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_siswarutinbayar`";
+			$sSqlWrk = "SELECT `Periode_Tahun_Bulan` AS `LinkFld`, `Periode_Text` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t10_siswanonrutinbayar`";
 			$sWhereWrk = "";
 			$this->Periode_Akhir->LookupFilters = array();
-			$lookuptblfilter = "siswarutin_id = ".$this->siswarutin_id->CurrentValue;
+			$lookuptblfilter = "siswanonrutin_id = ".$this->siswanonrutin_id->CurrentValue;
 			ew_AddFilter($sWhereWrk, $lookuptblfilter);
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`Periode_Tahun_Bulan` = {filter_value}', "t0" => "200", "fn0" => "");
 			$sSqlWrk = "";
@@ -1112,6 +1100,19 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_nonrutin_id":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id`, `Jenis` AS `DispFld` FROM `t08_nonrutin`";
+			$sWhereWrk = "`Jenis` LIKE '{query_value}%'";
+			$this->nonrutin_id->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->nonrutin_id, $sWhereWrk); // Call Lookup selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " LIMIT " . EW_AUTO_SUGGEST_MAX_ENTRIES;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -1187,29 +1188,29 @@ class ct06_siswarutintemp_edit extends ct06_siswarutintemp {
 <?php
 
 // Create page object
-if (!isset($t06_siswarutintemp_edit)) $t06_siswarutintemp_edit = new ct06_siswarutintemp_edit();
+if (!isset($t09_siswanonrutintemp_edit)) $t09_siswanonrutintemp_edit = new ct09_siswanonrutintemp_edit();
 
 // Page init
-$t06_siswarutintemp_edit->Page_Init();
+$t09_siswanonrutintemp_edit->Page_Init();
 
 // Page main
-$t06_siswarutintemp_edit->Page_Main();
+$t09_siswanonrutintemp_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t06_siswarutintemp_edit->Page_Render();
+$t09_siswanonrutintemp_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ft06_siswarutintempedit = new ew_Form("ft06_siswarutintempedit", "edit");
+var CurrentForm = ft09_siswanonrutintempedit = new ew_Form("ft09_siswanonrutintempedit", "edit");
 
 // Validate form
-ft06_siswarutintempedit.Validate = function() {
+ft09_siswanonrutintempedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -1223,15 +1224,27 @@ ft06_siswarutintempedit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_siswarutin_id");
+			elm = this.GetElements("x" + infix + "_siswa_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_siswarutintemp->siswarutin_id->FldCaption(), $t06_siswarutintemp->siswarutin_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_siswarutin_id");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_siswanonrutintemp->siswa_id->FldCaption(), $t09_siswanonrutintemp->siswa_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_siswa_id");
 			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutintemp->siswarutin_id->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->siswa_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_nonrutin_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_siswanonrutintemp->nonrutin_id->FldCaption(), $t09_siswanonrutintemp->nonrutin_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_nonrutin_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->nonrutin_id->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_siswanonrutin_id");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_siswanonrutintemp->siswanonrutin_id->FldCaption(), $t09_siswanonrutintemp->siswanonrutin_id->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_siswanonrutin_id");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->siswanonrutin_id->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_Nilai");
 			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_siswarutintemp->Nilai->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->Nilai->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1250,7 +1263,7 @@ ft06_siswarutintempedit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft06_siswarutintempedit.Form_CustomValidate = 
+ft09_siswanonrutintempedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1259,16 +1272,15 @@ ft06_siswarutintempedit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft06_siswarutintempedit.ValidateRequired = true;
+ft09_siswanonrutintempedit.ValidateRequired = true;
 <?php } else { ?>
-ft06_siswarutintempedit.ValidateRequired = false; 
+ft09_siswanonrutintempedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft06_siswarutintempedit.Lists["x_siswa_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_NIS","x_Nama","x_kelas_id","x_sekolah_id"],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_siswa"};
-ft06_siswarutintempedit.Lists["x_rutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_rutin"};
-ft06_siswarutintempedit.Lists["x_Periode_Awal"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
-ft06_siswarutintempedit.Lists["x_Periode_Akhir"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_siswarutinbayar"};
+ft09_siswanonrutintempedit.Lists["x_nonrutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_nonrutin"};
+ft09_siswanonrutintempedit.Lists["x_Periode_Awal"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t10_siswanonrutinbayar"};
+ft09_siswanonrutintempedit.Lists["x_Periode_Akhir"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t10_siswanonrutinbayar"};
 
 // Form object for search
 </script>
@@ -1276,117 +1288,133 @@ ft06_siswarutintempedit.Lists["x_Periode_Akhir"] = {"LinkField":"x_Periode_Tahun
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php if (!$t06_siswarutintemp_edit->IsModal) { ?>
+<?php if (!$t09_siswanonrutintemp_edit->IsModal) { ?>
 <div class="ewToolbar">
 <?php $Breadcrumb->Render(); ?>
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t06_siswarutintemp_edit->ShowPageHeader(); ?>
+<?php $t09_siswanonrutintemp_edit->ShowPageHeader(); ?>
 <?php
-$t06_siswarutintemp_edit->ShowMessage();
+$t09_siswanonrutintemp_edit->ShowMessage();
 ?>
-<form name="ft06_siswarutintempedit" id="ft06_siswarutintempedit" class="<?php echo $t06_siswarutintemp_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t06_siswarutintemp_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t06_siswarutintemp_edit->Token ?>">
+<form name="ft09_siswanonrutintempedit" id="ft09_siswanonrutintempedit" class="<?php echo $t09_siswanonrutintemp_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t09_siswanonrutintemp_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t09_siswanonrutintemp_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t06_siswarutintemp">
+<input type="hidden" name="t" value="t09_siswanonrutintemp">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<?php if ($t06_siswarutintemp_edit->IsModal) { ?>
+<?php if ($t09_siswanonrutintemp_edit->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
-<?php if ($t06_siswarutintemp->getCurrentMasterTable() == "v01_siswa") { ?>
+<?php if ($t09_siswanonrutintemp->getCurrentMasterTable() == "v01_siswa") { ?>
 <input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="v01_siswa">
-<input type="hidden" name="fk_id" value="<?php echo $t06_siswarutintemp->siswa_id->getSessionValue() ?>">
+<input type="hidden" name="fk_id" value="<?php echo $t09_siswanonrutintemp->siswa_id->getSessionValue() ?>">
 <?php } ?>
 <div>
-<?php if ($t06_siswarutintemp->siswa_id->Visible) { // siswa_id ?>
+<?php if ($t09_siswanonrutintemp->siswa_id->Visible) { // siswa_id ?>
 	<div id="r_siswa_id" class="form-group">
-		<label id="elh_t06_siswarutintemp_siswa_id" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->siswa_id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->siswa_id->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_siswa_id">
-<span<?php echo $t06_siswarutintemp->siswa_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t06_siswarutintemp->siswa_id->EditValue ?></p></span>
+		<label id="elh_t09_siswanonrutintemp_siswa_id" for="x_siswa_id" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->siswa_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->siswa_id->CellAttributes() ?>>
+<?php if ($t09_siswanonrutintemp->siswa_id->getSessionValue() <> "") { ?>
+<span id="el_t09_siswanonrutintemp_siswa_id">
+<span<?php echo $t09_siswanonrutintemp->siswa_id->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t09_siswanonrutintemp->siswa_id->ViewValue ?></p></span>
 </span>
-<input type="hidden" data-table="t06_siswarutintemp" data-field="x_siswa_id" name="x_siswa_id" id="x_siswa_id" value="<?php echo ew_HtmlEncode($t06_siswarutintemp->siswa_id->CurrentValue) ?>">
-<?php echo $t06_siswarutintemp->siswa_id->CustomMsg ?></div></div>
+<input type="hidden" id="x_siswa_id" name="x_siswa_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswa_id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el_t09_siswanonrutintemp_siswa_id">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_siswa_id" name="x_siswa_id" id="x_siswa_id" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswa_id->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->siswa_id->EditValue ?>"<?php echo $t09_siswanonrutintemp->siswa_id->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php echo $t09_siswanonrutintemp->siswa_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_siswarutintemp->rutin_id->Visible) { // rutin_id ?>
-	<div id="r_rutin_id" class="form-group">
-		<label id="elh_t06_siswarutintemp_rutin_id" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->rutin_id->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->rutin_id->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_rutin_id">
-<span<?php echo $t06_siswarutintemp->rutin_id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t06_siswarutintemp->rutin_id->EditValue ?></p></span>
+<?php if ($t09_siswanonrutintemp->nonrutin_id->Visible) { // nonrutin_id ?>
+	<div id="r_nonrutin_id" class="form-group">
+		<label id="elh_t09_siswanonrutintemp_nonrutin_id" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->nonrutin_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->nonrutin_id->CellAttributes() ?>>
+<span id="el_t09_siswanonrutintemp_nonrutin_id">
+<?php
+$wrkonchange = trim(" " . @$t09_siswanonrutintemp->nonrutin_id->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t09_siswanonrutintemp->nonrutin_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_nonrutin_id" style="white-space: nowrap; z-index: 8970">
+	<input type="text" name="sv_x_nonrutin_id" id="sv_x_nonrutin_id" value="<?php echo $t09_siswanonrutintemp->nonrutin_id->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->nonrutin_id->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->nonrutin_id->getPlaceHolder()) ?>"<?php echo $t09_siswanonrutintemp->nonrutin_id->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t06_siswarutintemp" data-field="x_rutin_id" name="x_rutin_id" id="x_rutin_id" value="<?php echo ew_HtmlEncode($t06_siswarutintemp->rutin_id->CurrentValue) ?>">
-<?php echo $t06_siswarutintemp->rutin_id->CustomMsg ?></div></div>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_nonrutin_id" data-value-separator="<?php echo $t09_siswanonrutintemp->nonrutin_id->DisplayValueSeparatorAttribute() ?>" name="x_nonrutin_id" id="x_nonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->nonrutin_id->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<input type="hidden" name="q_x_nonrutin_id" id="q_x_nonrutin_id" value="<?php echo $t09_siswanonrutintemp->nonrutin_id->LookupFilterQuery(true) ?>">
+<script type="text/javascript">
+ft09_siswanonrutintempedit.CreateAutoSuggest({"id":"x_nonrutin_id","forceSelect":false});
+</script>
+</span>
+<?php echo $t09_siswanonrutintemp->nonrutin_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_siswarutintemp->siswarutin_id->Visible) { // siswarutin_id ?>
-	<div id="r_siswarutin_id" class="form-group">
-		<label id="elh_t06_siswarutintemp_siswarutin_id" for="x_siswarutin_id" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->siswarutin_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->siswarutin_id->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_siswarutin_id">
-<input type="text" data-table="t06_siswarutintemp" data-field="x_siswarutin_id" name="x_siswarutin_id" id="x_siswarutin_id" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutintemp->siswarutin_id->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutintemp->siswarutin_id->EditValue ?>"<?php echo $t06_siswarutintemp->siswarutin_id->EditAttributes() ?>>
+<?php if ($t09_siswanonrutintemp->siswanonrutin_id->Visible) { // siswanonrutin_id ?>
+	<div id="r_siswanonrutin_id" class="form-group">
+		<label id="elh_t09_siswanonrutintemp_siswanonrutin_id" for="x_siswanonrutin_id" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->siswanonrutin_id->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->siswanonrutin_id->CellAttributes() ?>>
+<span id="el_t09_siswanonrutintemp_siswanonrutin_id">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x_siswanonrutin_id" id="x_siswanonrutin_id" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditValue ?>"<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditAttributes() ?>>
 </span>
-<?php echo $t06_siswarutintemp->siswarutin_id->CustomMsg ?></div></div>
+<?php echo $t09_siswanonrutintemp->siswanonrutin_id->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_siswarutintemp->Periode_Awal->Visible) { // Periode_Awal ?>
+<?php if ($t09_siswanonrutintemp->Periode_Awal->Visible) { // Periode_Awal ?>
 	<div id="r_Periode_Awal" class="form-group">
-		<label id="elh_t06_siswarutintemp_Periode_Awal" for="x_Periode_Awal" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->Periode_Awal->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->Periode_Awal->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_Periode_Awal">
-<select data-table="t06_siswarutintemp" data-field="x_Periode_Awal" data-value-separator="<?php echo $t06_siswarutintemp->Periode_Awal->DisplayValueSeparatorAttribute() ?>" id="x_Periode_Awal" name="x_Periode_Awal"<?php echo $t06_siswarutintemp->Periode_Awal->EditAttributes() ?>>
-<?php echo $t06_siswarutintemp->Periode_Awal->SelectOptionListHtml("x_Periode_Awal") ?>
+		<label id="elh_t09_siswanonrutintemp_Periode_Awal" for="x_Periode_Awal" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->Periode_Awal->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->Periode_Awal->CellAttributes() ?>>
+<span id="el_t09_siswanonrutintemp_Periode_Awal">
+<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Awal->DisplayValueSeparatorAttribute() ?>" id="x_Periode_Awal" name="x_Periode_Awal"<?php echo $t09_siswanonrutintemp->Periode_Awal->EditAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Periode_Awal->SelectOptionListHtml("x_Periode_Awal") ?>
 </select>
-<input type="hidden" name="s_x_Periode_Awal" id="s_x_Periode_Awal" value="<?php echo $t06_siswarutintemp->Periode_Awal->LookupFilterQuery() ?>">
+<input type="hidden" name="s_x_Periode_Awal" id="s_x_Periode_Awal" value="<?php echo $t09_siswanonrutintemp->Periode_Awal->LookupFilterQuery() ?>">
 </span>
-<?php echo $t06_siswarutintemp->Periode_Awal->CustomMsg ?></div></div>
+<?php echo $t09_siswanonrutintemp->Periode_Awal->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_siswarutintemp->Periode_Akhir->Visible) { // Periode_Akhir ?>
+<?php if ($t09_siswanonrutintemp->Periode_Akhir->Visible) { // Periode_Akhir ?>
 	<div id="r_Periode_Akhir" class="form-group">
-		<label id="elh_t06_siswarutintemp_Periode_Akhir" for="x_Periode_Akhir" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->Periode_Akhir->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->Periode_Akhir->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_Periode_Akhir">
-<select data-table="t06_siswarutintemp" data-field="x_Periode_Akhir" data-value-separator="<?php echo $t06_siswarutintemp->Periode_Akhir->DisplayValueSeparatorAttribute() ?>" id="x_Periode_Akhir" name="x_Periode_Akhir"<?php echo $t06_siswarutintemp->Periode_Akhir->EditAttributes() ?>>
-<?php echo $t06_siswarutintemp->Periode_Akhir->SelectOptionListHtml("x_Periode_Akhir") ?>
+		<label id="elh_t09_siswanonrutintemp_Periode_Akhir" for="x_Periode_Akhir" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->Periode_Akhir->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->Periode_Akhir->CellAttributes() ?>>
+<span id="el_t09_siswanonrutintemp_Periode_Akhir">
+<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Akhir->DisplayValueSeparatorAttribute() ?>" id="x_Periode_Akhir" name="x_Periode_Akhir"<?php echo $t09_siswanonrutintemp->Periode_Akhir->EditAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Periode_Akhir->SelectOptionListHtml("x_Periode_Akhir") ?>
 </select>
-<input type="hidden" name="s_x_Periode_Akhir" id="s_x_Periode_Akhir" value="<?php echo $t06_siswarutintemp->Periode_Akhir->LookupFilterQuery() ?>">
+<input type="hidden" name="s_x_Periode_Akhir" id="s_x_Periode_Akhir" value="<?php echo $t09_siswanonrutintemp->Periode_Akhir->LookupFilterQuery() ?>">
 </span>
-<?php echo $t06_siswarutintemp->Periode_Akhir->CustomMsg ?></div></div>
+<?php echo $t09_siswanonrutintemp->Periode_Akhir->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_siswarutintemp->Nilai->Visible) { // Nilai ?>
+<?php if ($t09_siswanonrutintemp->Nilai->Visible) { // Nilai ?>
 	<div id="r_Nilai" class="form-group">
-		<label id="elh_t06_siswarutintemp_Nilai" for="x_Nilai" class="col-sm-2 control-label ewLabel"><?php echo $t06_siswarutintemp->Nilai->FldCaption() ?></label>
-		<div class="col-sm-10"><div<?php echo $t06_siswarutintemp->Nilai->CellAttributes() ?>>
-<span id="el_t06_siswarutintemp_Nilai">
-<input type="text" data-table="t06_siswarutintemp" data-field="x_Nilai" name="x_Nilai" id="x_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t06_siswarutintemp->Nilai->getPlaceHolder()) ?>" value="<?php echo $t06_siswarutintemp->Nilai->EditValue ?>"<?php echo $t06_siswarutintemp->Nilai->EditAttributes() ?>>
+		<label id="elh_t09_siswanonrutintemp_Nilai" for="x_Nilai" class="col-sm-2 control-label ewLabel"><?php echo $t09_siswanonrutintemp->Nilai->FldCaption() ?></label>
+		<div class="col-sm-10"><div<?php echo $t09_siswanonrutintemp->Nilai->CellAttributes() ?>>
+<span id="el_t09_siswanonrutintemp_Nilai">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="x_Nilai" id="x_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Nilai->EditValue ?>"<?php echo $t09_siswanonrutintemp->Nilai->EditAttributes() ?>>
 </span>
-<?php echo $t06_siswarutintemp->Nilai->CustomMsg ?></div></div>
+<?php echo $t09_siswanonrutintemp->Nilai->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div>
-<input type="hidden" data-table="t06_siswarutintemp" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t06_siswarutintemp->id->CurrentValue) ?>">
-<?php if (!$t06_siswarutintemp_edit->IsModal) { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->id->CurrentValue) ?>">
+<?php if (!$t09_siswanonrutintemp_edit->IsModal) { ?>
 <div class="form-group">
 	<div class="col-sm-offset-2 col-sm-10">
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t06_siswarutintemp_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t09_siswanonrutintemp_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div>
 </div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft06_siswarutintempedit.Init();
+ft09_siswanonrutintempedit.Init();
 </script>
 <?php
-$t06_siswarutintemp_edit->ShowPageFooter();
+$t09_siswanonrutintemp_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1398,5 +1426,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t06_siswarutintemp_edit->Page_Terminate();
+$t09_siswanonrutintemp_edit->Page_Terminate();
 ?>
