@@ -1187,6 +1187,10 @@ class ct09_siswanonrutintemp extends cTable {
 		// Enter your code here
 		// To cancel, set return value to FALSE
 
+		$_SESSION["nonrutin_Periode_Awal"] = $rsnew["Periode_Awal"];
+		$_SESSION["nonrutin_Periode_Akhir"] = $rsnew["Periode_Akhir"];
+		$rsnew["Periode_Awal"] = null;
+		$rsnew["Periode_Akhir"] = null;
 		return TRUE;
 	}
 
@@ -1194,6 +1198,7 @@ class ct09_siswanonrutintemp extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		f_update_bayar_nonrutin($rsold, $rsnew);
 	}
 
 	// Row Update Conflict event

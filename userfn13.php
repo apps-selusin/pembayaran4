@@ -19,12 +19,42 @@ function Page_Unloaded() {
 	//echo "Page Unloaded";
 }
 
+function f_update_bayar_nonrutin($rsold, $rsnew) {
+
+	// update pembayaran ke tabel t07_siswarutinbayar
+	$awal  = $_SESSION["nonrutin_Periode_Awal"]; // 201807
+	$akhir = $_SESSION["nonrutin_Periode_Akhir"]; // 201906
+	while ($awal <= $akhir) {
+
+		// proses update data
+		$q = "
+			update
+				t10_siswanonrutinbayar
+			set
+				Tanggal_Bayar = '".date("Y-m-d")."',
+				Nilai_Bayar = Nilai
+			where
+				Periode_Tahun_Bulan = '".$awal."'
+				and siswanonrutin_id = ".$rsold["siswanonrutin_id"]."
+			";
+		Conn()->Execute($q);
+
+		// proses pendefinisian variabel $awal
+		$awal_tahun = substr($awal, 0, 4);
+		$awal_bulan = substr("00".(substr($awal, -2) + 1), -2);
+
+		// jika $awal_bulan = 13 maka tahun + 1 dan bulan jadi 1
+		if ($awal_bulan == 13) {
+			$awal_tahun = $awal_tahun + 1;
+			$awal_bulan = "01";
+		}
+		$awal = $awal_tahun.$awal_bulan;
+	}
+}
+
 function f_update_bayar_rutin($rsold, $rsnew) {
 
 	// update pembayaran ke tabel t07_siswarutinbayar
-	//$awal  = $rsnew["Periode_Awal"]; // 201807
-	//$akhir = $rsnew["Periode_Akhir"]; // 201906
-
 	$awal  = $_SESSION["rutin_Periode_Awal"]; // 201807
 	$akhir = $_SESSION["rutin_Periode_Akhir"]; // 201906
 	while ($awal <= $akhir) {
@@ -49,9 +79,9 @@ function f_update_bayar_rutin($rsold, $rsnew) {
 		// jika $awal_bulan = 13 maka tahun + 1 dan bulan jadi 1
 		if ($awal_bulan == 13) {
 			$awal_tahun = $awal_tahun + 1;
-			$awal_bulan = "01"; //$awal = $awal_tahun.$awal_bulan; echo $awal; exit;
+			$awal_bulan = "01";
 		}
-		$awal = $awal_tahun.$awal_bulan; //echo $awal;
+		$awal = $awal_tahun.$awal_bulan;
 	}
 }
 
