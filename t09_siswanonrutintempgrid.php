@@ -46,9 +46,12 @@ ft09_siswanonrutintempgrid.Validate = function() {
 			elm = this.GetElements("x" + infix + "_nonrutin_id");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_siswanonrutintemp->nonrutin_id->FldCaption(), $t09_siswanonrutintemp->nonrutin_id->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Nilai");
+			elm = this.GetElements("x" + infix + "_Bayar");
 			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->Nilai->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->Bayar->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_Sisa");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_siswanonrutintemp->Sisa->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -63,10 +66,10 @@ ft09_siswanonrutintempgrid.EmptyRow = function(infix) {
 	var fobj = this.Form;
 	if (ew_ValueChanged(fobj, infix, "siswa_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "nonrutin_id", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Periode_Awal", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Periode_Akhir", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "siswanonrutin_id", false)) return false;
 	if (ew_ValueChanged(fobj, infix, "Nilai", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Nilai_Temp", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "Bayar", false)) return false;
+	if (ew_ValueChanged(fobj, infix, "Sisa", false)) return false;
 	return true;
 }
 
@@ -87,8 +90,6 @@ ft09_siswanonrutintempgrid.ValidateRequired = false;
 
 // Dynamic selection lists
 ft09_siswanonrutintempgrid.Lists["x_nonrutin_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Jenis","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_nonrutin"};
-ft09_siswanonrutintempgrid.Lists["x_Periode_Awal"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t10_siswanonrutinbayar"};
-ft09_siswanonrutintempgrid.Lists["x_Periode_Akhir"] = {"LinkField":"x_Periode_Tahun_Bulan","Ajax":true,"AutoFill":false,"DisplayFields":["x_Periode_Text","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t10_siswanonrutinbayar"};
 
 // Form object for search
 </script>
@@ -178,21 +179,12 @@ $t09_siswanonrutintemp_grid->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($t09_siswanonrutintemp->Periode_Awal->Visible) { // Periode_Awal ?>
-	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Periode_Awal) == "") { ?>
-		<th data-name="Periode_Awal"><div id="elh_t09_siswanonrutintemp_Periode_Awal" class="t09_siswanonrutintemp_Periode_Awal"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Periode_Awal->FldCaption() ?></div></div></th>
+<?php if ($t09_siswanonrutintemp->siswanonrutin_id->Visible) { // siswanonrutin_id ?>
+	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->siswanonrutin_id) == "") { ?>
+		<th data-name="siswanonrutin_id"><div id="elh_t09_siswanonrutintemp_siswanonrutin_id" class="t09_siswanonrutintemp_siswanonrutin_id"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->siswanonrutin_id->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="Periode_Awal"><div><div id="elh_t09_siswanonrutintemp_Periode_Awal" class="t09_siswanonrutintemp_Periode_Awal">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Periode_Awal->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Periode_Awal->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Periode_Awal->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t09_siswanonrutintemp->Periode_Akhir->Visible) { // Periode_Akhir ?>
-	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Periode_Akhir) == "") { ?>
-		<th data-name="Periode_Akhir"><div id="elh_t09_siswanonrutintemp_Periode_Akhir" class="t09_siswanonrutintemp_Periode_Akhir"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Periode_Akhir->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Periode_Akhir"><div><div id="elh_t09_siswanonrutintemp_Periode_Akhir" class="t09_siswanonrutintemp_Periode_Akhir">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Periode_Akhir->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Periode_Akhir->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Periode_Akhir->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="siswanonrutin_id"><div><div id="elh_t09_siswanonrutintemp_siswanonrutin_id" class="t09_siswanonrutintemp_siswanonrutin_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->siswanonrutin_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->siswanonrutin_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->siswanonrutin_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -205,12 +197,21 @@ $t09_siswanonrutintemp_grid->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
-	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Nilai_Temp) == "") { ?>
-		<th data-name="Nilai_Temp"><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></div></div></th>
+<?php if ($t09_siswanonrutintemp->Bayar->Visible) { // Bayar ?>
+	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Bayar) == "") { ?>
+		<th data-name="Bayar"><div id="elh_t09_siswanonrutintemp_Bayar" class="t09_siswanonrutintemp_Bayar"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Bayar->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="Nilai_Temp"><div><div id="elh_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Nilai_Temp->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Nilai_Temp->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Bayar"><div><div id="elh_t09_siswanonrutintemp_Bayar" class="t09_siswanonrutintemp_Bayar">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Bayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Bayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Bayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t09_siswanonrutintemp->Sisa->Visible) { // Sisa ?>
+	<?php if ($t09_siswanonrutintemp->SortUrl($t09_siswanonrutintemp->Sisa) == "") { ?>
+		<th data-name="Sisa"><div id="elh_t09_siswanonrutintemp_Sisa" class="t09_siswanonrutintemp_Sisa"><div class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Sisa->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Sisa"><div><div id="elh_t09_siswanonrutintemp_Sisa" class="t09_siswanonrutintemp_Sisa">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_siswanonrutintemp->Sisa->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_siswanonrutintemp->Sisa->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_siswanonrutintemp->Sisa->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -410,70 +411,30 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <?php } ?>
 </td>
 	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Periode_Awal->Visible) { // Periode_Awal ?>
-		<td data-name="Periode_Awal"<?php echo $t09_siswanonrutintemp->Periode_Awal->CellAttributes() ?>>
+	<?php if ($t09_siswanonrutintemp->siswanonrutin_id->Visible) { // siswanonrutin_id ?>
+		<td data-name="siswanonrutin_id"<?php echo $t09_siswanonrutintemp->siswanonrutin_id->CellAttributes() ?>>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Awal" class="form-group t09_siswanonrutintemp_Periode_Awal">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Awal->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal"<?php echo $t09_siswanonrutintemp->Periode_Awal->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Awal->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo $t09_siswanonrutintemp->Periode_Awal->LookupFilterQuery() ?>">
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_siswanonrutin_id" class="form-group t09_siswanonrutintemp_siswanonrutin_id">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditValue ?>"<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->OldValue) ?>">
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Awal" class="form-group t09_siswanonrutintemp_Periode_Awal">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Awal->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal"<?php echo $t09_siswanonrutintemp->Periode_Awal->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Awal->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo $t09_siswanonrutintemp->Periode_Awal->LookupFilterQuery() ?>">
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_siswanonrutin_id" class="form-group t09_siswanonrutintemp_siswanonrutin_id">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->CurrentValue) ?>">
 </span>
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Awal" class="t09_siswanonrutintemp_Periode_Awal">
-<span<?php echo $t09_siswanonrutintemp->Periode_Awal->ViewAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Awal->ListViewValue() ?></span>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_siswanonrutin_id" class="t09_siswanonrutintemp_siswanonrutin_id">
+<span<?php echo $t09_siswanonrutintemp->siswanonrutin_id->ViewAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->siswanonrutin_id->ListViewValue() ?></span>
 </span>
 <?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->OldValue) ?>">
 <?php } else { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Periode_Akhir->Visible) { // Periode_Akhir ?>
-		<td data-name="Periode_Akhir"<?php echo $t09_siswanonrutintemp->Periode_Akhir->CellAttributes() ?>>
-<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Akhir" class="form-group t09_siswanonrutintemp_Periode_Akhir">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Akhir->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir"<?php echo $t09_siswanonrutintemp->Periode_Akhir->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Akhir->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo $t09_siswanonrutintemp->Periode_Akhir->LookupFilterQuery() ?>">
-</span>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->OldValue) ?>">
-<?php } ?>
-<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Akhir" class="form-group t09_siswanonrutintemp_Periode_Akhir">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Akhir->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir"<?php echo $t09_siswanonrutintemp->Periode_Akhir->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Akhir->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo $t09_siswanonrutintemp->Periode_Akhir->LookupFilterQuery() ?>">
-</span>
-<?php } ?>
-<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Periode_Akhir" class="t09_siswanonrutintemp_Periode_Akhir">
-<span<?php echo $t09_siswanonrutintemp->Periode_Akhir->ViewAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Akhir->ListViewValue() ?></span>
-</span>
-<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->OldValue) ?>">
-<?php } else { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -488,8 +449,10 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai" class="form-group t09_siswanonrutintemp_Nilai">
-<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Nilai->EditValue ?>"<?php echo $t09_siswanonrutintemp->Nilai->EditAttributes() ?>>
+<span<?php echo $t09_siswanonrutintemp->Nilai->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t09_siswanonrutintemp->Nilai->EditValue ?></p></span>
 </span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->CurrentValue) ?>">
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai" class="t09_siswanonrutintemp_Nilai">
@@ -506,30 +469,58 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <?php } ?>
 </td>
 	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
-		<td data-name="Nilai_Temp"<?php echo $t09_siswanonrutintemp->Nilai_Temp->CellAttributes() ?>>
+	<?php if ($t09_siswanonrutintemp->Bayar->Visible) { // Bayar ?>
+		<td data-name="Bayar"<?php echo $t09_siswanonrutintemp->Bayar->CellAttributes() ?>>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Bayar" class="form-group t09_siswanonrutintemp_Bayar">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Bayar->EditValue ?>"<?php echo $t09_siswanonrutintemp->Bayar->EditAttributes() ?>>
 </span>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->OldValue) ?>">
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Bayar" class="form-group t09_siswanonrutintemp_Bayar">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Bayar->EditValue ?>"<?php echo $t09_siswanonrutintemp->Bayar->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
-<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Nilai_Temp" class="t09_siswanonrutintemp_Nilai_Temp">
-<span<?php echo $t09_siswanonrutintemp->Nilai_Temp->ViewAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Nilai_Temp->ListViewValue() ?></span>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Bayar" class="t09_siswanonrutintemp_Bayar">
+<span<?php echo $t09_siswanonrutintemp->Bayar->ViewAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Bayar->ListViewValue() ?></span>
 </span>
 <?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->OldValue) ?>">
 <?php } else { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Sisa->Visible) { // Sisa ?>
+		<td data-name="Sisa"<?php echo $t09_siswanonrutintemp->Sisa->CellAttributes() ?>>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Sisa" class="form-group t09_siswanonrutintemp_Sisa">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Sisa->EditValue ?>"<?php echo $t09_siswanonrutintemp->Sisa->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->OldValue) ?>">
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Sisa" class="form-group t09_siswanonrutintemp_Sisa">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Sisa->EditValue ?>"<?php echo $t09_siswanonrutintemp->Sisa->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t09_siswanonrutintemp->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t09_siswanonrutintemp_grid->RowCnt ?>_t09_siswanonrutintemp_Sisa" class="t09_siswanonrutintemp_Sisa">
+<span<?php echo $t09_siswanonrutintemp->Sisa->ViewAttributes() ?>>
+<?php echo $t09_siswanonrutintemp->Sisa->ListViewValue() ?></span>
+</span>
+<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->OldValue) ?>">
+<?php } else { ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="ft09_siswanonrutintempgrid$x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="ft09_siswanonrutintempgrid$o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -628,42 +619,16 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_nonrutin_id" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_nonrutin_id" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_nonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->nonrutin_id->OldValue) ?>">
 </td>
 	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Periode_Awal->Visible) { // Periode_Awal ?>
-		<td data-name="Periode_Awal">
+	<?php if ($t09_siswanonrutintemp->siswanonrutin_id->Visible) { // siswanonrutin_id ?>
+		<td data-name="siswanonrutin_id">
 <?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<span id="el$rowindex$_t09_siswanonrutintemp_Periode_Awal" class="form-group t09_siswanonrutintemp_Periode_Awal">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Awal->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal"<?php echo $t09_siswanonrutintemp->Periode_Awal->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Awal->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo $t09_siswanonrutintemp->Periode_Awal->LookupFilterQuery() ?>">
+<span id="el$rowindex$_t09_siswanonrutintemp_siswanonrutin_id" class="form-group t09_siswanonrutintemp_siswanonrutin_id">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" size="30" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditValue ?>"<?php echo $t09_siswanonrutintemp->siswanonrutin_id->EditAttributes() ?>>
 </span>
 <?php } else { ?>
-<span id="el$rowindex$_t09_siswanonrutintemp_Periode_Awal" class="form-group t09_siswanonrutintemp_Periode_Awal">
-<span<?php echo $t09_siswanonrutintemp->Periode_Awal->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t09_siswanonrutintemp->Periode_Awal->ViewValue ?></p></span>
-</span>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->FormValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->FormValue) ?>">
 <?php } ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Awal" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Awal" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Awal->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Periode_Akhir->Visible) { // Periode_Akhir ?>
-		<td data-name="Periode_Akhir">
-<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<span id="el$rowindex$_t09_siswanonrutintemp_Periode_Akhir" class="form-group t09_siswanonrutintemp_Periode_Akhir">
-<select data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" data-value-separator="<?php echo $t09_siswanonrutintemp->Periode_Akhir->DisplayValueSeparatorAttribute() ?>" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir"<?php echo $t09_siswanonrutintemp->Periode_Akhir->EditAttributes() ?>>
-<?php echo $t09_siswanonrutintemp->Periode_Akhir->SelectOptionListHtml("x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir") ?>
-</select>
-<input type="hidden" name="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="s_x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo $t09_siswanonrutintemp->Periode_Akhir->LookupFilterQuery() ?>">
-</span>
-<?php } else { ?>
-<span id="el$rowindex$_t09_siswanonrutintemp_Periode_Akhir" class="form-group t09_siswanonrutintemp_Periode_Akhir">
-<span<?php echo $t09_siswanonrutintemp->Periode_Akhir->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t09_siswanonrutintemp->Periode_Akhir->ViewValue ?></p></span>
-</span>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Periode_Akhir" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Periode_Akhir" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Periode_Akhir->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_siswanonrutin_id" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_siswanonrutin_id" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->siswanonrutin_id->OldValue) ?>">
 </td>
 	<?php } ?>
 	<?php if ($t09_siswanonrutintemp->Nilai->Visible) { // Nilai ?>
@@ -682,16 +647,36 @@ ft09_siswanonrutintempgrid.CreateAutoSuggest({"id":"x<?php echo $t09_siswanonrut
 <input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai->OldValue) ?>">
 </td>
 	<?php } ?>
-	<?php if ($t09_siswanonrutintemp->Nilai_Temp->Visible) { // Nilai_Temp ?>
-		<td data-name="Nilai_Temp">
+	<?php if ($t09_siswanonrutintemp->Bayar->Visible) { // Bayar ?>
+		<td data-name="Bayar">
 <?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
-<span id="el$rowindex$_t09_siswanonrutintemp_Nilai_Temp" class="form-group t09_siswanonrutintemp_Nilai_Temp">
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->CurrentValue) ?>">
+<span id="el$rowindex$_t09_siswanonrutintemp_Bayar" class="form-group t09_siswanonrutintemp_Bayar">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Bayar->EditValue ?>"<?php echo $t09_siswanonrutintemp->Bayar->EditAttributes() ?>>
 </span>
 <?php } else { ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->FormValue) ?>">
+<span id="el$rowindex$_t09_siswanonrutintemp_Bayar" class="form-group t09_siswanonrutintemp_Bayar">
+<span<?php echo $t09_siswanonrutintemp->Bayar->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t09_siswanonrutintemp->Bayar->ViewValue ?></p></span>
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->FormValue) ?>">
 <?php } ?>
-<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Nilai_Temp" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Nilai_Temp" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Nilai_Temp->OldValue) ?>">
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Bayar" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Bayar" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Bayar->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_siswanonrutintemp->Sisa->Visible) { // Sisa ?>
+		<td data-name="Sisa">
+<?php if ($t09_siswanonrutintemp->CurrentAction <> "F") { ?>
+<span id="el$rowindex$_t09_siswanonrutintemp_Sisa" class="form-group t09_siswanonrutintemp_Sisa">
+<input type="text" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" size="10" placeholder="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->getPlaceHolder()) ?>" value="<?php echo $t09_siswanonrutintemp->Sisa->EditValue ?>"<?php echo $t09_siswanonrutintemp->Sisa->EditAttributes() ?>>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_t09_siswanonrutintemp_Sisa" class="form-group t09_siswanonrutintemp_Sisa">
+<span<?php echo $t09_siswanonrutintemp->Sisa->ViewAttributes() ?>>
+<p class="form-control-static"><?php echo $t09_siswanonrutintemp->Sisa->ViewValue ?></p></span>
+</span>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="x<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="t09_siswanonrutintemp" data-field="x_Sisa" name="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" id="o<?php echo $t09_siswanonrutintemp_grid->RowIndex ?>_Sisa" value="<?php echo ew_HtmlEncode($t09_siswanonrutintemp->Sisa->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php

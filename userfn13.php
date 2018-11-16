@@ -23,36 +23,28 @@ function Page_Unloaded() {
 function f_update_bayar_nonrutin($rsold, $rsnew) {
 
 // -----------------------------------------------
-	// update pembayaran ke tabel t07_siswarutinbayar
+		// proses insert data pembayaran
 
-	$awal  = $_SESSION["nonrutin_Periode_Awal"]; // 201807
-	$akhir = $_SESSION["nonrutin_Periode_Akhir"]; // 201906
-	while ($awal <= $akhir) {
-
-		// proses update data
 		$q = "
-			update
+			insert into
 				t10_siswanonrutinbayar
-			set
-				Tanggal_Bayar = '".date("Y-m-d")."',
-				Nilai_Bayar = Nilai
-			where
-				Periode_Tahun_Bulan = '".$awal."'
-				and siswanonrutin_id = ".$rsold["siswanonrutin_id"]."
+				(
+				siswanonrutin_id,
+				Nilai,
+				Tanggal_Bayar,
+				Bayar,
+				Sisa
+				)
+			values
+				(
+				".$rsold["id"].",
+				".$_SESSION["nonrutin_Nilai"].",
+				'".date("Y-m-d")."',
+				".$_SESSION["nonrutin_Bayar"].",
+				".$_SESSION["nonrutin_Sisa"]."
+				)
 			";
 		Conn()->Execute($q);
-
-		// proses pendefinisian variabel $awal
-		$awal_tahun = substr($awal, 0, 4);
-		$awal_bulan = substr("00".(substr($awal, -2) + 1), -2);
-
-		// jika $awal_bulan = 13 maka tahun + 1 dan bulan jadi 1
-		if ($awal_bulan == 13) {
-			$awal_tahun = $awal_tahun + 1;
-			$awal_bulan = "01";
-		}
-		$awal = $awal_tahun.$awal_bulan;
-	}
 }
 
 // --------------------------------------------
@@ -95,6 +87,8 @@ function f_update_bayar_rutin($rsold, $rsnew) {
 function f_buat_rincian_pembayaran_non_rutin($rsold, $rsnew) {
 
 // -----------------------------------------------------------
+	/*
+
 	// ambil data tahun ajaran dan diloop selama satu periode tahun ajaran
 	// mulai awal tahun ajaran hingga akhir tahun ajaran
 
@@ -145,6 +139,7 @@ function f_buat_rincian_pembayaran_non_rutin($rsold, $rsnew) {
 		Conn()->Execute($q);
 		$awal = $bulan.$tahun;
 	}
+	*/
 
 	// simpan data di tabel t09_siswanonrutintemp
 	$q = "insert into
@@ -152,11 +147,13 @@ function f_buat_rincian_pembayaran_non_rutin($rsold, $rsnew) {
 			siswa_id,
 			nonrutin_id,
 			siswanonrutin_id,
-			Nilai_Temp
+			Nilai,
+			Sisa
 		) values (
 		".$rsnew["siswa_id"].",
 		".$rsnew["nonrutin_id"].",
 		".$rsnew["id"].",
+		".$rsnew["Nilai"].",
 		".$rsnew["Nilai"]."
 		)
 		";

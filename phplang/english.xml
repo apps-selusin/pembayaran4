@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/11/15" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/11/16" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -818,17 +818,16 @@
       <field id="nonrutin_id">
         <phrase id="fldcaption" value="Jenis" />
       </field>
-      <field id="periode_awal">
-        <phrase id="fldcaption" value="Periode Awal" />
-      </field>
-      <field id="periode_akhir">
-        <phrase id="fldcaption" value="Periode Akhir" />
-      </field>
+      <field id="siswanonrutin_id" />
       <field id="nilai">
         <phrase id="fldcaption" value="Nilai" />
       </field>
-      <field id="siswanonrutin_id" />
-      <field id="nilai_temp" />
+      <field id="bayar">
+        <phrase id="fldcaption" value="Bayar" />
+      </field>
+      <field id="sisa">
+        <phrase id="fldcaption" value="Sisa" />
+      </field>
     </table>
     <table id="t10_siswanonrutinbayar">
       <phrase id="tblcaption" value="Rincian Pembayaran Non-Rutin" />
@@ -838,26 +837,17 @@
       <field id="siswanonrutin_id">
         <phrase id="fldcaption" value="siswanonrutin id" />
       </field>
-      <field id="bulan">
-        <phrase id="fldcaption" value="Bulan" />
-      </field>
-      <field id="tahun">
-        <phrase id="fldcaption" value="Tahun" />
-      </field>
       <field id="nilai">
         <phrase id="fldcaption" value="Nilai" />
       </field>
       <field id="tanggal_bayar">
         <phrase id="fldcaption" value="Tanggal Bayar" />
       </field>
-      <field id="nilai_bayar">
-        <phrase id="fldcaption" value="Nilai Bayar" />
+      <field id="bayar">
+        <phrase id="fldcaption" value="Bayar" />
       </field>
-      <field id="periode_tahun_bulan">
-        <phrase id="fldcaption" value="Periode Tahun Bulan" />
-      </field>
-      <field id="periode_text">
-        <phrase id="fldcaption" value="Periode Text" />
+      <field id="sisa">
+        <phrase id="fldcaption" value="Sisa" />
       </field>
     </table>
     <table id="t99_audittrail">

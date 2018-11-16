@@ -80,8 +80,8 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 		}
 	);
 
-	// Table 't09_siswanonrutintemp' Field 'Periode_Awal, Periode_Akhir'
-	$('[data-table=t09_siswanonrutintemp][data-field=x_Periode_Awal], [data-table=t09_siswanonrutintemp][data-field=x_Periode_Akhir]').on(
+	// Table 't09_siswanonrutintemp' Field 'Bayar'
+	$('[data-table=t09_siswanonrutintemp][data-field=x_Bayar]').on(
 		{ // keys = event types, values = handler functions
 			"change keyup": function(e) {
 				var $row = $(this).fields();
@@ -92,13 +92,16 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt13.js");
 				//alert($row["siswa_id"].val());
 				//alert("siswa_id: <?php echo $_SESSION['siswa_id']?>");
 				//alert("rutin_id: "+$row["rutin_id"].val());
+				//var periode_awal = $row["Periode_Awal"].val();
+				//var periode_akhir = $row["Periode_Akhir"].val();
+				//var nilai = $row["Nilai_Temp"].val();
 
-				var periode_awal = $row["Periode_Awal"].val();
-				var periode_akhir = $row["Periode_Akhir"].val();
-				var nilai = $row["Nilai_Temp"].val();
+				var nilai = parseFloat($row["Nilai"].val());
+				var bayar = parseFloat($row["Bayar"].val());
+				var sisa = nilai - bayar;
 
 				//f_hitung_nilai_rutin(periode_awal, periode_akhir, nilai);
-				$row["Nilai"].val(f_hitung_nilai_rutin(periode_awal, periode_akhir, nilai));
+				$row["Sisa"].val(sisa);
 			}
 		}
 	);

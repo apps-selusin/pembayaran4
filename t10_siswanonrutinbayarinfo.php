@@ -15,13 +15,10 @@ class ct10_siswanonrutinbayar extends cTable {
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
 	var $siswanonrutin_id;
-	var $Bulan;
-	var $Tahun;
 	var $Nilai;
 	var $Tanggal_Bayar;
-	var $Nilai_Bayar;
-	var $Periode_Tahun_Bulan;
-	var $Periode_Text;
+	var $Bayar;
+	var $Sisa;
 
 	//
 	// Table class constructor
@@ -65,18 +62,6 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->siswanonrutin_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['siswanonrutin_id'] = &$this->siswanonrutin_id;
 
-		// Bulan
-		$this->Bulan = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Bulan', 'Bulan', '`Bulan`', '`Bulan`', 16, -1, FALSE, '`Bulan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Bulan->Sortable = TRUE; // Allow sort
-		$this->Bulan->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['Bulan'] = &$this->Bulan;
-
-		// Tahun
-		$this->Tahun = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Tahun', 'Tahun', '`Tahun`', '`Tahun`', 2, -1, FALSE, '`Tahun`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Tahun->Sortable = TRUE; // Allow sort
-		$this->Tahun->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['Tahun'] = &$this->Tahun;
-
 		// Nilai
 		$this->Nilai = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Nilai', 'Nilai', '`Nilai`', '`Nilai`', 4, -1, FALSE, '`Nilai`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->Nilai->Sortable = TRUE; // Allow sort
@@ -89,21 +74,17 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Tanggal_Bayar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_FORMAT"], $Language->Phrase("IncorrectDate"));
 		$this->fields['Tanggal_Bayar'] = &$this->Tanggal_Bayar;
 
-		// Nilai_Bayar
-		$this->Nilai_Bayar = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Nilai_Bayar', 'Nilai_Bayar', '`Nilai_Bayar`', '`Nilai_Bayar`', 4, -1, FALSE, '`Nilai_Bayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Nilai_Bayar->Sortable = TRUE; // Allow sort
-		$this->Nilai_Bayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['Nilai_Bayar'] = &$this->Nilai_Bayar;
+		// Bayar
+		$this->Bayar = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Bayar', 'Bayar', '`Bayar`', '`Bayar`', 4, -1, FALSE, '`Bayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Bayar->Sortable = TRUE; // Allow sort
+		$this->Bayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Bayar'] = &$this->Bayar;
 
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Periode_Tahun_Bulan', 'Periode_Tahun_Bulan', '`Periode_Tahun_Bulan`', '`Periode_Tahun_Bulan`', 200, -1, FALSE, '`Periode_Tahun_Bulan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Periode_Tahun_Bulan->Sortable = TRUE; // Allow sort
-		$this->fields['Periode_Tahun_Bulan'] = &$this->Periode_Tahun_Bulan;
-
-		// Periode_Text
-		$this->Periode_Text = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Periode_Text', 'Periode_Text', '`Periode_Text`', '`Periode_Text`', 200, -1, FALSE, '`Periode_Text`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Periode_Text->Sortable = TRUE; // Allow sort
-		$this->fields['Periode_Text'] = &$this->Periode_Text;
+		// Sisa
+		$this->Sisa = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Sisa', 'Sisa', '`Sisa`', '`Sisa`', 4, -1, FALSE, '`Sisa`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Sisa->Sortable = TRUE; // Allow sort
+		$this->Sisa->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Sisa'] = &$this->Sisa;
 	}
 
 	// Set Field Visibility
@@ -618,13 +599,10 @@ class ct10_siswanonrutinbayar extends cTable {
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
-		$this->Bulan->setDbValue($rs->fields('Bulan'));
-		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
 		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
-		$this->Nilai_Bayar->setDbValue($rs->fields('Nilai_Bayar'));
-		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
-		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Bayar->setDbValue($rs->fields('Bayar'));
+		$this->Sisa->setDbValue($rs->fields('Sisa'));
 	}
 
 	// Render list row values
@@ -637,13 +615,10 @@ class ct10_siswanonrutinbayar extends cTable {
    // Common render codes
 		// id
 		// siswanonrutin_id
-		// Bulan
-		// Tahun
 		// Nilai
 		// Tanggal_Bayar
-		// Nilai_Bayar
-		// Periode_Tahun_Bulan
-		// Periode_Text
+		// Bayar
+		// Sisa
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -652,14 +627,6 @@ class ct10_siswanonrutinbayar extends cTable {
 		// siswanonrutin_id
 		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
 		$this->siswanonrutin_id->ViewCustomAttributes = "";
-
-		// Bulan
-		$this->Bulan->ViewValue = $this->Bulan->CurrentValue;
-		$this->Bulan->ViewCustomAttributes = "";
-
-		// Tahun
-		$this->Tahun->ViewValue = $this->Tahun->CurrentValue;
-		$this->Tahun->ViewCustomAttributes = "";
 
 		// Nilai
 		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
@@ -670,17 +637,13 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 0);
 		$this->Tanggal_Bayar->ViewCustomAttributes = "";
 
-		// Nilai_Bayar
-		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
-		$this->Nilai_Bayar->ViewCustomAttributes = "";
+		// Bayar
+		$this->Bayar->ViewValue = $this->Bayar->CurrentValue;
+		$this->Bayar->ViewCustomAttributes = "";
 
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->CurrentValue;
-		$this->Periode_Tahun_Bulan->ViewCustomAttributes = "";
-
-		// Periode_Text
-		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
-		$this->Periode_Text->ViewCustomAttributes = "";
+		// Sisa
+		$this->Sisa->ViewValue = $this->Sisa->CurrentValue;
+		$this->Sisa->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
@@ -692,16 +655,6 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->siswanonrutin_id->HrefValue = "";
 		$this->siswanonrutin_id->TooltipValue = "";
 
-		// Bulan
-		$this->Bulan->LinkCustomAttributes = "";
-		$this->Bulan->HrefValue = "";
-		$this->Bulan->TooltipValue = "";
-
-		// Tahun
-		$this->Tahun->LinkCustomAttributes = "";
-		$this->Tahun->HrefValue = "";
-		$this->Tahun->TooltipValue = "";
-
 		// Nilai
 		$this->Nilai->LinkCustomAttributes = "";
 		$this->Nilai->HrefValue = "";
@@ -712,20 +665,15 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Tanggal_Bayar->HrefValue = "";
 		$this->Tanggal_Bayar->TooltipValue = "";
 
-		// Nilai_Bayar
-		$this->Nilai_Bayar->LinkCustomAttributes = "";
-		$this->Nilai_Bayar->HrefValue = "";
-		$this->Nilai_Bayar->TooltipValue = "";
+		// Bayar
+		$this->Bayar->LinkCustomAttributes = "";
+		$this->Bayar->HrefValue = "";
+		$this->Bayar->TooltipValue = "";
 
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->LinkCustomAttributes = "";
-		$this->Periode_Tahun_Bulan->HrefValue = "";
-		$this->Periode_Tahun_Bulan->TooltipValue = "";
-
-		// Periode_Text
-		$this->Periode_Text->LinkCustomAttributes = "";
-		$this->Periode_Text->HrefValue = "";
-		$this->Periode_Text->TooltipValue = "";
+		// Sisa
+		$this->Sisa->LinkCustomAttributes = "";
+		$this->Sisa->HrefValue = "";
+		$this->Sisa->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -750,18 +698,6 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->siswanonrutin_id->EditValue = $this->siswanonrutin_id->CurrentValue;
 		$this->siswanonrutin_id->PlaceHolder = ew_RemoveHtml($this->siswanonrutin_id->FldCaption());
 
-		// Bulan
-		$this->Bulan->EditAttrs["class"] = "form-control";
-		$this->Bulan->EditCustomAttributes = "";
-		$this->Bulan->EditValue = $this->Bulan->CurrentValue;
-		$this->Bulan->PlaceHolder = ew_RemoveHtml($this->Bulan->FldCaption());
-
-		// Tahun
-		$this->Tahun->EditAttrs["class"] = "form-control";
-		$this->Tahun->EditCustomAttributes = "";
-		$this->Tahun->EditValue = $this->Tahun->CurrentValue;
-		$this->Tahun->PlaceHolder = ew_RemoveHtml($this->Tahun->FldCaption());
-
 		// Nilai
 		$this->Nilai->EditAttrs["class"] = "form-control";
 		$this->Nilai->EditCustomAttributes = "";
@@ -775,24 +711,19 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Tanggal_Bayar->EditValue = ew_FormatDateTime($this->Tanggal_Bayar->CurrentValue, 8);
 		$this->Tanggal_Bayar->PlaceHolder = ew_RemoveHtml($this->Tanggal_Bayar->FldCaption());
 
-		// Nilai_Bayar
-		$this->Nilai_Bayar->EditAttrs["class"] = "form-control";
-		$this->Nilai_Bayar->EditCustomAttributes = "";
-		$this->Nilai_Bayar->EditValue = $this->Nilai_Bayar->CurrentValue;
-		$this->Nilai_Bayar->PlaceHolder = ew_RemoveHtml($this->Nilai_Bayar->FldCaption());
-		if (strval($this->Nilai_Bayar->EditValue) <> "" && is_numeric($this->Nilai_Bayar->EditValue)) $this->Nilai_Bayar->EditValue = ew_FormatNumber($this->Nilai_Bayar->EditValue, -2, -1, -2, 0);
+		// Bayar
+		$this->Bayar->EditAttrs["class"] = "form-control";
+		$this->Bayar->EditCustomAttributes = "";
+		$this->Bayar->EditValue = $this->Bayar->CurrentValue;
+		$this->Bayar->PlaceHolder = ew_RemoveHtml($this->Bayar->FldCaption());
+		if (strval($this->Bayar->EditValue) <> "" && is_numeric($this->Bayar->EditValue)) $this->Bayar->EditValue = ew_FormatNumber($this->Bayar->EditValue, -2, -1, -2, 0);
 
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->EditAttrs["class"] = "form-control";
-		$this->Periode_Tahun_Bulan->EditCustomAttributes = "";
-		$this->Periode_Tahun_Bulan->EditValue = $this->Periode_Tahun_Bulan->CurrentValue;
-		$this->Periode_Tahun_Bulan->PlaceHolder = ew_RemoveHtml($this->Periode_Tahun_Bulan->FldCaption());
-
-		// Periode_Text
-		$this->Periode_Text->EditAttrs["class"] = "form-control";
-		$this->Periode_Text->EditCustomAttributes = "";
-		$this->Periode_Text->EditValue = $this->Periode_Text->CurrentValue;
-		$this->Periode_Text->PlaceHolder = ew_RemoveHtml($this->Periode_Text->FldCaption());
+		// Sisa
+		$this->Sisa->EditAttrs["class"] = "form-control";
+		$this->Sisa->EditCustomAttributes = "";
+		$this->Sisa->EditValue = $this->Sisa->CurrentValue;
+		$this->Sisa->PlaceHolder = ew_RemoveHtml($this->Sisa->FldCaption());
+		if (strval($this->Sisa->EditValue) <> "" && is_numeric($this->Sisa->EditValue)) $this->Sisa->EditValue = ew_FormatNumber($this->Sisa->EditValue, -2, -1, -2, 0);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -823,23 +754,17 @@ class ct10_siswanonrutinbayar extends cTable {
 				if ($ExportPageType == "view") {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
-					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
-					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
 					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
-					if ($this->Nilai_Bayar->Exportable) $Doc->ExportCaption($this->Nilai_Bayar);
-					if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportCaption($this->Periode_Tahun_Bulan);
-					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
+					if ($this->Bayar->Exportable) $Doc->ExportCaption($this->Bayar);
+					if ($this->Sisa->Exportable) $Doc->ExportCaption($this->Sisa);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
-					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
-					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Nilai->Exportable) $Doc->ExportCaption($this->Nilai);
 					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
-					if ($this->Nilai_Bayar->Exportable) $Doc->ExportCaption($this->Nilai_Bayar);
-					if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportCaption($this->Periode_Tahun_Bulan);
-					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
+					if ($this->Bayar->Exportable) $Doc->ExportCaption($this->Bayar);
+					if ($this->Sisa->Exportable) $Doc->ExportCaption($this->Sisa);
 				}
 				$Doc->EndExportRow();
 			}
@@ -873,23 +798,17 @@ class ct10_siswanonrutinbayar extends cTable {
 					if ($ExportPageType == "view") {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
-						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
-						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
 						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
-						if ($this->Nilai_Bayar->Exportable) $Doc->ExportField($this->Nilai_Bayar);
-						if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportField($this->Periode_Tahun_Bulan);
-						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
+						if ($this->Bayar->Exportable) $Doc->ExportField($this->Bayar);
+						if ($this->Sisa->Exportable) $Doc->ExportField($this->Sisa);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
-						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
-						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Nilai->Exportable) $Doc->ExportField($this->Nilai);
 						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
-						if ($this->Nilai_Bayar->Exportable) $Doc->ExportField($this->Nilai_Bayar);
-						if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportField($this->Periode_Tahun_Bulan);
-						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
+						if ($this->Bayar->Exportable) $Doc->ExportField($this->Bayar);
+						if ($this->Sisa->Exportable) $Doc->ExportField($this->Sisa);
 					}
 					$Doc->EndExportRow();
 				}

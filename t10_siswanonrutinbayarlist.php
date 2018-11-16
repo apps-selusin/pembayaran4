@@ -345,13 +345,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->id->SetVisibility();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 		$this->siswanonrutin_id->SetVisibility();
-		$this->Bulan->SetVisibility();
-		$this->Tahun->SetVisibility();
 		$this->Nilai->SetVisibility();
 		$this->Tanggal_Bayar->SetVisibility();
-		$this->Nilai_Bayar->SetVisibility();
-		$this->Periode_Tahun_Bulan->SetVisibility();
-		$this->Periode_Text->SetVisibility();
+		$this->Bayar->SetVisibility();
+		$this->Sisa->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -622,13 +619,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id, $bCtrl); // id
 			$this->UpdateSort($this->siswanonrutin_id, $bCtrl); // siswanonrutin_id
-			$this->UpdateSort($this->Bulan, $bCtrl); // Bulan
-			$this->UpdateSort($this->Tahun, $bCtrl); // Tahun
 			$this->UpdateSort($this->Nilai, $bCtrl); // Nilai
 			$this->UpdateSort($this->Tanggal_Bayar, $bCtrl); // Tanggal_Bayar
-			$this->UpdateSort($this->Nilai_Bayar, $bCtrl); // Nilai_Bayar
-			$this->UpdateSort($this->Periode_Tahun_Bulan, $bCtrl); // Periode_Tahun_Bulan
-			$this->UpdateSort($this->Periode_Text, $bCtrl); // Periode_Text
+			$this->UpdateSort($this->Bayar, $bCtrl); // Bayar
+			$this->UpdateSort($this->Sisa, $bCtrl); // Sisa
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -659,13 +653,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 				$this->setSessionOrderBy($sOrderBy);
 				$this->id->setSort("");
 				$this->siswanonrutin_id->setSort("");
-				$this->Bulan->setSort("");
-				$this->Tahun->setSort("");
 				$this->Nilai->setSort("");
 				$this->Tanggal_Bayar->setSort("");
-				$this->Nilai_Bayar->setSort("");
-				$this->Periode_Tahun_Bulan->setSort("");
-				$this->Periode_Text->setSort("");
+				$this->Bayar->setSort("");
+				$this->Sisa->setSort("");
 			}
 
 			// Reset start position
@@ -1054,13 +1045,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
-		$this->Bulan->setDbValue($rs->fields('Bulan'));
-		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Nilai->setDbValue($rs->fields('Nilai'));
 		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
-		$this->Nilai_Bayar->setDbValue($rs->fields('Nilai_Bayar'));
-		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
-		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Bayar->setDbValue($rs->fields('Bayar'));
+		$this->Sisa->setDbValue($rs->fields('Sisa'));
 	}
 
 	// Load DbValue from recordset
@@ -1069,13 +1057,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->siswanonrutin_id->DbValue = $row['siswanonrutin_id'];
-		$this->Bulan->DbValue = $row['Bulan'];
-		$this->Tahun->DbValue = $row['Tahun'];
 		$this->Nilai->DbValue = $row['Nilai'];
 		$this->Tanggal_Bayar->DbValue = $row['Tanggal_Bayar'];
-		$this->Nilai_Bayar->DbValue = $row['Nilai_Bayar'];
-		$this->Periode_Tahun_Bulan->DbValue = $row['Periode_Tahun_Bulan'];
-		$this->Periode_Text->DbValue = $row['Periode_Text'];
+		$this->Bayar->DbValue = $row['Bayar'];
+		$this->Sisa->DbValue = $row['Sisa'];
 	}
 
 	// Load old record
@@ -1118,8 +1103,12 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->Nilai->CurrentValue = ew_StrToFloat($this->Nilai->CurrentValue);
 
 		// Convert decimal values if posted back
-		if ($this->Nilai_Bayar->FormValue == $this->Nilai_Bayar->CurrentValue && is_numeric(ew_StrToFloat($this->Nilai_Bayar->CurrentValue)))
-			$this->Nilai_Bayar->CurrentValue = ew_StrToFloat($this->Nilai_Bayar->CurrentValue);
+		if ($this->Bayar->FormValue == $this->Bayar->CurrentValue && is_numeric(ew_StrToFloat($this->Bayar->CurrentValue)))
+			$this->Bayar->CurrentValue = ew_StrToFloat($this->Bayar->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->Sisa->FormValue == $this->Sisa->CurrentValue && is_numeric(ew_StrToFloat($this->Sisa->CurrentValue)))
+			$this->Sisa->CurrentValue = ew_StrToFloat($this->Sisa->CurrentValue);
 
 		// Call Row_Rendering event
 		$this->Row_Rendering();
@@ -1127,13 +1116,10 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		// Common render codes for all row types
 		// id
 		// siswanonrutin_id
-		// Bulan
-		// Tahun
 		// Nilai
 		// Tanggal_Bayar
-		// Nilai_Bayar
-		// Periode_Tahun_Bulan
-		// Periode_Text
+		// Bayar
+		// Sisa
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1145,14 +1131,6 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->siswanonrutin_id->ViewValue = $this->siswanonrutin_id->CurrentValue;
 		$this->siswanonrutin_id->ViewCustomAttributes = "";
 
-		// Bulan
-		$this->Bulan->ViewValue = $this->Bulan->CurrentValue;
-		$this->Bulan->ViewCustomAttributes = "";
-
-		// Tahun
-		$this->Tahun->ViewValue = $this->Tahun->CurrentValue;
-		$this->Tahun->ViewCustomAttributes = "";
-
 		// Nilai
 		$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
 		$this->Nilai->ViewCustomAttributes = "";
@@ -1162,17 +1140,13 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->Tanggal_Bayar->ViewValue = ew_FormatDateTime($this->Tanggal_Bayar->ViewValue, 0);
 		$this->Tanggal_Bayar->ViewCustomAttributes = "";
 
-		// Nilai_Bayar
-		$this->Nilai_Bayar->ViewValue = $this->Nilai_Bayar->CurrentValue;
-		$this->Nilai_Bayar->ViewCustomAttributes = "";
+		// Bayar
+		$this->Bayar->ViewValue = $this->Bayar->CurrentValue;
+		$this->Bayar->ViewCustomAttributes = "";
 
-		// Periode_Tahun_Bulan
-		$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->CurrentValue;
-		$this->Periode_Tahun_Bulan->ViewCustomAttributes = "";
-
-		// Periode_Text
-		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
-		$this->Periode_Text->ViewCustomAttributes = "";
+		// Sisa
+		$this->Sisa->ViewValue = $this->Sisa->CurrentValue;
+		$this->Sisa->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -1184,16 +1158,6 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->siswanonrutin_id->HrefValue = "";
 			$this->siswanonrutin_id->TooltipValue = "";
 
-			// Bulan
-			$this->Bulan->LinkCustomAttributes = "";
-			$this->Bulan->HrefValue = "";
-			$this->Bulan->TooltipValue = "";
-
-			// Tahun
-			$this->Tahun->LinkCustomAttributes = "";
-			$this->Tahun->HrefValue = "";
-			$this->Tahun->TooltipValue = "";
-
 			// Nilai
 			$this->Nilai->LinkCustomAttributes = "";
 			$this->Nilai->HrefValue = "";
@@ -1204,20 +1168,15 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->Tanggal_Bayar->HrefValue = "";
 			$this->Tanggal_Bayar->TooltipValue = "";
 
-			// Nilai_Bayar
-			$this->Nilai_Bayar->LinkCustomAttributes = "";
-			$this->Nilai_Bayar->HrefValue = "";
-			$this->Nilai_Bayar->TooltipValue = "";
+			// Bayar
+			$this->Bayar->LinkCustomAttributes = "";
+			$this->Bayar->HrefValue = "";
+			$this->Bayar->TooltipValue = "";
 
-			// Periode_Tahun_Bulan
-			$this->Periode_Tahun_Bulan->LinkCustomAttributes = "";
-			$this->Periode_Tahun_Bulan->HrefValue = "";
-			$this->Periode_Tahun_Bulan->TooltipValue = "";
-
-			// Periode_Text
-			$this->Periode_Text->LinkCustomAttributes = "";
-			$this->Periode_Text->HrefValue = "";
-			$this->Periode_Text->TooltipValue = "";
+			// Sisa
+			$this->Sisa->LinkCustomAttributes = "";
+			$this->Sisa->HrefValue = "";
+			$this->Sisa->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1499,24 +1458,6 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($t10_siswanonrutinbayar->Bulan->Visible) { // Bulan ?>
-	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Bulan) == "") { ?>
-		<th data-name="Bulan"><div id="elh_t10_siswanonrutinbayar_Bulan" class="t10_siswanonrutinbayar_Bulan"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Bulan->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Bulan"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Bulan) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Bulan" class="t10_siswanonrutinbayar_Bulan">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Bulan->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Bulan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Bulan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t10_siswanonrutinbayar->Tahun->Visible) { // Tahun ?>
-	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Tahun) == "") { ?>
-		<th data-name="Tahun"><div id="elh_t10_siswanonrutinbayar_Tahun" class="t10_siswanonrutinbayar_Tahun"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Tahun->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Tahun"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Tahun) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Tahun" class="t10_siswanonrutinbayar_Tahun">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Tahun->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Tahun->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Tahun->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
 <?php if ($t10_siswanonrutinbayar->Nilai->Visible) { // Nilai ?>
 	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Nilai) == "") { ?>
 		<th data-name="Nilai"><div id="elh_t10_siswanonrutinbayar_Nilai" class="t10_siswanonrutinbayar_Nilai"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Nilai->FldCaption() ?></div></div></th>
@@ -1535,30 +1476,21 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($t10_siswanonrutinbayar->Nilai_Bayar->Visible) { // Nilai_Bayar ?>
-	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Nilai_Bayar) == "") { ?>
-		<th data-name="Nilai_Bayar"><div id="elh_t10_siswanonrutinbayar_Nilai_Bayar" class="t10_siswanonrutinbayar_Nilai_Bayar"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Nilai_Bayar->FldCaption() ?></div></div></th>
+<?php if ($t10_siswanonrutinbayar->Bayar->Visible) { // Bayar ?>
+	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Bayar) == "") { ?>
+		<th data-name="Bayar"><div id="elh_t10_siswanonrutinbayar_Bayar" class="t10_siswanonrutinbayar_Bayar"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Bayar->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="Nilai_Bayar"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Nilai_Bayar) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Nilai_Bayar" class="t10_siswanonrutinbayar_Nilai_Bayar">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Nilai_Bayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Nilai_Bayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Nilai_Bayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Bayar"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Bayar) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Bayar" class="t10_siswanonrutinbayar_Bayar">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Bayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Bayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Bayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
-<?php if ($t10_siswanonrutinbayar->Periode_Tahun_Bulan->Visible) { // Periode_Tahun_Bulan ?>
-	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Periode_Tahun_Bulan) == "") { ?>
-		<th data-name="Periode_Tahun_Bulan"><div id="elh_t10_siswanonrutinbayar_Periode_Tahun_Bulan" class="t10_siswanonrutinbayar_Periode_Tahun_Bulan"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->FldCaption() ?></div></div></th>
+<?php if ($t10_siswanonrutinbayar->Sisa->Visible) { // Sisa ?>
+	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Sisa) == "") { ?>
+		<th data-name="Sisa"><div id="elh_t10_siswanonrutinbayar_Sisa" class="t10_siswanonrutinbayar_Sisa"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Sisa->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="Periode_Tahun_Bulan"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Periode_Tahun_Bulan) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Periode_Tahun_Bulan" class="t10_siswanonrutinbayar_Periode_Tahun_Bulan">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Periode_Tahun_Bulan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Periode_Tahun_Bulan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></th>
-	<?php } ?>
-<?php } ?>		
-<?php if ($t10_siswanonrutinbayar->Periode_Text->Visible) { // Periode_Text ?>
-	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Periode_Text) == "") { ?>
-		<th data-name="Periode_Text"><div id="elh_t10_siswanonrutinbayar_Periode_Text" class="t10_siswanonrutinbayar_Periode_Text"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Periode_Text->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="Periode_Text"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Periode_Text) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Periode_Text" class="t10_siswanonrutinbayar_Periode_Text">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Periode_Text->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Periode_Text->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Periode_Text->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Sisa"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Sisa) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Sisa" class="t10_siswanonrutinbayar_Sisa">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Sisa->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Sisa->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Sisa->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
@@ -1643,22 +1575,6 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("body", "left", $t10_siswanonr
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t10_siswanonrutinbayar->Bulan->Visible) { // Bulan ?>
-		<td data-name="Bulan"<?php echo $t10_siswanonrutinbayar->Bulan->CellAttributes() ?>>
-<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Bulan" class="t10_siswanonrutinbayar_Bulan">
-<span<?php echo $t10_siswanonrutinbayar->Bulan->ViewAttributes() ?>>
-<?php echo $t10_siswanonrutinbayar->Bulan->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t10_siswanonrutinbayar->Tahun->Visible) { // Tahun ?>
-		<td data-name="Tahun"<?php echo $t10_siswanonrutinbayar->Tahun->CellAttributes() ?>>
-<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Tahun" class="t10_siswanonrutinbayar_Tahun">
-<span<?php echo $t10_siswanonrutinbayar->Tahun->ViewAttributes() ?>>
-<?php echo $t10_siswanonrutinbayar->Tahun->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
 	<?php if ($t10_siswanonrutinbayar->Nilai->Visible) { // Nilai ?>
 		<td data-name="Nilai"<?php echo $t10_siswanonrutinbayar->Nilai->CellAttributes() ?>>
 <span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Nilai" class="t10_siswanonrutinbayar_Nilai">
@@ -1675,27 +1591,19 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("body", "left", $t10_siswanonr
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t10_siswanonrutinbayar->Nilai_Bayar->Visible) { // Nilai_Bayar ?>
-		<td data-name="Nilai_Bayar"<?php echo $t10_siswanonrutinbayar->Nilai_Bayar->CellAttributes() ?>>
-<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Nilai_Bayar" class="t10_siswanonrutinbayar_Nilai_Bayar">
-<span<?php echo $t10_siswanonrutinbayar->Nilai_Bayar->ViewAttributes() ?>>
-<?php echo $t10_siswanonrutinbayar->Nilai_Bayar->ListViewValue() ?></span>
+	<?php if ($t10_siswanonrutinbayar->Bayar->Visible) { // Bayar ?>
+		<td data-name="Bayar"<?php echo $t10_siswanonrutinbayar->Bayar->CellAttributes() ?>>
+<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Bayar" class="t10_siswanonrutinbayar_Bayar">
+<span<?php echo $t10_siswanonrutinbayar->Bayar->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Bayar->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t10_siswanonrutinbayar->Periode_Tahun_Bulan->Visible) { // Periode_Tahun_Bulan ?>
-		<td data-name="Periode_Tahun_Bulan"<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->CellAttributes() ?>>
-<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Periode_Tahun_Bulan" class="t10_siswanonrutinbayar_Periode_Tahun_Bulan">
-<span<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->ViewAttributes() ?>>
-<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t10_siswanonrutinbayar->Periode_Text->Visible) { // Periode_Text ?>
-		<td data-name="Periode_Text"<?php echo $t10_siswanonrutinbayar->Periode_Text->CellAttributes() ?>>
-<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Periode_Text" class="t10_siswanonrutinbayar_Periode_Text">
-<span<?php echo $t10_siswanonrutinbayar->Periode_Text->ViewAttributes() ?>>
-<?php echo $t10_siswanonrutinbayar->Periode_Text->ListViewValue() ?></span>
+	<?php if ($t10_siswanonrutinbayar->Sisa->Visible) { // Sisa ?>
+		<td data-name="Sisa"<?php echo $t10_siswanonrutinbayar->Sisa->CellAttributes() ?>>
+<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Sisa" class="t10_siswanonrutinbayar_Sisa">
+<span<?php echo $t10_siswanonrutinbayar->Sisa->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Sisa->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
