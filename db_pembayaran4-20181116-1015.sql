@@ -736,7 +736,7 @@ CREATE TABLE `v01_siswa` (
 --
 DROP TABLE IF EXISTS `v01_siswa`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v01_siswa`  AS  select `t04_siswa`.`id` AS `id`,`t04_siswa`.`sekolah_id` AS `sekolah_id`,`t04_siswa`.`kelas_id` AS `kelas_id`,`t04_siswa`.`NIS` AS `NIS`,`t04_siswa`.`Nama` AS `Nama` from `t04_siswa` ;
+CREATE VIEW `v01_siswa`  AS  select `t04_siswa`.`id` AS `id`,`t04_siswa`.`sekolah_id` AS `sekolah_id`,`t04_siswa`.`kelas_id` AS `kelas_id`,`t04_siswa`.`NIS` AS `NIS`,`t04_siswa`.`Nama` AS `Nama` from `t04_siswa` ;
 
 --
 -- Indexes for dumped tables
