@@ -286,7 +286,10 @@ Page_Rendering();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
+<!--
 <pre><code><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></code></pre>
+-->
+<pre><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></pre>
 
 <!--<pre>
 	  <code>pre {
