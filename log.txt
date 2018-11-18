@@ -1,0 +1,5 @@
+1.	buat list siswa:
+	- tabel yang dimerge:
+		- tabel siswa
+		- tabel bayar rutin
+		- tabel bayar non-rutin

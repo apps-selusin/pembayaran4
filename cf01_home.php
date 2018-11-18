@@ -286,7 +286,17 @@ Page_Rendering();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<!-- %%Custom page content begin%% --><!-- %%Custom page content end%% --><?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
+<pre>
+  <code>
+  <?php 
+  $lines = file('log.txt'); 
+  foreach ($lines as $line_num => $line){
+  	echo $line . "<br />"; 
+  }
+  ?>
+  </code>
+</pre>
+<?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php
 $cf01_home_php->Page_Terminate();
