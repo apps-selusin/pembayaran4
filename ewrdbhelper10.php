@@ -22,7 +22,7 @@ class crdb_pembayaran4_db extends crDbHelper {
 
 	// Database connection info
 	var $Host = '';
-	var $Port = 3307;
+	var $Port = 3306;
 	var $Username = 'root';
 	var $Password = 'admin';
 	var $DbName = 'db_pembayaran4';

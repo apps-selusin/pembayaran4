@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2018/11/19" author="e.World Technology Ltd.">
-  <project id="{64CABE7A-1609-4157-8293-D7242B591905}" file="C:\xampp\htdocs\pembayaran4\pembayaran4_prj.pmp" name="pembayaran4_prj" product="PHPMaker" version="13.0" datetime="2018/11/19 09:01:05" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
+  <project id="{64CABE7A-1609-4157-8293-D7242B591905}" file="C:\xampp\htdocs\pembayaran4\pembayaran4_prj.pmp" name="pembayaran4_prj" product="PHPMaker" version="13.0" datetime="2018/11/19 10:28:54" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;">
     <table id="cf01_home_php" name="cf01_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,8;" priv="1" />
     <table id="t01_tahunajaran" name="t01_tahunajaran" caption="Tahun Ajaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="t02_sekolah" name="t02_sekolah" caption="Sekolah" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
@@ -18,5 +18,7 @@
     <table id="t99_audittrail" name="t99_audittrail" caption="Log Aktifitas" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="v01_siswa" name="v01_siswa" caption="Pembayaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
     <table id="cf02_tutupbuku_php" name="cf02_tutupbuku.php" caption="Tutup Buku" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t92_periodeold" name="t92_periodeold" caption="t 92 periodeold" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v02_siswa" name="v02_siswa" caption="v 02 siswa" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
   </project>
 </configuration>
