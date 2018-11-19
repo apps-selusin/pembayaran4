@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration date="2018/11/19" author="e.World Technology Ltd.">
+  <project id="{0BB1DC5C-09DE-419A-9701-F3161918C007}" file="C:\xampp\htdocs\pembayaran4\pembayaran4_prj.prp" name="pembayaran4_prj" product="PHPReportMaker" version="10.0" datetime="2018/11/19 09:00:36" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;">
+    <table id="t01_tahunajaran" name="t01_tahunajaran" caption="t 01 tahunajaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t02_sekolah" name="t02_sekolah" caption="t 02 sekolah" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t03_kelas" name="t03_kelas" caption="t 03 kelas" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t04_siswa" name="t04_siswa" caption="t 04 siswa" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t05_rutin" name="t05_rutin" caption="t 05 rutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t06_siswarutin" name="t06_siswarutin" caption="t 06 siswarutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t06_siswarutintemp" name="t06_siswarutintemp" caption="t 06 siswarutintemp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t07_siswarutinbayar" name="t07_siswarutinbayar" caption="t 07 siswarutinbayar" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t08_nonrutin" name="t08_nonrutin" caption="t 08 nonrutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t09_siswanonrutin" name="t09_siswanonrutin" caption="t 09 siswanonrutin" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t09_siswanonrutintemp" name="t09_siswanonrutintemp" caption="t 09 siswanonrutintemp" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t10_siswanonrutinbayar" name="t10_siswanonrutinbayar" caption="t 10 siswanonrutinbayar" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t92_periodeold" name="t92_periodeold" caption="t 92 periodeold" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t93_periode" name="t93_periode" caption="t 93 periode" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="t99_audittrail" name="t99_audittrail" caption="t 99 audittrail" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v01_siswa" name="v01_siswa" caption="v 01 siswa" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+    <table id="v02_siswa" name="v02_siswa" caption="Pembayaran" userlevel="-2,&quot;Anonymous&quot;,0;" priv="1" />
+  </project>
+</configuration>

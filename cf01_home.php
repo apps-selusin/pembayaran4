@@ -286,28 +286,11 @@ Page_Rendering();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<!--
-<pre><code><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></code></pre>
--->
+<!-- log -->
 <pre><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></pre>
 
-<!--<pre>
-	  <code>pre {
-		display: block;
-		font-family: monospace;
-		white-space: pre;
-		margin: 1em 0px;
-	  }</code>
-	</pre>
-
-<pre>
-	<code>
-	<?php echo "a<br>"?>
-	<?php echo "b<br>"?>
-	<?php echo "c<br>"?>
-	</code>
-</pre>
--->
+<!-- periode -->
+<pre><?php $abulan = array("", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "Novembber", "Desember"); echo "<strong>Periode</strong>:<br>".$abulan[ew_ExecuteScalar("select Bulan from t93_Periode")]." - ".ew_ExecuteScalar("select Tahun from t93_Periode"); ?></pre>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php

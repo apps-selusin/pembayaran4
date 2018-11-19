@@ -1,3 +1,16 @@
-1. buat setting periode
-2. buat modul (proses) tutup buku
-3. buat laporan yang sudah bayar tagihan
+<strong>to do:</strong>
+7:53 AM 11/19/2018
+- untuk "laporan yang sudah bayar tagihan":: 
+  - perlu dikroscek dengan nilai "periode" saat ini,
+    apabila data di tabel pembayaran sudah ada data field Periode yang sama dengan data Periode saat ini
+    maka data ditampilkan
+
+6:58 AM 11/19/2018
+- buat laporan yang sudah bayar tagihan
+
+<strong>done:</strong>
+7:51 AM 11/19/2018
+- buat modul (proses) tutup buku
+
+6:57 AM 11/19/2018
+- buat setting periode

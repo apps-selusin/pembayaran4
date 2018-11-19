@@ -13,7 +13,9 @@ $RootMenu->AddMenuItem(3, "mmi_t03_kelas", $Language->MenuPhrase("3", "MenuText"
 $RootMenu->AddMenuItem(4, "mmi_t04_siswa", $Language->MenuPhrase("4", "MenuText"), "t04_siswalist.php", 19, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(5, "mmi_t05_rutin", $Language->MenuPhrase("5", "MenuText"), "t05_rutinlist.php", 19, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(22, "mmi_t08_nonrutin", $Language->MenuPhrase("22", "MenuText"), "t08_nonrutinlist.php", 19, "", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(27, "mmi_cf02_tutupbuku_php", $Language->MenuPhrase("27", "MenuText"), "cf02_tutupbuku.php", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(20, "mmci_Laporan", $Language->MenuPhrase("20", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
+$RootMenu->AddMenuItem(10017, "mmri_v025fsiswa", $Language->MenuPhrase("10017", "MenuText"), "v02_siswarpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(8, "mmi_t99_audittrail", $Language->MenuPhrase("8", "MenuText"), "t99_audittraillist.php", 20, "", TRUE, FALSE, FALSE);
 $RootMenu->Render();
 ?>
