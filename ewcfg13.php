@@ -7,7 +7,7 @@
 if (!isset($EW_RELATIVE_PATH)) $EW_RELATIVE_PATH = "";
 
 // Show SQL for debug
-define("EW_DEBUG_ENABLED", TRUE, TRUE); // TRUE to debug
+define("EW_DEBUG_ENABLED", FALSE, TRUE); // TRUE to debug
 if (EW_DEBUG_ENABLED) {
 	@ini_set("display_errors", "1"); // Display errors
 	error_reporting(E_ALL ^ E_NOTICE); // Report all errors except E_NOTICE
@@ -25,7 +25,7 @@ define("EW_CONFIG_FILE_FOLDER", EW_PROJECT_NAME, TRUE); // Config file name
 define("EW_PROJECT_ID", "{64CABE7A-1609-4157-8293-D7242B591905}", TRUE); // Project ID (GUID)
 $EW_RELATED_PROJECT_ID = "";
 $EW_RELATED_LANGUAGE_FOLDER = "";
-define("EW_RANDOM_KEY", 'Rzpcj2TaaXP0pSaf', TRUE); // Random key for encryption
+define("EW_RANDOM_KEY", 'Q0JNdx5ES89PxnT8', TRUE); // Random key for encryption
 define("EW_PROJECT_STYLESHEET_FILENAME", "phpcss/pembayaran4_prj.css", TRUE); // Project stylesheet file name
 define("EW_CHARSET", "", TRUE); // Project charset
 define("EW_EMAIL_CHARSET", EW_CHARSET, TRUE); // Email charset
@@ -48,7 +48,7 @@ if (!defined("EW_ADODB_TZ_OFFSET"))
 	define("EW_ADODB_TZ_OFFSET", FALSE, TRUE); // Use ADOdb time zone offset
 if (!defined("EW_USE_MYSQLI"))
 	define('EW_USE_MYSQLI', extension_loaded("mysqli"), TRUE); // Use MySQLi
-$EW_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3306, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
+$EW_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3307, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
 $EW_CONN[0] = &$EW_CONN["DB"];
 
 // Set up database error function
