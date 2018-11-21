@@ -1,7 +1,4 @@
 <strong>to do:</strong>
-10:48 AM 11/21/2018
-- <font color="red">betulkan lagi "view" siswa v02, harus disesuaikan dengan PERIODE aktif saat ini</font>
-
 7:53 AM 11/19/2018
 - untuk "laporan yang sudah bayar tagihan":: 
   - perlu dikroscek dengan nilai "periode" saat ini,
@@ -12,6 +9,9 @@
 - buat laporan yang sudah bayar tagihan
 
 <strong>done:</strong>
+10:48 AM 11/21/2018
+- betulkan lagi "view" siswa v02, harus disesuaikan dengan PERIODE aktif saat ini
+
 7:51 AM 11/19/2018
 - buat modul (proses) tutup buku
 
