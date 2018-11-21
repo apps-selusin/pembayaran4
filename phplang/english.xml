@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/11/20" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/11/21" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -700,6 +700,9 @@
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
     </table>
+    <table id="cf02_tutupbuku_php">
+      <phrase id="tblcaption" value="Tutup Buku" />
+    </table>
     <table id="t01_tahunajaran">
       <phrase id="tblcaption" value="Tahun Ajaran" />
       <field id="id">
@@ -913,6 +916,21 @@
         <phrase id="fldcaption" value="Sisa" />
       </field>
     </table>
+    <table id="t92_periodeold">
+      <phrase id="tblcaption" value="t 92 periodeold" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="bulan">
+        <phrase id="fldcaption" value="Bulan" />
+      </field>
+      <field id="tahun">
+        <phrase id="fldcaption" value="Tahun" />
+      </field>
+      <field id="tahun_bulan">
+        <phrase id="fldcaption" value="Tahun Bulan" />
+      </field>
+    </table>
     <table id="t93_periode">
       <phrase id="tblcaption" value="Periode" />
       <field id="id">
@@ -977,24 +995,6 @@
       </field>
       <field id="sekolah_id">
         <phrase id="fldcaption" value="Sekolah" />
-      </field>
-    </table>
-    <table id="cf02_tutupbuku_php">
-      <phrase id="tblcaption" value="Tutup Buku" />
-    </table>
-    <table id="t92_periodeold">
-      <phrase id="tblcaption" value="t 92 periodeold" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="bulan">
-        <phrase id="fldcaption" value="Bulan" />
-      </field>
-      <field id="tahun">
-        <phrase id="fldcaption" value="Tahun" />
-      </field>
-      <field id="tahun_bulan">
-        <phrase id="fldcaption" value="Tahun Bulan" />
       </field>
     </table>
     <table id="v02_siswa">

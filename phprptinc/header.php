@@ -20,7 +20,6 @@ var EWR_SESSION_URL = EWR_RELATIVE_PATH + "ewrsession10.php"; // Session URL
 var EWR_IS_LOGGEDIN = <?php echo IsLoggedIn() ? "true" : "false" ?>; // Is logged in
 var EWR_IS_AUTOLOGIN = <?php echo ewr_IsAutoLogin() ? "true" : "false" ?>; // Is logged in with option "Auto login until I logout explicitly"
 var EWR_TIMEOUT_URL = EWR_RELATIVE_PATH + "index.php"; // Timeout URL
-var EWR_MAX_EMAIL_RECIPIENT = <?php echo EWR_MAX_EMAIL_RECIPIENT ?>;
 var EWR_DISABLE_BUTTON_ON_SUBMIT = true;
 var EWR_IMAGES_FOLDER = "phprptimages/"; // Image folder
 var EWR_LOOKUP_FILE_NAME = "ewrajax10.php"; // Lookup file name
