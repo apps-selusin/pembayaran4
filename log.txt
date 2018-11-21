@@ -1,4 +1,12 @@
+------
 <strong>to do:</strong>
+------
+1:15 PM 11/21/2018
+- buat laporan "yang belum bayar tagihan"
+
+-----
+<strong>done:</strong>
+-----
 7:53 AM 11/19/2018
 - untuk "laporan yang sudah bayar tagihan":: 
   - perlu dikroscek dengan nilai "periode" saat ini,
@@ -8,7 +16,6 @@
 6:58 AM 11/19/2018
 - buat laporan yang sudah bayar tagihan
 
-<strong>done:</strong>
 10:48 AM 11/21/2018
 - betulkan lagi "view" siswa v02, harus disesuaikan dengan PERIODE aktif saat ini
 
