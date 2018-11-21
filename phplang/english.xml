@@ -586,11 +586,11 @@
     <menu id="10018">
       <phrase id="menutext" value="t 92 periodeold" />
     </menu>
-    <menu id="10019">
-      <phrase id="menutext" value="v 02 siswa" />
-    </menu>
     <menu id="21">
       <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10019">
+      <phrase id="menutext" value="v 02 siswa" />
     </menu>
     <menu id="10">
       <phrase id="menutext" value="Pembayaran" />
@@ -644,7 +644,10 @@
       <phrase id="menutext" value="Laporan" />
     </menu>
     <menu id="10017">
-      <phrase id="menutext" value="Pembayaran" />
+      <phrase id="menutext" value="Pembayaran (sudah bayar)" />
+    </menu>
+    <menu id="10020">
+      <phrase id="menutext" value="Pembayaran (belum bayar)" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="Log Aktifitas" />

@@ -16,6 +16,7 @@ $RootMenu->AddMenuItem(22, "mmi_t08_nonrutin", $Language->MenuPhrase("22", "Menu
 $RootMenu->AddMenuItem(27, "mmi_cf02_tutupbuku_php", $Language->MenuPhrase("27", "MenuText"), "cf02_tutupbuku.php", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(20, "mmci_Laporan", $Language->MenuPhrase("20", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(10017, "mmri_v025fsiswa", $Language->MenuPhrase("10017", "MenuText"), "v02_siswarpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10020, "mmri_v035fsiswa5fblm5fbyr", $Language->MenuPhrase("10020", "MenuText"), "v03_siswa_blm_byrrpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(8, "mmi_t99_audittrail", $Language->MenuPhrase("8", "MenuText"), "t99_audittraillist.php", 20, "", TRUE, FALSE, FALSE);
 $RootMenu->Render();
 ?>
