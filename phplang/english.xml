@@ -1032,6 +1032,12 @@
       <field id="periode_text">
         <phrase id="fldcaption" value="Periode Text" />
       </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
     </table>
   </project>
 </ew-language>

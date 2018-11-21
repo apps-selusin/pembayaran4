@@ -718,6 +718,12 @@
       <field id="nama">
         <phrase id="fldcaption" value="Nama" />
       </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
       <field id="kelas">
         <phrase id="fldcaption" value="Kelas" />
       </field>
@@ -728,7 +734,7 @@
         <phrase id="fldcaption" value="Periode Tahun Bulan" />
       </field>
       <field id="periode_text">
-        <phrase id="fldcaption" value="Periode Text" />
+        <phrase id="fldcaption" value="Periode" />
       </field>
     </table>
   </project>

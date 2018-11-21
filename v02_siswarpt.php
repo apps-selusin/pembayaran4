@@ -512,14 +512,17 @@ class crv02_siswa_rpt extends crv02_siswa {
 		// Set field visibility for detail fields
 		$this->NIS->SetVisibility();
 		$this->Nama->SetVisibility();
+		$this->Jenis->SetVisibility();
+		$this->Nilai->SetVisibility();
 		$this->Kelas->SetVisibility();
 		$this->Sekolah->SetVisibility();
+		$this->Periode_Text->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 5;
+		$nDtls = 8;
 		$nGrps = 1;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -532,7 +535,7 @@ class crv02_siswa_rpt extends crv02_siswa {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -752,6 +755,8 @@ class crv02_siswa_rpt extends crv02_siswa {
 				$this->FirstRowData['kelas_id'] = ewr_Conv($rs->fields('kelas_id'), 3);
 				$this->FirstRowData['NIS'] = ewr_Conv($rs->fields('NIS'), 200);
 				$this->FirstRowData['Nama'] = ewr_Conv($rs->fields('Nama'), 200);
+				$this->FirstRowData['Jenis'] = ewr_Conv($rs->fields('Jenis'), 200);
+				$this->FirstRowData['Nilai'] = ewr_Conv($rs->fields('Nilai'), 4);
 				$this->FirstRowData['Kelas'] = ewr_Conv($rs->fields('Kelas'), 200);
 				$this->FirstRowData['Sekolah'] = ewr_Conv($rs->fields('Sekolah'), 200);
 				$this->FirstRowData['Periode_Tahun_Bulan'] = ewr_Conv($rs->fields('Periode_Tahun_Bulan'), 200);
@@ -767,14 +772,19 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->kelas_id->setDbValue($rs->fields('kelas_id'));
 			$this->NIS->setDbValue($rs->fields('NIS'));
 			$this->Nama->setDbValue($rs->fields('Nama'));
+			$this->Jenis->setDbValue($rs->fields('Jenis'));
+			$this->Nilai->setDbValue($rs->fields('Nilai'));
 			$this->Kelas->setDbValue($rs->fields('Kelas'));
 			$this->Sekolah->setDbValue($rs->fields('Sekolah'));
 			$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
 			$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
 			$this->Val[1] = $this->NIS->CurrentValue;
 			$this->Val[2] = $this->Nama->CurrentValue;
-			$this->Val[3] = $this->Kelas->CurrentValue;
-			$this->Val[4] = $this->Sekolah->CurrentValue;
+			$this->Val[3] = $this->Jenis->CurrentValue;
+			$this->Val[4] = $this->Nilai->CurrentValue;
+			$this->Val[5] = $this->Kelas->CurrentValue;
+			$this->Val[6] = $this->Sekolah->CurrentValue;
+			$this->Val[7] = $this->Periode_Text->CurrentValue;
 		} else {
 			$this->siswarutin_id->setDbValue("");
 			$this->siswa_id->setDbValue("");
@@ -783,6 +793,8 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->kelas_id->setDbValue("");
 			$this->NIS->setDbValue("");
 			$this->Nama->setDbValue("");
+			$this->Jenis->setDbValue("");
+			$this->Nilai->setDbValue("");
 			$this->Kelas->setDbValue("");
 			$this->Sekolah->setDbValue("");
 			$this->Periode_Tahun_Bulan->setDbValue("");
@@ -987,11 +999,20 @@ class crv02_siswa_rpt extends crv02_siswa {
 			// Nama
 			$this->Nama->HrefValue = "";
 
+			// Jenis
+			$this->Jenis->HrefValue = "";
+
+			// Nilai
+			$this->Nilai->HrefValue = "";
+
 			// Kelas
 			$this->Kelas->HrefValue = "";
 
 			// Sekolah
 			$this->Sekolah->HrefValue = "";
+
+			// Periode_Text
+			$this->Periode_Text->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			} else {
@@ -1005,6 +1026,16 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->Nama->ViewValue = $this->Nama->CurrentValue;
 			$this->Nama->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
+			// Jenis
+			$this->Jenis->ViewValue = $this->Jenis->CurrentValue;
+			$this->Jenis->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// Nilai
+			$this->Nilai->ViewValue = $this->Nilai->CurrentValue;
+			$this->Nilai->ViewValue = ewr_FormatNumber($this->Nilai->ViewValue, 2, -2, -2, -2);
+			$this->Nilai->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->Nilai->CellAttrs["style"] = "text-align:right;";
+
 			// Kelas
 			$this->Kelas->ViewValue = $this->Kelas->CurrentValue;
 			$this->Kelas->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
@@ -1013,17 +1044,30 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->Sekolah->ViewValue = $this->Sekolah->CurrentValue;
 			$this->Sekolah->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
+			// Periode_Text
+			$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
+			$this->Periode_Text->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// NIS
 			$this->NIS->HrefValue = "";
 
 			// Nama
 			$this->Nama->HrefValue = "";
 
+			// Jenis
+			$this->Jenis->HrefValue = "";
+
+			// Nilai
+			$this->Nilai->HrefValue = "";
+
 			// Kelas
 			$this->Kelas->HrefValue = "";
 
 			// Sekolah
 			$this->Sekolah->HrefValue = "";
+
+			// Periode_Text
+			$this->Periode_Text->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1048,6 +1092,24 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$LinkAttrs = &$this->Nama->LinkAttrs;
 			$this->Cell_Rendered($this->Nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// Jenis
+			$CurrentValue = $this->Jenis->CurrentValue;
+			$ViewValue = &$this->Jenis->ViewValue;
+			$ViewAttrs = &$this->Jenis->ViewAttrs;
+			$CellAttrs = &$this->Jenis->CellAttrs;
+			$HrefValue = &$this->Jenis->HrefValue;
+			$LinkAttrs = &$this->Jenis->LinkAttrs;
+			$this->Cell_Rendered($this->Jenis, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Nilai
+			$CurrentValue = $this->Nilai->CurrentValue;
+			$ViewValue = &$this->Nilai->ViewValue;
+			$ViewAttrs = &$this->Nilai->ViewAttrs;
+			$CellAttrs = &$this->Nilai->CellAttrs;
+			$HrefValue = &$this->Nilai->HrefValue;
+			$LinkAttrs = &$this->Nilai->LinkAttrs;
+			$this->Cell_Rendered($this->Nilai, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// Kelas
 			$CurrentValue = $this->Kelas->CurrentValue;
 			$ViewValue = &$this->Kelas->ViewValue;
@@ -1065,6 +1127,15 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$HrefValue = &$this->Sekolah->HrefValue;
 			$LinkAttrs = &$this->Sekolah->LinkAttrs;
 			$this->Cell_Rendered($this->Sekolah, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Periode_Text
+			$CurrentValue = $this->Periode_Text->CurrentValue;
+			$ViewValue = &$this->Periode_Text->ViewValue;
+			$ViewAttrs = &$this->Periode_Text->ViewAttrs;
+			$CellAttrs = &$this->Periode_Text->CellAttrs;
+			$HrefValue = &$this->Periode_Text->HrefValue;
+			$LinkAttrs = &$this->Periode_Text->LinkAttrs;
+			$this->Cell_Rendered($this->Periode_Text, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1079,8 +1150,11 @@ class crv02_siswa_rpt extends crv02_siswa {
 		$this->DtlColumnCount = 0;
 		if ($this->NIS->Visible) $this->DtlColumnCount += 1;
 		if ($this->Nama->Visible) $this->DtlColumnCount += 1;
+		if ($this->Jenis->Visible) $this->DtlColumnCount += 1;
+		if ($this->Nilai->Visible) $this->DtlColumnCount += 1;
 		if ($this->Kelas->Visible) $this->DtlColumnCount += 1;
 		if ($this->Sekolah->Visible) $this->DtlColumnCount += 1;
+		if ($this->Periode_Text->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1124,8 +1198,10 @@ class crv02_siswa_rpt extends crv02_siswa {
 			// Load default values
 			$this->SetSessionDropDownValue($this->NIS->DropDownValue, $this->NIS->SearchOperator, 'NIS'); // Field NIS
 			$this->SetSessionDropDownValue($this->Nama->DropDownValue, $this->Nama->SearchOperator, 'Nama'); // Field Nama
+			$this->SetSessionDropDownValue($this->Jenis->DropDownValue, $this->Jenis->SearchOperator, 'Jenis'); // Field Jenis
 			$this->SetSessionDropDownValue($this->Kelas->DropDownValue, $this->Kelas->SearchOperator, 'Kelas'); // Field Kelas
 			$this->SetSessionDropDownValue($this->Sekolah->DropDownValue, $this->Sekolah->SearchOperator, 'Sekolah'); // Field Sekolah
+			$this->SetSessionDropDownValue($this->Periode_Text->DropDownValue, $this->Periode_Text->SearchOperator, 'Periode_Text'); // Field Periode_Text
 
 			//$bSetupFilter = TRUE; // No need to set up, just use default
 		} else {
@@ -1145,6 +1221,13 @@ class crv02_siswa_rpt extends crv02_siswa {
 				$bSetupFilter = TRUE;
 			}
 
+			// Field Jenis
+			if ($this->GetDropDownValue($this->Jenis)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Jenis->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v02_siswa_Jenis'])) {
+				$bSetupFilter = TRUE;
+			}
+
 			// Field Kelas
 			if ($this->GetDropDownValue($this->Kelas)) {
 				$bSetupFilter = TRUE;
@@ -1158,6 +1241,13 @@ class crv02_siswa_rpt extends crv02_siswa {
 			} elseif ($this->Sekolah->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v02_siswa_Sekolah'])) {
 				$bSetupFilter = TRUE;
 			}
+
+			// Field Periode_Text
+			if ($this->GetDropDownValue($this->Periode_Text)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Periode_Text->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v02_siswa_Periode_Text'])) {
+				$bSetupFilter = TRUE;
+			}
 			if (!$this->ValidateForm()) {
 				$this->setFailureMessage($gsFormError);
 				return $sFilter;
@@ -1168,8 +1258,10 @@ class crv02_siswa_rpt extends crv02_siswa {
 		if ($bRestoreSession) {
 			$this->GetSessionDropDownValue($this->NIS); // Field NIS
 			$this->GetSessionDropDownValue($this->Nama); // Field Nama
+			$this->GetSessionDropDownValue($this->Jenis); // Field Jenis
 			$this->GetSessionDropDownValue($this->Kelas); // Field Kelas
 			$this->GetSessionDropDownValue($this->Sekolah); // Field Sekolah
+			$this->GetSessionDropDownValue($this->Periode_Text); // Field Periode_Text
 		}
 
 		// Call page filter validated event
@@ -1178,14 +1270,18 @@ class crv02_siswa_rpt extends crv02_siswa {
 		// Build SQL
 		$this->BuildDropDownFilter($this->NIS, $sFilter, $this->NIS->SearchOperator, FALSE, TRUE); // Field NIS
 		$this->BuildDropDownFilter($this->Nama, $sFilter, $this->Nama->SearchOperator, FALSE, TRUE); // Field Nama
+		$this->BuildDropDownFilter($this->Jenis, $sFilter, $this->Jenis->SearchOperator, FALSE, TRUE); // Field Jenis
 		$this->BuildDropDownFilter($this->Kelas, $sFilter, $this->Kelas->SearchOperator, FALSE, TRUE); // Field Kelas
 		$this->BuildDropDownFilter($this->Sekolah, $sFilter, $this->Sekolah->SearchOperator, FALSE, TRUE); // Field Sekolah
+		$this->BuildDropDownFilter($this->Periode_Text, $sFilter, $this->Periode_Text->SearchOperator, FALSE, TRUE); // Field Periode_Text
 
 		// Save parms to session
 		$this->SetSessionDropDownValue($this->NIS->DropDownValue, $this->NIS->SearchOperator, 'NIS'); // Field NIS
 		$this->SetSessionDropDownValue($this->Nama->DropDownValue, $this->Nama->SearchOperator, 'Nama'); // Field Nama
+		$this->SetSessionDropDownValue($this->Jenis->DropDownValue, $this->Jenis->SearchOperator, 'Jenis'); // Field Jenis
 		$this->SetSessionDropDownValue($this->Kelas->DropDownValue, $this->Kelas->SearchOperator, 'Kelas'); // Field Kelas
 		$this->SetSessionDropDownValue($this->Sekolah->DropDownValue, $this->Sekolah->SearchOperator, 'Sekolah'); // Field Sekolah
+		$this->SetSessionDropDownValue($this->Periode_Text->DropDownValue, $this->Periode_Text->SearchOperator, 'Periode_Text'); // Field Periode_Text
 
 		// Setup filter
 		if ($bSetupFilter) {
@@ -1197,11 +1293,17 @@ class crv02_siswa_rpt extends crv02_siswa {
 		// Field Nama
 		ewr_LoadDropDownList($this->Nama->DropDownList, $this->Nama->DropDownValue);
 
+		// Field Jenis
+		ewr_LoadDropDownList($this->Jenis->DropDownList, $this->Jenis->DropDownValue);
+
 		// Field Kelas
 		ewr_LoadDropDownList($this->Kelas->DropDownList, $this->Kelas->DropDownValue);
 
 		// Field Sekolah
 		ewr_LoadDropDownList($this->Sekolah->DropDownList, $this->Sekolah->DropDownValue);
+
+		// Field Periode_Text
+		ewr_LoadDropDownList($this->Periode_Text->DropDownList, $this->Periode_Text->DropDownValue);
 		return $sFilter;
 	}
 
@@ -1510,6 +1612,10 @@ class crv02_siswa_rpt extends crv02_siswa {
 		$this->Nama->DefaultDropDownValue = EWR_INIT_VALUE;
 		if (!$this->SearchCommand) $this->Nama->DropDownValue = $this->Nama->DefaultDropDownValue;
 
+		// Field Jenis
+		$this->Jenis->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Jenis->DropDownValue = $this->Jenis->DefaultDropDownValue;
+
 		// Field Kelas
 		$this->Kelas->DefaultDropDownValue = EWR_INIT_VALUE;
 		if (!$this->SearchCommand) $this->Kelas->DropDownValue = $this->Kelas->DefaultDropDownValue;
@@ -1517,6 +1623,10 @@ class crv02_siswa_rpt extends crv02_siswa {
 		// Field Sekolah
 		$this->Sekolah->DefaultDropDownValue = EWR_INIT_VALUE;
 		if (!$this->SearchCommand) $this->Sekolah->DropDownValue = $this->Sekolah->DefaultDropDownValue;
+
+		// Field Periode_Text
+		$this->Periode_Text->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Periode_Text->DropDownValue = $this->Periode_Text->DefaultDropDownValue;
 		/**
 		* Set up default values for extended filters
 		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
@@ -1544,12 +1654,20 @@ class crv02_siswa_rpt extends crv02_siswa {
 		if ($this->NonTextFilterApplied($this->Nama))
 			return TRUE;
 
+		// Check Jenis extended filter
+		if ($this->NonTextFilterApplied($this->Jenis))
+			return TRUE;
+
 		// Check Kelas extended filter
 		if ($this->NonTextFilterApplied($this->Kelas))
 			return TRUE;
 
 		// Check Sekolah extended filter
 		if ($this->NonTextFilterApplied($this->Sekolah))
+			return TRUE;
+
+		// Check Periode_Text extended filter
+		if ($this->NonTextFilterApplied($this->Periode_Text))
 			return TRUE;
 		return FALSE;
 	}
@@ -1585,6 +1703,18 @@ class crv02_siswa_rpt extends crv02_siswa {
 		if ($sFilter <> "")
 			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Nama->FldCaption() . "</span>" . $sFilter . "</div>";
 
+		// Field Jenis
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->Jenis, $sExtWrk, $this->Jenis->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Jenis->FldCaption() . "</span>" . $sFilter . "</div>";
+
 		// Field Kelas
 		$sExtWrk = "";
 		$sWrk = "";
@@ -1608,6 +1738,18 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
 		if ($sFilter <> "")
 			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Sekolah->FldCaption() . "</span>" . $sFilter . "</div>";
+
+		// Field Periode_Text
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->Periode_Text, $sExtWrk, $this->Periode_Text->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Periode_Text->FldCaption() . "</span>" . $sFilter . "</div>";
 		$divstyle = "";
 		$divdataclass = "";
 
@@ -1654,6 +1796,18 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$sFilterList .= $sWrk;
 		}
 
+		// Field Jenis
+		$sWrk = "";
+		$sWrk = ($this->Jenis->DropDownValue <> EWR_INIT_VALUE) ? $this->Jenis->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Jenis\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
 		// Field Kelas
 		$sWrk = "";
 		$sWrk = ($this->Kelas->DropDownValue <> EWR_INIT_VALUE) ? $this->Kelas->DropDownValue : "";
@@ -1673,6 +1827,18 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$sWrk = implode("||", $sWrk);
 		if ($sWrk <> "")
 			$sWrk = "\"sv_Sekolah\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Field Periode_Text
+		$sWrk = "";
+		$sWrk = ($this->Periode_Text->DropDownValue <> EWR_INIT_VALUE) ? $this->Periode_Text->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Periode_Text\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1726,6 +1892,19 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Nama");
 		}
 
+		// Field Jenis
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_Jenis", $filter)) {
+			$sWrk = $filter["sv_Jenis"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Jenis"], "Jenis");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Jenis");
+		}
+
 		// Field Kelas
 		$bRestoreFilter = FALSE;
 		if (array_key_exists("sv_Kelas", $filter)) {
@@ -1750,6 +1929,19 @@ class crv02_siswa_rpt extends crv02_siswa {
 		}
 		if (!$bRestoreFilter) { // Clear filter
 			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Sekolah");
+		}
+
+		// Field Periode_Text
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_Periode_Text", $filter)) {
+			$sWrk = $filter["sv_Periode_Text"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Periode_Text"], "Periode_Text");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Periode_Text");
 		}
 		return TRUE;
 	}
@@ -1782,8 +1974,11 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->setStartGroup(1);
 			$this->NIS->setSort("");
 			$this->Nama->setSort("");
+			$this->Jenis->setSort("");
+			$this->Nilai->setSort("");
 			$this->Kelas->setSort("");
 			$this->Sekolah->setSort("");
+			$this->Periode_Text->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -1791,8 +1986,11 @@ class crv02_siswa_rpt extends crv02_siswa {
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->NIS, $bCtrl); // NIS
 			$this->UpdateSort($this->Nama, $bCtrl); // Nama
+			$this->UpdateSort($this->Jenis, $bCtrl); // Jenis
+			$this->UpdateSort($this->Nilai, $bCtrl); // Nilai
 			$this->UpdateSort($this->Kelas, $bCtrl); // Kelas
 			$this->UpdateSort($this->Sekolah, $bCtrl); // Sekolah
+			$this->UpdateSort($this->Periode_Text, $bCtrl); // Periode_Text
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2039,8 +2237,10 @@ fv02_siswarpt.ValidateRequired = false; // No JavaScript validation
 // Use Ajax
 fv02_siswarpt.Lists["sv_NIS"] = {"LinkField":"sv_NIS","Ajax":true,"DisplayFields":["sv_NIS","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 fv02_siswarpt.Lists["sv_Nama"] = {"LinkField":"sv_Nama","Ajax":true,"DisplayFields":["sv_Nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv02_siswarpt.Lists["sv_Jenis"] = {"LinkField":"sv_Jenis","Ajax":true,"DisplayFields":["sv_Jenis","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 fv02_siswarpt.Lists["sv_Kelas"] = {"LinkField":"sv_Kelas","Ajax":true,"DisplayFields":["sv_Kelas","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 fv02_siswarpt.Lists["sv_Sekolah"] = {"LinkField":"sv_Sekolah","Ajax":true,"DisplayFields":["sv_Sekolah","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv02_siswarpt.Lists["sv_Periode_Text"] = {"LinkField":"sv_Periode_Text","Ajax":true,"DisplayFields":["sv_Periode_Text","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
@@ -2174,6 +2374,41 @@ if (!$Page->DrillDownInPanel) {
 </div>
 </div>
 <div id="r_3" class="ewRow">
+<div id="c_Jenis" class="ewCell form-group">
+	<label for="sv_Jenis" class="ewSearchCaption ewLabel"><?php echo $Page->Jenis->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Jenis->EditAttrs["class"], "form-control"); ?>
+<select data-table="v02_siswa" data-field="x_Jenis" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Jenis->DisplayValueSeparator) ? json_encode($Page->Jenis->DisplayValueSeparator) : $Page->Jenis->DisplayValueSeparator) ?>" id="sv_Jenis" name="sv_Jenis"<?php echo $Page->Jenis->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Jenis->AdvancedFilters) ? count($Page->Jenis->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Jenis->DropDownList) ? count($Page->Jenis->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Jenis->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Jenis->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Jenis->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Jenis->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Jenis" id="s_sv_Jenis" value="<?php echo $Page->Jenis->LookupFilterQuery() ?>"></span>
+</div>
+</div>
+<div id="r_4" class="ewRow">
 <div id="c_Kelas" class="ewCell form-group">
 	<label for="sv_Kelas" class="ewSearchCaption ewLabel"><?php echo $Page->Kelas->FldCaption() ?></label>
 	<span class="ewSearchField">
@@ -2208,7 +2443,7 @@ if (!$Page->DrillDownInPanel) {
 <input type="hidden" name="s_sv_Kelas" id="s_sv_Kelas" value="<?php echo $Page->Kelas->LookupFilterQuery() ?>"></span>
 </div>
 </div>
-<div id="r_4" class="ewRow">
+<div id="r_5" class="ewRow">
 <div id="c_Sekolah" class="ewCell form-group">
 	<label for="sv_Sekolah" class="ewSearchCaption ewLabel"><?php echo $Page->Sekolah->FldCaption() ?></label>
 	<span class="ewSearchField">
@@ -2241,6 +2476,41 @@ if (!$Page->DrillDownInPanel) {
 ?>
 </select>
 <input type="hidden" name="s_sv_Sekolah" id="s_sv_Sekolah" value="<?php echo $Page->Sekolah->LookupFilterQuery() ?>"></span>
+</div>
+</div>
+<div id="r_6" class="ewRow">
+<div id="c_Periode_Text" class="ewCell form-group">
+	<label for="sv_Periode_Text" class="ewSearchCaption ewLabel"><?php echo $Page->Periode_Text->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Periode_Text->EditAttrs["class"], "form-control"); ?>
+<select data-table="v02_siswa" data-field="x_Periode_Text" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Periode_Text->DisplayValueSeparator) ? json_encode($Page->Periode_Text->DisplayValueSeparator) : $Page->Periode_Text->DisplayValueSeparator) ?>" id="sv_Periode_Text" name="sv_Periode_Text"<?php echo $Page->Periode_Text->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Periode_Text->AdvancedFilters) ? count($Page->Periode_Text->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Periode_Text->DropDownList) ? count($Page->Periode_Text->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Periode_Text->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Periode_Text->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Periode_Text->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Periode_Text->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Periode_Text" id="s_sv_Periode_Text" value="<?php echo $Page->Periode_Text->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">
@@ -2337,6 +2607,42 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->Jenis->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Jenis"><div class="v02_siswa_Jenis"><span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Jenis">
+<?php if ($Page->SortUrl($Page->Jenis) == "") { ?>
+		<div class="ewTableHeaderBtn v02_siswa_Jenis">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v02_siswa_Jenis" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Jenis) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Jenis->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Jenis->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->Nilai->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Nilai"><div class="v02_siswa_Nilai" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Nilai">
+<?php if ($Page->SortUrl($Page->Nilai) == "") { ?>
+		<div class="ewTableHeaderBtn v02_siswa_Nilai" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v02_siswa_Nilai" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Nilai) ?>',2);" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Nilai->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Nilai->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 <?php if ($Page->Kelas->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="Kelas"><div class="v02_siswa_Kelas"><span class="ewTableHeaderCaption"><?php echo $Page->Kelas->FldCaption() ?></span></div></td>
@@ -2373,6 +2679,24 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->Periode_Text->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Periode_Text"><div class="v02_siswa_Periode_Text"><span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Periode_Text">
+<?php if ($Page->SortUrl($Page->Periode_Text) == "") { ?>
+		<div class="ewTableHeaderBtn v02_siswa_Periode_Text">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v02_siswa_Periode_Text" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Periode_Text) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Periode_Text->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Periode_Text->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2399,6 +2723,14 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 		<td data-field="Nama"<?php echo $Page->Nama->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Nama"<?php echo $Page->Nama->ViewAttributes() ?>><?php echo $Page->Nama->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->Jenis->Visible) { ?>
+		<td data-field="Jenis"<?php echo $Page->Jenis->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Jenis"<?php echo $Page->Jenis->ViewAttributes() ?>><?php echo $Page->Jenis->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Nilai->Visible) { ?>
+		<td data-field="Nilai"<?php echo $Page->Nilai->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Nilai"<?php echo $Page->Nilai->ViewAttributes() ?>><?php echo $Page->Nilai->ListViewValue() ?></span></td>
+<?php } ?>
 <?php if ($Page->Kelas->Visible) { ?>
 		<td data-field="Kelas"<?php echo $Page->Kelas->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Kelas"<?php echo $Page->Kelas->ViewAttributes() ?>><?php echo $Page->Kelas->ListViewValue() ?></span></td>
@@ -2406,6 +2738,10 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php if ($Page->Sekolah->Visible) { ?>
 		<td data-field="Sekolah"<?php echo $Page->Sekolah->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Sekolah"<?php echo $Page->Sekolah->ViewAttributes() ?>><?php echo $Page->Sekolah->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Periode_Text->Visible) { ?>
+		<td data-field="Periode_Text"<?php echo $Page->Periode_Text->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v02_siswa_Periode_Text"<?php echo $Page->Periode_Text->ViewAttributes() ?>><?php echo $Page->Periode_Text->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
