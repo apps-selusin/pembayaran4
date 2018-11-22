@@ -808,7 +808,7 @@ CREATE TABLE `v03_siswa_blm_byr` (
 --
 DROP TABLE IF EXISTS `v01_siswa`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v01_siswa`  AS  select `t04_siswa`.`id` AS `id`,`t04_siswa`.`sekolah_id` AS `sekolah_id`,`t04_siswa`.`kelas_id` AS `kelas_id`,`t04_siswa`.`NIS` AS `NIS`,`t04_siswa`.`Nama` AS `Nama` from `t04_siswa` ;
+CREATE VIEW `v01_siswa`  AS  select `t04_siswa`.`id` AS `id`,`t04_siswa`.`sekolah_id` AS `sekolah_id`,`t04_siswa`.`kelas_id` AS `kelas_id`,`t04_siswa`.`NIS` AS `NIS`,`t04_siswa`.`Nama` AS `Nama` from `t04_siswa` ;
 
 -- --------------------------------------------------------
 
@@ -817,7 +817,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v02_siswa`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v02_siswa`  AS  select `a`.`siswarutin_id` AS `siswarutin_id`,`b`.`siswa_id` AS `siswa_id`,`b`.`rutin_id` AS `rutin_id`,`c`.`sekolah_id` AS `sekolah_id`,`c`.`kelas_id` AS `kelas_id`,`c`.`NIS` AS `NIS`,`c`.`Nama` AS `Nama`,`f`.`Jenis` AS `Jenis`,`b`.`Nilai` AS `Nilai`,`d`.`Kelas` AS `Kelas`,`e`.`Sekolah` AS `Sekolah`,`a`.`Periode_Tahun_Bulan` AS `Periode_Tahun_Bulan`,`a`.`Periode_Text` AS `Periode_Text` from (((((`t07_siswarutinbayar` `a` left join `t06_siswarutin` `b` on((`a`.`siswarutin_id` = `b`.`id`))) left join `t04_siswa` `c` on((`b`.`siswa_id` = `c`.`id`))) left join `t03_kelas` `d` on((`c`.`kelas_id` = `d`.`id`))) left join `t02_sekolah` `e` on((`c`.`sekolah_id` = `e`.`id`))) left join `t05_rutin` `f` on((`b`.`rutin_id` = `f`.`id`))) where (`a`.`Tanggal_Bayar` is not null) ;
+CREATE VIEW `v02_siswa`  AS  select `a`.`siswarutin_id` AS `siswarutin_id`,`b`.`siswa_id` AS `siswa_id`,`b`.`rutin_id` AS `rutin_id`,`c`.`sekolah_id` AS `sekolah_id`,`c`.`kelas_id` AS `kelas_id`,`c`.`NIS` AS `NIS`,`c`.`Nama` AS `Nama`,`f`.`Jenis` AS `Jenis`,`b`.`Nilai` AS `Nilai`,`d`.`Kelas` AS `Kelas`,`e`.`Sekolah` AS `Sekolah`,`a`.`Periode_Tahun_Bulan` AS `Periode_Tahun_Bulan`,`a`.`Periode_Text` AS `Periode_Text` from (((((`t07_siswarutinbayar` `a` left join `t06_siswarutin` `b` on((`a`.`siswarutin_id` = `b`.`id`))) left join `t04_siswa` `c` on((`b`.`siswa_id` = `c`.`id`))) left join `t03_kelas` `d` on((`c`.`kelas_id` = `d`.`id`))) left join `t02_sekolah` `e` on((`c`.`sekolah_id` = `e`.`id`))) left join `t05_rutin` `f` on((`b`.`rutin_id` = `f`.`id`))) where (`a`.`Tanggal_Bayar` is not null) ;
 
 -- --------------------------------------------------------
 
@@ -826,7 +826,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v03_siswa_blm_byr`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v03_siswa_blm_byr`  AS  select `a`.`siswarutin_id` AS `siswarutin_id`,`b`.`siswa_id` AS `siswa_id`,`b`.`rutin_id` AS `rutin_id`,`c`.`sekolah_id` AS `sekolah_id`,`c`.`kelas_id` AS `kelas_id`,`c`.`NIS` AS `NIS`,`c`.`Nama` AS `Nama`,`f`.`Jenis` AS `Jenis`,`b`.`Nilai` AS `Nilai`,`d`.`Kelas` AS `Kelas`,`e`.`Sekolah` AS `Sekolah`,`a`.`Periode_Tahun_Bulan` AS `Periode_Tahun_Bulan`,`a`.`Periode_Text` AS `Periode_Text` from (((((`t07_siswarutinbayar` `a` left join `t06_siswarutin` `b` on((`a`.`siswarutin_id` = `b`.`id`))) left join `t04_siswa` `c` on((`b`.`siswa_id` = `c`.`id`))) left join `t03_kelas` `d` on((`c`.`kelas_id` = `d`.`id`))) left join `t02_sekolah` `e` on((`c`.`sekolah_id` = `e`.`id`))) left join `t05_rutin` `f` on((`b`.`rutin_id` = `f`.`id`))) where isnull(`a`.`Tanggal_Bayar`) ;
+CREATE VIEW `v03_siswa_blm_byr`  AS  select `a`.`siswarutin_id` AS `siswarutin_id`,`b`.`siswa_id` AS `siswa_id`,`b`.`rutin_id` AS `rutin_id`,`c`.`sekolah_id` AS `sekolah_id`,`c`.`kelas_id` AS `kelas_id`,`c`.`NIS` AS `NIS`,`c`.`Nama` AS `Nama`,`f`.`Jenis` AS `Jenis`,`b`.`Nilai` AS `Nilai`,`d`.`Kelas` AS `Kelas`,`e`.`Sekolah` AS `Sekolah`,`a`.`Periode_Tahun_Bulan` AS `Periode_Tahun_Bulan`,`a`.`Periode_Text` AS `Periode_Text` from (((((`t07_siswarutinbayar` `a` left join `t06_siswarutin` `b` on((`a`.`siswarutin_id` = `b`.`id`))) left join `t04_siswa` `c` on((`b`.`siswa_id` = `c`.`id`))) left join `t03_kelas` `d` on((`c`.`kelas_id` = `d`.`id`))) left join `t02_sekolah` `e` on((`c`.`sekolah_id` = `e`.`id`))) left join `t05_rutin` `f` on((`b`.`rutin_id` = `f`.`id`))) where isnull(`a`.`Tanggal_Bayar`) ;
 
 --
 -- Indexes for dumped tables
