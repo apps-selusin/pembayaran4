@@ -4,6 +4,10 @@
 
 12:12 PM 11/22/2018
 - kerjakan laporan uang masuk
+  - baca data dari tabel t07_siswarutinbayar dan t10_siswanonrutinbayar
+  - baca data sesuai periode yang aktif
+  - simpan dalam view
+  - view diolah oleh report-maker
 
 
 
