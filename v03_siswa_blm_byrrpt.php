@@ -266,13 +266,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$gsEmailContentType = @$_POST["contenttype"]; // Get email content type
 
 		// Setup placeholder
-		$this->NIS->PlaceHolder = $this->NIS->FldCaption();
-		$this->Nama->PlaceHolder = $this->Nama->FldCaption();
-		$this->Jenis->PlaceHolder = $this->Jenis->FldCaption();
-		$this->Kelas->PlaceHolder = $this->Kelas->FldCaption();
-		$this->Sekolah->PlaceHolder = $this->Sekolah->FldCaption();
-
 		// Setup export options
+
 		$this->SetupExportOptions();
 
 		// Global Page Loading event (in userfn*.php)
@@ -1222,38 +1217,48 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		} elseif (@$_GET["cmd"] == "reset") {
 
 			// Load default values
-			$this->SetSessionFilterValues($this->NIS->SearchValue, $this->NIS->SearchOperator, $this->NIS->SearchCondition, $this->NIS->SearchValue2, $this->NIS->SearchOperator2, 'NIS'); // Field NIS
-			$this->SetSessionFilterValues($this->Nama->SearchValue, $this->Nama->SearchOperator, $this->Nama->SearchCondition, $this->Nama->SearchValue2, $this->Nama->SearchOperator2, 'Nama'); // Field Nama
-			$this->SetSessionFilterValues($this->Jenis->SearchValue, $this->Jenis->SearchOperator, $this->Jenis->SearchCondition, $this->Jenis->SearchValue2, $this->Jenis->SearchOperator2, 'Jenis'); // Field Jenis
-			$this->SetSessionFilterValues($this->Kelas->SearchValue, $this->Kelas->SearchOperator, $this->Kelas->SearchCondition, $this->Kelas->SearchValue2, $this->Kelas->SearchOperator2, 'Kelas'); // Field Kelas
-			$this->SetSessionFilterValues($this->Sekolah->SearchValue, $this->Sekolah->SearchOperator, $this->Sekolah->SearchCondition, $this->Sekolah->SearchValue2, $this->Sekolah->SearchOperator2, 'Sekolah'); // Field Sekolah
+			$this->SetSessionDropDownValue($this->NIS->DropDownValue, $this->NIS->SearchOperator, 'NIS'); // Field NIS
+			$this->SetSessionDropDownValue($this->Nama->DropDownValue, $this->Nama->SearchOperator, 'Nama'); // Field Nama
+			$this->SetSessionDropDownValue($this->Jenis->DropDownValue, $this->Jenis->SearchOperator, 'Jenis'); // Field Jenis
+			$this->SetSessionDropDownValue($this->Kelas->DropDownValue, $this->Kelas->SearchOperator, 'Kelas'); // Field Kelas
+			$this->SetSessionDropDownValue($this->Sekolah->DropDownValue, $this->Sekolah->SearchOperator, 'Sekolah'); // Field Sekolah
 
 			//$bSetupFilter = TRUE; // No need to set up, just use default
 		} else {
 			$bRestoreSession = !$this->SearchCommand;
 
 			// Field NIS
-			if ($this->GetFilterValues($this->NIS)) {
+			if ($this->GetDropDownValue($this->NIS)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->NIS->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v03_siswa_blm_byr_NIS'])) {
 				$bSetupFilter = TRUE;
 			}
 
 			// Field Nama
-			if ($this->GetFilterValues($this->Nama)) {
+			if ($this->GetDropDownValue($this->Nama)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Nama->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v03_siswa_blm_byr_Nama'])) {
 				$bSetupFilter = TRUE;
 			}
 
 			// Field Jenis
-			if ($this->GetFilterValues($this->Jenis)) {
+			if ($this->GetDropDownValue($this->Jenis)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Jenis->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v03_siswa_blm_byr_Jenis'])) {
 				$bSetupFilter = TRUE;
 			}
 
 			// Field Kelas
-			if ($this->GetFilterValues($this->Kelas)) {
+			if ($this->GetDropDownValue($this->Kelas)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Kelas->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v03_siswa_blm_byr_Kelas'])) {
 				$bSetupFilter = TRUE;
 			}
 
 			// Field Sekolah
-			if ($this->GetFilterValues($this->Sekolah)) {
+			if ($this->GetDropDownValue($this->Sekolah)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Sekolah->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_v03_siswa_blm_byr_Sekolah'])) {
 				$bSetupFilter = TRUE;
 			}
 			if (!$this->ValidateForm()) {
@@ -1264,33 +1269,48 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Restore session
 		if ($bRestoreSession) {
-			$this->GetSessionFilterValues($this->NIS); // Field NIS
-			$this->GetSessionFilterValues($this->Nama); // Field Nama
-			$this->GetSessionFilterValues($this->Jenis); // Field Jenis
-			$this->GetSessionFilterValues($this->Kelas); // Field Kelas
-			$this->GetSessionFilterValues($this->Sekolah); // Field Sekolah
+			$this->GetSessionDropDownValue($this->NIS); // Field NIS
+			$this->GetSessionDropDownValue($this->Nama); // Field Nama
+			$this->GetSessionDropDownValue($this->Jenis); // Field Jenis
+			$this->GetSessionDropDownValue($this->Kelas); // Field Kelas
+			$this->GetSessionDropDownValue($this->Sekolah); // Field Sekolah
 		}
 
 		// Call page filter validated event
 		$this->Page_FilterValidated();
 
 		// Build SQL
-		$this->BuildExtendedFilter($this->NIS, $sFilter, FALSE, TRUE); // Field NIS
-		$this->BuildExtendedFilter($this->Nama, $sFilter, FALSE, TRUE); // Field Nama
-		$this->BuildExtendedFilter($this->Jenis, $sFilter, FALSE, TRUE); // Field Jenis
-		$this->BuildExtendedFilter($this->Kelas, $sFilter, FALSE, TRUE); // Field Kelas
-		$this->BuildExtendedFilter($this->Sekolah, $sFilter, FALSE, TRUE); // Field Sekolah
+		$this->BuildDropDownFilter($this->NIS, $sFilter, $this->NIS->SearchOperator, FALSE, TRUE); // Field NIS
+		$this->BuildDropDownFilter($this->Nama, $sFilter, $this->Nama->SearchOperator, FALSE, TRUE); // Field Nama
+		$this->BuildDropDownFilter($this->Jenis, $sFilter, $this->Jenis->SearchOperator, FALSE, TRUE); // Field Jenis
+		$this->BuildDropDownFilter($this->Kelas, $sFilter, $this->Kelas->SearchOperator, FALSE, TRUE); // Field Kelas
+		$this->BuildDropDownFilter($this->Sekolah, $sFilter, $this->Sekolah->SearchOperator, FALSE, TRUE); // Field Sekolah
 
 		// Save parms to session
-		$this->SetSessionFilterValues($this->NIS->SearchValue, $this->NIS->SearchOperator, $this->NIS->SearchCondition, $this->NIS->SearchValue2, $this->NIS->SearchOperator2, 'NIS'); // Field NIS
-		$this->SetSessionFilterValues($this->Nama->SearchValue, $this->Nama->SearchOperator, $this->Nama->SearchCondition, $this->Nama->SearchValue2, $this->Nama->SearchOperator2, 'Nama'); // Field Nama
-		$this->SetSessionFilterValues($this->Jenis->SearchValue, $this->Jenis->SearchOperator, $this->Jenis->SearchCondition, $this->Jenis->SearchValue2, $this->Jenis->SearchOperator2, 'Jenis'); // Field Jenis
-		$this->SetSessionFilterValues($this->Kelas->SearchValue, $this->Kelas->SearchOperator, $this->Kelas->SearchCondition, $this->Kelas->SearchValue2, $this->Kelas->SearchOperator2, 'Kelas'); // Field Kelas
-		$this->SetSessionFilterValues($this->Sekolah->SearchValue, $this->Sekolah->SearchOperator, $this->Sekolah->SearchCondition, $this->Sekolah->SearchValue2, $this->Sekolah->SearchOperator2, 'Sekolah'); // Field Sekolah
+		$this->SetSessionDropDownValue($this->NIS->DropDownValue, $this->NIS->SearchOperator, 'NIS'); // Field NIS
+		$this->SetSessionDropDownValue($this->Nama->DropDownValue, $this->Nama->SearchOperator, 'Nama'); // Field Nama
+		$this->SetSessionDropDownValue($this->Jenis->DropDownValue, $this->Jenis->SearchOperator, 'Jenis'); // Field Jenis
+		$this->SetSessionDropDownValue($this->Kelas->DropDownValue, $this->Kelas->SearchOperator, 'Kelas'); // Field Kelas
+		$this->SetSessionDropDownValue($this->Sekolah->DropDownValue, $this->Sekolah->SearchOperator, 'Sekolah'); // Field Sekolah
 
 		// Setup filter
 		if ($bSetupFilter) {
 		}
+
+		// Field NIS
+		ewr_LoadDropDownList($this->NIS->DropDownList, $this->NIS->DropDownValue);
+
+		// Field Nama
+		ewr_LoadDropDownList($this->Nama->DropDownList, $this->Nama->DropDownValue);
+
+		// Field Jenis
+		ewr_LoadDropDownList($this->Jenis->DropDownList, $this->Jenis->DropDownValue);
+
+		// Field Kelas
+		ewr_LoadDropDownList($this->Kelas->DropDownList, $this->Kelas->DropDownValue);
+
+		// Field Sekolah
+		ewr_LoadDropDownList($this->Sekolah->DropDownList, $this->Sekolah->DropDownValue);
 		return $sFilter;
 	}
 
@@ -1590,6 +1610,26 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		/**
 		* Set up default values for non Text filters
 		*/
+
+		// Field NIS
+		$this->NIS->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->NIS->DropDownValue = $this->NIS->DefaultDropDownValue;
+
+		// Field Nama
+		$this->Nama->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Nama->DropDownValue = $this->Nama->DefaultDropDownValue;
+
+		// Field Jenis
+		$this->Jenis->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Jenis->DropDownValue = $this->Jenis->DefaultDropDownValue;
+
+		// Field Kelas
+		$this->Kelas->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Kelas->DropDownValue = $this->Kelas->DefaultDropDownValue;
+
+		// Field Sekolah
+		$this->Sekolah->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Sekolah->DropDownValue = $this->Sekolah->DefaultDropDownValue;
 		/**
 		* Set up default values for extended filters
 		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
@@ -1601,26 +1641,6 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		* $so2 - Default search operator 2 (if operator 2 is enabled)
 		* $sv2 - Default ext filter value 2 (if operator 2 is enabled)
 		*/
-
-		// Field NIS
-		$this->SetDefaultExtFilter($this->NIS, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->NIS);
-
-		// Field Nama
-		$this->SetDefaultExtFilter($this->Nama, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Nama);
-
-		// Field Jenis
-		$this->SetDefaultExtFilter($this->Jenis, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Jenis);
-
-		// Field Kelas
-		$this->SetDefaultExtFilter($this->Kelas, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Kelas);
-
-		// Field Sekolah
-		$this->SetDefaultExtFilter($this->Sekolah, "LIKE", NULL, 'AND', "=", NULL);
-		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Sekolah);
 		/**
 		* Set up default values for popup filters
 		*/
@@ -1629,24 +1649,24 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 	// Check if filter applied
 	function CheckFilter() {
 
-		// Check NIS text filter
-		if ($this->TextFilterApplied($this->NIS))
+		// Check NIS extended filter
+		if ($this->NonTextFilterApplied($this->NIS))
 			return TRUE;
 
-		// Check Nama text filter
-		if ($this->TextFilterApplied($this->Nama))
+		// Check Nama extended filter
+		if ($this->NonTextFilterApplied($this->Nama))
 			return TRUE;
 
-		// Check Jenis text filter
-		if ($this->TextFilterApplied($this->Jenis))
+		// Check Jenis extended filter
+		if ($this->NonTextFilterApplied($this->Jenis))
 			return TRUE;
 
-		// Check Kelas text filter
-		if ($this->TextFilterApplied($this->Kelas))
+		// Check Kelas extended filter
+		if ($this->NonTextFilterApplied($this->Kelas))
 			return TRUE;
 
-		// Check Sekolah text filter
-		if ($this->TextFilterApplied($this->Sekolah))
+		// Check Sekolah extended filter
+		if ($this->NonTextFilterApplied($this->Sekolah))
 			return TRUE;
 		return FALSE;
 	}
@@ -1661,7 +1681,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field NIS
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->NIS, $sExtWrk);
+		$this->BuildDropDownFilter($this->NIS, $sExtWrk, $this->NIS->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1673,7 +1693,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field Nama
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->Nama, $sExtWrk);
+		$this->BuildDropDownFilter($this->Nama, $sExtWrk, $this->Nama->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1685,7 +1705,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field Jenis
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->Jenis, $sExtWrk);
+		$this->BuildDropDownFilter($this->Jenis, $sExtWrk, $this->Jenis->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1697,7 +1717,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field Kelas
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->Kelas, $sExtWrk);
+		$this->BuildDropDownFilter($this->Kelas, $sExtWrk, $this->Kelas->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1709,7 +1729,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field Sekolah
 		$sExtWrk = "";
 		$sWrk = "";
-		$this->BuildExtendedFilter($this->Sekolah, $sExtWrk);
+		$this->BuildDropDownFilter($this->Sekolah, $sExtWrk, $this->Sekolah->SearchOperator);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1741,13 +1761,11 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field NIS
 		$sWrk = "";
-		if ($this->NIS->SearchValue <> "" || $this->NIS->SearchValue2 <> "") {
-			$sWrk = "\"sv_NIS\":\"" . ewr_JsEncode2($this->NIS->SearchValue) . "\"," .
-				"\"so_NIS\":\"" . ewr_JsEncode2($this->NIS->SearchOperator) . "\"," .
-				"\"sc_NIS\":\"" . ewr_JsEncode2($this->NIS->SearchCondition) . "\"," .
-				"\"sv2_NIS\":\"" . ewr_JsEncode2($this->NIS->SearchValue2) . "\"," .
-				"\"so2_NIS\":\"" . ewr_JsEncode2($this->NIS->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->NIS->DropDownValue <> EWR_INIT_VALUE) ? $this->NIS->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_NIS\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1755,13 +1773,11 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field Nama
 		$sWrk = "";
-		if ($this->Nama->SearchValue <> "" || $this->Nama->SearchValue2 <> "") {
-			$sWrk = "\"sv_Nama\":\"" . ewr_JsEncode2($this->Nama->SearchValue) . "\"," .
-				"\"so_Nama\":\"" . ewr_JsEncode2($this->Nama->SearchOperator) . "\"," .
-				"\"sc_Nama\":\"" . ewr_JsEncode2($this->Nama->SearchCondition) . "\"," .
-				"\"sv2_Nama\":\"" . ewr_JsEncode2($this->Nama->SearchValue2) . "\"," .
-				"\"so2_Nama\":\"" . ewr_JsEncode2($this->Nama->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->Nama->DropDownValue <> EWR_INIT_VALUE) ? $this->Nama->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Nama\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1769,13 +1785,11 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field Jenis
 		$sWrk = "";
-		if ($this->Jenis->SearchValue <> "" || $this->Jenis->SearchValue2 <> "") {
-			$sWrk = "\"sv_Jenis\":\"" . ewr_JsEncode2($this->Jenis->SearchValue) . "\"," .
-				"\"so_Jenis\":\"" . ewr_JsEncode2($this->Jenis->SearchOperator) . "\"," .
-				"\"sc_Jenis\":\"" . ewr_JsEncode2($this->Jenis->SearchCondition) . "\"," .
-				"\"sv2_Jenis\":\"" . ewr_JsEncode2($this->Jenis->SearchValue2) . "\"," .
-				"\"so2_Jenis\":\"" . ewr_JsEncode2($this->Jenis->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->Jenis->DropDownValue <> EWR_INIT_VALUE) ? $this->Jenis->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Jenis\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1783,13 +1797,11 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field Kelas
 		$sWrk = "";
-		if ($this->Kelas->SearchValue <> "" || $this->Kelas->SearchValue2 <> "") {
-			$sWrk = "\"sv_Kelas\":\"" . ewr_JsEncode2($this->Kelas->SearchValue) . "\"," .
-				"\"so_Kelas\":\"" . ewr_JsEncode2($this->Kelas->SearchOperator) . "\"," .
-				"\"sc_Kelas\":\"" . ewr_JsEncode2($this->Kelas->SearchCondition) . "\"," .
-				"\"sv2_Kelas\":\"" . ewr_JsEncode2($this->Kelas->SearchValue2) . "\"," .
-				"\"so2_Kelas\":\"" . ewr_JsEncode2($this->Kelas->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->Kelas->DropDownValue <> EWR_INIT_VALUE) ? $this->Kelas->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Kelas\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1797,13 +1809,11 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field Sekolah
 		$sWrk = "";
-		if ($this->Sekolah->SearchValue <> "" || $this->Sekolah->SearchValue2 <> "") {
-			$sWrk = "\"sv_Sekolah\":\"" . ewr_JsEncode2($this->Sekolah->SearchValue) . "\"," .
-				"\"so_Sekolah\":\"" . ewr_JsEncode2($this->Sekolah->SearchOperator) . "\"," .
-				"\"sc_Sekolah\":\"" . ewr_JsEncode2($this->Sekolah->SearchCondition) . "\"," .
-				"\"sv2_Sekolah\":\"" . ewr_JsEncode2($this->Sekolah->SearchValue2) . "\"," .
-				"\"so2_Sekolah\":\"" . ewr_JsEncode2($this->Sekolah->SearchOperator2) . "\"";
-		}
+		$sWrk = ($this->Sekolah->DropDownValue <> EWR_INIT_VALUE) ? $this->Sekolah->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Sekolah\":\"" . ewr_JsEncode2($sWrk) . "\"";
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1833,62 +1843,67 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Field NIS
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_NIS", $filter) || array_key_exists("so_NIS", $filter) ||
-			array_key_exists("sc_NIS", $filter) ||
-			array_key_exists("sv2_NIS", $filter) || array_key_exists("so2_NIS", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_NIS"], @$filter["so_NIS"], @$filter["sc_NIS"], @$filter["sv2_NIS"], @$filter["so2_NIS"], "NIS");
+		if (array_key_exists("sv_NIS", $filter)) {
+			$sWrk = $filter["sv_NIS"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_NIS"], "NIS");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "NIS");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "NIS");
 		}
 
 		// Field Nama
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_Nama", $filter) || array_key_exists("so_Nama", $filter) ||
-			array_key_exists("sc_Nama", $filter) ||
-			array_key_exists("sv2_Nama", $filter) || array_key_exists("so2_Nama", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_Nama"], @$filter["so_Nama"], @$filter["sc_Nama"], @$filter["sv2_Nama"], @$filter["so2_Nama"], "Nama");
+		if (array_key_exists("sv_Nama", $filter)) {
+			$sWrk = $filter["sv_Nama"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Nama"], "Nama");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Nama");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Nama");
 		}
 
 		// Field Jenis
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_Jenis", $filter) || array_key_exists("so_Jenis", $filter) ||
-			array_key_exists("sc_Jenis", $filter) ||
-			array_key_exists("sv2_Jenis", $filter) || array_key_exists("so2_Jenis", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_Jenis"], @$filter["so_Jenis"], @$filter["sc_Jenis"], @$filter["sv2_Jenis"], @$filter["so2_Jenis"], "Jenis");
+		if (array_key_exists("sv_Jenis", $filter)) {
+			$sWrk = $filter["sv_Jenis"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Jenis"], "Jenis");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Jenis");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Jenis");
 		}
 
 		// Field Kelas
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_Kelas", $filter) || array_key_exists("so_Kelas", $filter) ||
-			array_key_exists("sc_Kelas", $filter) ||
-			array_key_exists("sv2_Kelas", $filter) || array_key_exists("so2_Kelas", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_Kelas"], @$filter["so_Kelas"], @$filter["sc_Kelas"], @$filter["sv2_Kelas"], @$filter["so2_Kelas"], "Kelas");
+		if (array_key_exists("sv_Kelas", $filter)) {
+			$sWrk = $filter["sv_Kelas"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Kelas"], "Kelas");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Kelas");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Kelas");
 		}
 
 		// Field Sekolah
 		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_Sekolah", $filter) || array_key_exists("so_Sekolah", $filter) ||
-			array_key_exists("sc_Sekolah", $filter) ||
-			array_key_exists("sv2_Sekolah", $filter) || array_key_exists("so2_Sekolah", $filter)) {
-			$this->SetSessionFilterValues(@$filter["sv_Sekolah"], @$filter["so_Sekolah"], @$filter["sc_Sekolah"], @$filter["sv2_Sekolah"], @$filter["so2_Sekolah"], "Sekolah");
+		if (array_key_exists("sv_Sekolah", $filter)) {
+			$sWrk = $filter["sv_Sekolah"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Sekolah"], "Sekolah");
 			$bRestoreFilter = TRUE;
 		}
 		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Sekolah");
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Sekolah");
 		}
 		return TRUE;
 	}
@@ -2184,6 +2199,11 @@ fv03_siswa_blm_byrrpt.ValidateRequired = false; // No JavaScript validation
 <?php } ?>
 
 // Use Ajax
+fv03_siswa_blm_byrrpt.Lists["sv_NIS"] = {"LinkField":"sv_NIS","Ajax":true,"DisplayFields":["sv_NIS","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv03_siswa_blm_byrrpt.Lists["sv_Nama"] = {"LinkField":"sv_Nama","Ajax":true,"DisplayFields":["sv_Nama","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv03_siswa_blm_byrrpt.Lists["sv_Jenis"] = {"LinkField":"sv_Jenis","Ajax":true,"DisplayFields":["sv_Jenis","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv03_siswa_blm_byrrpt.Lists["sv_Kelas"] = {"LinkField":"sv_Kelas","Ajax":true,"DisplayFields":["sv_Kelas","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fv03_siswa_blm_byrrpt.Lists["sv_Sekolah"] = {"LinkField":"sv_Sekolah","Ajax":true,"DisplayFields":["sv_Sekolah","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
@@ -2249,51 +2269,176 @@ if (!$Page->DrillDownInPanel) {
 <div id="r_1" class="ewRow">
 <div id="c_NIS" class="ewCell form-group">
 	<label for="sv_NIS" class="ewSearchCaption ewLabel"><?php echo $Page->NIS->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_NIS" id="so_NIS" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->NIS->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_NIS" id="sv_NIS" name="sv_NIS" size="30" maxlength="100" placeholder="<?php echo $Page->NIS->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->NIS->SearchValue) ?>"<?php echo $Page->NIS->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->NIS->EditAttrs["class"], "form-control"); ?>
+<select data-table="v03_siswa_blm_byr" data-field="x_NIS" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->NIS->DisplayValueSeparator) ? json_encode($Page->NIS->DisplayValueSeparator) : $Page->NIS->DisplayValueSeparator) ?>" id="sv_NIS" name="sv_NIS"<?php echo $Page->NIS->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->NIS->AdvancedFilters) ? count($Page->NIS->AdvancedFilters) : 0;
+	$cntd = is_array($Page->NIS->DropDownList) ? count($Page->NIS->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->NIS->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->NIS->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->NIS->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->NIS->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_NIS" id="s_sv_NIS" value="<?php echo $Page->NIS->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div id="r_2" class="ewRow">
 <div id="c_Nama" class="ewCell form-group">
 	<label for="sv_Nama" class="ewSearchCaption ewLabel"><?php echo $Page->Nama->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Nama" id="so_Nama" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->Nama->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Nama" id="sv_Nama" name="sv_Nama" size="30" maxlength="100" placeholder="<?php echo $Page->Nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Nama->SearchValue) ?>"<?php echo $Page->Nama->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Nama->EditAttrs["class"], "form-control"); ?>
+<select data-table="v03_siswa_blm_byr" data-field="x_Nama" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Nama->DisplayValueSeparator) ? json_encode($Page->Nama->DisplayValueSeparator) : $Page->Nama->DisplayValueSeparator) ?>" id="sv_Nama" name="sv_Nama"<?php echo $Page->Nama->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Nama->AdvancedFilters) ? count($Page->Nama->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Nama->DropDownList) ? count($Page->Nama->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Nama->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Nama->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Nama->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Nama->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Nama" id="s_sv_Nama" value="<?php echo $Page->Nama->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div id="r_3" class="ewRow">
 <div id="c_Jenis" class="ewCell form-group">
 	<label for="sv_Jenis" class="ewSearchCaption ewLabel"><?php echo $Page->Jenis->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Jenis" id="so_Jenis" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->Jenis->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Jenis" id="sv_Jenis" name="sv_Jenis" size="30" maxlength="50" placeholder="<?php echo $Page->Jenis->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Jenis->SearchValue) ?>"<?php echo $Page->Jenis->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Jenis->EditAttrs["class"], "form-control"); ?>
+<select data-table="v03_siswa_blm_byr" data-field="x_Jenis" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Jenis->DisplayValueSeparator) ? json_encode($Page->Jenis->DisplayValueSeparator) : $Page->Jenis->DisplayValueSeparator) ?>" id="sv_Jenis" name="sv_Jenis"<?php echo $Page->Jenis->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Jenis->AdvancedFilters) ? count($Page->Jenis->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Jenis->DropDownList) ? count($Page->Jenis->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Jenis->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Jenis->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Jenis->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Jenis->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Jenis" id="s_sv_Jenis" value="<?php echo $Page->Jenis->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div id="r_4" class="ewRow">
 <div id="c_Kelas" class="ewCell form-group">
 	<label for="sv_Kelas" class="ewSearchCaption ewLabel"><?php echo $Page->Kelas->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Kelas" id="so_Kelas" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->Kelas->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Kelas" id="sv_Kelas" name="sv_Kelas" size="30" maxlength="100" placeholder="<?php echo $Page->Kelas->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Kelas->SearchValue) ?>"<?php echo $Page->Kelas->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Kelas->EditAttrs["class"], "form-control"); ?>
+<select data-table="v03_siswa_blm_byr" data-field="x_Kelas" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Kelas->DisplayValueSeparator) ? json_encode($Page->Kelas->DisplayValueSeparator) : $Page->Kelas->DisplayValueSeparator) ?>" id="sv_Kelas" name="sv_Kelas"<?php echo $Page->Kelas->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Kelas->AdvancedFilters) ? count($Page->Kelas->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Kelas->DropDownList) ? count($Page->Kelas->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Kelas->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Kelas->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Kelas->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Kelas->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Kelas" id="s_sv_Kelas" value="<?php echo $Page->Kelas->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div id="r_5" class="ewRow">
 <div id="c_Sekolah" class="ewCell form-group">
 	<label for="sv_Sekolah" class="ewSearchCaption ewLabel"><?php echo $Page->Sekolah->FldCaption() ?></label>
-	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Sekolah" id="so_Sekolah" value="LIKE"></span>
-	<span class="control-group ewSearchField">
-<?php ewr_PrependClass($Page->Sekolah->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Sekolah" id="sv_Sekolah" name="sv_Sekolah" size="30" maxlength="100" placeholder="<?php echo $Page->Sekolah->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Sekolah->SearchValue) ?>"<?php echo $Page->Sekolah->EditAttributes() ?>>
-</span>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Sekolah->EditAttrs["class"], "form-control"); ?>
+<select data-table="v03_siswa_blm_byr" data-field="x_Sekolah" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Sekolah->DisplayValueSeparator) ? json_encode($Page->Sekolah->DisplayValueSeparator) : $Page->Sekolah->DisplayValueSeparator) ?>" id="sv_Sekolah" name="sv_Sekolah"<?php echo $Page->Sekolah->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Sekolah->AdvancedFilters) ? count($Page->Sekolah->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Sekolah->DropDownList) ? count($Page->Sekolah->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Sekolah->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Sekolah->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Sekolah->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Sekolah->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Sekolah" id="s_sv_Sekolah" value="<?php echo $Page->Sekolah->LookupFilterQuery() ?>"></span>
 </div>
 </div>
 <div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">
