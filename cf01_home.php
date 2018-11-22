@@ -295,6 +295,9 @@ $_SESSION["Tahun_Bulan_Text"] = $abulan[ew_ExecuteScalar("select Bulan from t93_
 <!-- periode -->
 <pre><?php $abulan = array("", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"); echo "<strong>Periode</strong>:<br>".$abulan[ew_ExecuteScalar("select Bulan from t93_periode")]." - ".ew_ExecuteScalar("select Tahun from t93_periode"); ?></pre>
 
+<!-- uang masuk -->
+<pre><?php echo "<strong>Uang Masuk</strong>: ".number_format(ew_ExecuteScalar("select sum(Bayar) from v04_uang_masuk where Per_Thn_Bln_Byr = '".$_SESSION["Tahun_Bulan"]."'")); ?></pre>
+
 <!-- log -->
 <pre><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></pre>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
