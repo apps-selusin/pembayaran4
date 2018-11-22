@@ -286,6 +286,12 @@ Page_Rendering();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
+<?php
+$_SESSION["Tahun_Bulan"] = ew_ExecuteScalar("select Tahun_Bulan from t93_periode");
+$abulan = array("", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "Novembber", "Desember");
+$_SESSION["Tahun_Bulan_Text"] = $abulan[ew_ExecuteScalar("select Bulan from t93_periode")]." ".ew_ExecuteScalar("select Tahun from t93_periode");
+?>
+
 <!-- periode -->
 <pre><?php $abulan = array("", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "Novembber", "Desember"); echo "<strong>Periode</strong>:<br>".$abulan[ew_ExecuteScalar("select Bulan from t93_periode")]." - ".ew_ExecuteScalar("select Tahun from t93_periode"); ?></pre>
 

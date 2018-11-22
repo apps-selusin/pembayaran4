@@ -315,6 +315,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Tanggal_Bayar->SetVisibility();
 		$this->Bayar->SetVisibility();
 		$this->Sisa->SetVisibility();
+		$this->Periode_Tahun_Bulan->SetVisibility();
+		$this->Periode_Text->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -536,6 +538,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
 		$this->Bayar->setDbValue($rs->fields('Bayar'));
 		$this->Sisa->setDbValue($rs->fields('Sisa'));
+		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
+		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
 	}
 
 	// Load DbValue from recordset
@@ -548,6 +552,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Tanggal_Bayar->DbValue = $row['Tanggal_Bayar'];
 		$this->Bayar->DbValue = $row['Bayar'];
 		$this->Sisa->DbValue = $row['Sisa'];
+		$this->Periode_Tahun_Bulan->DbValue = $row['Periode_Tahun_Bulan'];
+		$this->Periode_Text->DbValue = $row['Periode_Text'];
 	}
 
 	// Render row values based on field settings
@@ -584,6 +590,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		// Tanggal_Bayar
 		// Bayar
 		// Sisa
+		// Periode_Tahun_Bulan
+		// Periode_Text
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -611,6 +619,14 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		// Sisa
 		$this->Sisa->ViewValue = $this->Sisa->CurrentValue;
 		$this->Sisa->ViewCustomAttributes = "";
+
+		// Periode_Tahun_Bulan
+		$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->CurrentValue;
+		$this->Periode_Tahun_Bulan->ViewCustomAttributes = "";
+
+		// Periode_Text
+		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
+		$this->Periode_Text->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -641,6 +657,16 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 			$this->Sisa->LinkCustomAttributes = "";
 			$this->Sisa->HrefValue = "";
 			$this->Sisa->TooltipValue = "";
+
+			// Periode_Tahun_Bulan
+			$this->Periode_Tahun_Bulan->LinkCustomAttributes = "";
+			$this->Periode_Tahun_Bulan->HrefValue = "";
+			$this->Periode_Tahun_Bulan->TooltipValue = "";
+
+			// Periode_Text
+			$this->Periode_Text->LinkCustomAttributes = "";
+			$this->Periode_Text->HrefValue = "";
+			$this->Periode_Text->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -898,6 +924,28 @@ $t10_siswanonrutinbayar_view->ShowMessage();
 <span id="el_t10_siswanonrutinbayar_Sisa">
 <span<?php echo $t10_siswanonrutinbayar->Sisa->ViewAttributes() ?>>
 <?php echo $t10_siswanonrutinbayar->Sisa->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t10_siswanonrutinbayar->Periode_Tahun_Bulan->Visible) { // Periode_Tahun_Bulan ?>
+	<tr id="r_Periode_Tahun_Bulan">
+		<td><span id="elh_t10_siswanonrutinbayar_Periode_Tahun_Bulan"><?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->FldCaption() ?></span></td>
+		<td data-name="Periode_Tahun_Bulan"<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->CellAttributes() ?>>
+<span id="el_t10_siswanonrutinbayar_Periode_Tahun_Bulan">
+<span<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Periode_Tahun_Bulan->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t10_siswanonrutinbayar->Periode_Text->Visible) { // Periode_Text ?>
+	<tr id="r_Periode_Text">
+		<td><span id="elh_t10_siswanonrutinbayar_Periode_Text"><?php echo $t10_siswanonrutinbayar->Periode_Text->FldCaption() ?></span></td>
+		<td data-name="Periode_Text"<?php echo $t10_siswanonrutinbayar->Periode_Text->CellAttributes() ?>>
+<span id="el_t10_siswanonrutinbayar_Periode_Text">
+<span<?php echo $t10_siswanonrutinbayar->Periode_Text->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Periode_Text->ViewValue ?></span>
 </span>
 </td>
 	</tr>

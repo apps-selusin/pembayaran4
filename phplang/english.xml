@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/11/21" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/11/22" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,6 +583,9 @@
   <project>
     <phrase id="bodytitle" value="PEMBAYARAN" />
     <phrase id="footertext" value="&amp;copy;2018 Selaras Solusindo. All rights reserved." />
+    <menu id="10021">
+      <phrase id="menutext" value="v 03 siswa blm byr" />
+    </menu>
     <menu id="10018">
       <phrase id="menutext" value="t 92 periodeold" />
     </menu>
@@ -918,6 +921,12 @@
       <field id="sisa">
         <phrase id="fldcaption" value="Sisa" />
       </field>
+      <field id="periode_tahun_bulan">
+        <phrase id="fldcaption" value="Periode Tahun Bulan" />
+      </field>
+      <field id="periode_text">
+        <phrase id="fldcaption" value="Periode Text" />
+      </field>
     </table>
     <table id="t92_periodeold">
       <phrase id="tblcaption" value="t 92 periodeold" />
@@ -1040,6 +1049,48 @@
       </field>
       <field id="nilai">
         <phrase id="fldcaption" value="Nilai" />
+      </field>
+    </table>
+    <table id="v03_siswa_blm_byr">
+      <phrase id="tblcaption" value="v 03 siswa blm byr" />
+      <field id="siswarutin_id">
+        <phrase id="fldcaption" value="siswarutin id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="rutin_id">
+        <phrase id="fldcaption" value="rutin id" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="sekolah id" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="kelas id" />
+      </field>
+      <field id="nis">
+        <phrase id="fldcaption" value="NIS" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+      <field id="kelas">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="sekolah">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+      <field id="periode_tahun_bulan">
+        <phrase id="fldcaption" value="Periode Tahun Bulan" />
+      </field>
+      <field id="periode_text">
+        <phrase id="fldcaption" value="Periode Text" />
       </field>
     </table>
   </project>

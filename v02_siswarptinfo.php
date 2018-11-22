@@ -16,12 +16,12 @@ class crv02_siswa extends crTableBase {
 	var $kelas_id;
 	var $NIS;
 	var $Nama;
-	var $Jenis;
-	var $Nilai;
 	var $Kelas;
 	var $Sekolah;
 	var $Periode_Tahun_Bulan;
 	var $Periode_Text;
+	var $Jenis;
+	var $Nilai;
 
 	//
 	// Table class constructor
@@ -96,23 +96,6 @@ class crv02_siswa extends crTableBase {
 		$this->Nama->SqlSelect = "";
 		$this->Nama->SqlOrderBy = "";
 
-		// Jenis
-		$this->Jenis = new crField('v02_siswa', 'v02_siswa', 'x_Jenis', 'Jenis', '`Jenis`', 200, EWR_DATATYPE_STRING, -1);
-		$this->Jenis->Sortable = TRUE; // Allow sort
-		$this->fields['Jenis'] = &$this->Jenis;
-		$this->Jenis->DateFilter = "";
-		$this->Jenis->SqlSelect = "";
-		$this->Jenis->SqlOrderBy = "";
-
-		// Nilai
-		$this->Nilai = new crField('v02_siswa', 'v02_siswa', 'x_Nilai', 'Nilai', '`Nilai`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->Nilai->Sortable = TRUE; // Allow sort
-		$this->Nilai->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->fields['Nilai'] = &$this->Nilai;
-		$this->Nilai->DateFilter = "";
-		$this->Nilai->SqlSelect = "";
-		$this->Nilai->SqlOrderBy = "";
-
 		// Kelas
 		$this->Kelas = new crField('v02_siswa', 'v02_siswa', 'x_Kelas', 'Kelas', '`Kelas`', 200, EWR_DATATYPE_STRING, -1);
 		$this->Kelas->Sortable = TRUE; // Allow sort
@@ -144,6 +127,23 @@ class crv02_siswa extends crTableBase {
 		$this->Periode_Text->DateFilter = "";
 		$this->Periode_Text->SqlSelect = "";
 		$this->Periode_Text->SqlOrderBy = "";
+
+		// Jenis
+		$this->Jenis = new crField('v02_siswa', 'v02_siswa', 'x_Jenis', 'Jenis', '`Jenis`', 200, EWR_DATATYPE_STRING, -1);
+		$this->Jenis->Sortable = TRUE; // Allow sort
+		$this->fields['Jenis'] = &$this->Jenis;
+		$this->Jenis->DateFilter = "";
+		$this->Jenis->SqlSelect = "";
+		$this->Jenis->SqlOrderBy = "";
+
+		// Nilai
+		$this->Nilai = new crField('v02_siswa', 'v02_siswa', 'x_Nilai', 'Nilai', '`Nilai`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->Nilai->Sortable = TRUE; // Allow sort
+		$this->Nilai->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['Nilai'] = &$this->Nilai;
+		$this->Nilai->DateFilter = "";
+		$this->Nilai->SqlSelect = "";
+		$this->Nilai->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
@@ -404,19 +404,6 @@ class crv02_siswa extends crTableBase {
 		$this->Lookup_Selecting($this->Nama, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 		$sSqlWrk .= " ORDER BY `Nama` ASC";
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_Jenis":
-			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `Jenis`, `Jenis` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v02_siswa`";
-		$sWhereWrk = "";
-		$this->Jenis->LookupFilters = array();
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`Jenis` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
-			$sSqlWrk = "";
-		$this->Lookup_Selecting($this->Jenis, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-		$sSqlWrk .= " ORDER BY `Jenis` ASC";
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;

@@ -19,6 +19,8 @@ class ct10_siswanonrutinbayar extends cTable {
 	var $Tanggal_Bayar;
 	var $Bayar;
 	var $Sisa;
+	var $Periode_Tahun_Bulan;
+	var $Periode_Text;
 
 	//
 	// Table class constructor
@@ -85,6 +87,16 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Sisa->Sortable = TRUE; // Allow sort
 		$this->Sisa->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['Sisa'] = &$this->Sisa;
+
+		// Periode_Tahun_Bulan
+		$this->Periode_Tahun_Bulan = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Periode_Tahun_Bulan', 'Periode_Tahun_Bulan', '`Periode_Tahun_Bulan`', '`Periode_Tahun_Bulan`', 200, -1, FALSE, '`Periode_Tahun_Bulan`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Periode_Tahun_Bulan->Sortable = TRUE; // Allow sort
+		$this->fields['Periode_Tahun_Bulan'] = &$this->Periode_Tahun_Bulan;
+
+		// Periode_Text
+		$this->Periode_Text = new cField('t10_siswanonrutinbayar', 't10_siswanonrutinbayar', 'x_Periode_Text', 'Periode_Text', '`Periode_Text`', '`Periode_Text`', 200, -1, FALSE, '`Periode_Text`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Periode_Text->Sortable = TRUE; // Allow sort
+		$this->fields['Periode_Text'] = &$this->Periode_Text;
 	}
 
 	// Set Field Visibility
@@ -603,6 +615,8 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Tanggal_Bayar->setDbValue($rs->fields('Tanggal_Bayar'));
 		$this->Bayar->setDbValue($rs->fields('Bayar'));
 		$this->Sisa->setDbValue($rs->fields('Sisa'));
+		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
+		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
 	}
 
 	// Render list row values
@@ -619,6 +633,8 @@ class ct10_siswanonrutinbayar extends cTable {
 		// Tanggal_Bayar
 		// Bayar
 		// Sisa
+		// Periode_Tahun_Bulan
+		// Periode_Text
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -644,6 +660,14 @@ class ct10_siswanonrutinbayar extends cTable {
 		// Sisa
 		$this->Sisa->ViewValue = $this->Sisa->CurrentValue;
 		$this->Sisa->ViewCustomAttributes = "";
+
+		// Periode_Tahun_Bulan
+		$this->Periode_Tahun_Bulan->ViewValue = $this->Periode_Tahun_Bulan->CurrentValue;
+		$this->Periode_Tahun_Bulan->ViewCustomAttributes = "";
+
+		// Periode_Text
+		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
+		$this->Periode_Text->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
@@ -674,6 +698,16 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Sisa->LinkCustomAttributes = "";
 		$this->Sisa->HrefValue = "";
 		$this->Sisa->TooltipValue = "";
+
+		// Periode_Tahun_Bulan
+		$this->Periode_Tahun_Bulan->LinkCustomAttributes = "";
+		$this->Periode_Tahun_Bulan->HrefValue = "";
+		$this->Periode_Tahun_Bulan->TooltipValue = "";
+
+		// Periode_Text
+		$this->Periode_Text->LinkCustomAttributes = "";
+		$this->Periode_Text->HrefValue = "";
+		$this->Periode_Text->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -725,6 +759,18 @@ class ct10_siswanonrutinbayar extends cTable {
 		$this->Sisa->PlaceHolder = ew_RemoveHtml($this->Sisa->FldCaption());
 		if (strval($this->Sisa->EditValue) <> "" && is_numeric($this->Sisa->EditValue)) $this->Sisa->EditValue = ew_FormatNumber($this->Sisa->EditValue, -2, -1, -2, 0);
 
+		// Periode_Tahun_Bulan
+		$this->Periode_Tahun_Bulan->EditAttrs["class"] = "form-control";
+		$this->Periode_Tahun_Bulan->EditCustomAttributes = "";
+		$this->Periode_Tahun_Bulan->EditValue = $this->Periode_Tahun_Bulan->CurrentValue;
+		$this->Periode_Tahun_Bulan->PlaceHolder = ew_RemoveHtml($this->Periode_Tahun_Bulan->FldCaption());
+
+		// Periode_Text
+		$this->Periode_Text->EditAttrs["class"] = "form-control";
+		$this->Periode_Text->EditCustomAttributes = "";
+		$this->Periode_Text->EditValue = $this->Periode_Text->CurrentValue;
+		$this->Periode_Text->PlaceHolder = ew_RemoveHtml($this->Periode_Text->FldCaption());
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -758,6 +804,8 @@ class ct10_siswanonrutinbayar extends cTable {
 					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
 					if ($this->Bayar->Exportable) $Doc->ExportCaption($this->Bayar);
 					if ($this->Sisa->Exportable) $Doc->ExportCaption($this->Sisa);
+					if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportCaption($this->Periode_Tahun_Bulan);
+					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswanonrutin_id->Exportable) $Doc->ExportCaption($this->siswanonrutin_id);
@@ -765,6 +813,8 @@ class ct10_siswanonrutinbayar extends cTable {
 					if ($this->Tanggal_Bayar->Exportable) $Doc->ExportCaption($this->Tanggal_Bayar);
 					if ($this->Bayar->Exportable) $Doc->ExportCaption($this->Bayar);
 					if ($this->Sisa->Exportable) $Doc->ExportCaption($this->Sisa);
+					if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportCaption($this->Periode_Tahun_Bulan);
+					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
 				}
 				$Doc->EndExportRow();
 			}
@@ -802,6 +852,8 @@ class ct10_siswanonrutinbayar extends cTable {
 						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
 						if ($this->Bayar->Exportable) $Doc->ExportField($this->Bayar);
 						if ($this->Sisa->Exportable) $Doc->ExportField($this->Sisa);
+						if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportField($this->Periode_Tahun_Bulan);
+						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswanonrutin_id->Exportable) $Doc->ExportField($this->siswanonrutin_id);
@@ -809,6 +861,8 @@ class ct10_siswanonrutinbayar extends cTable {
 						if ($this->Tanggal_Bayar->Exportable) $Doc->ExportField($this->Tanggal_Bayar);
 						if ($this->Bayar->Exportable) $Doc->ExportField($this->Bayar);
 						if ($this->Sisa->Exportable) $Doc->ExportField($this->Sisa);
+						if ($this->Periode_Tahun_Bulan->Exportable) $Doc->ExportField($this->Periode_Tahun_Bulan);
+						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
 					}
 					$Doc->EndExportRow();
 				}

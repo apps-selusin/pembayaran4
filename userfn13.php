@@ -33,7 +33,9 @@ function f_update_bayar_nonrutin($rsold, $rsnew) {
 				Nilai,
 				Tanggal_Bayar,
 				Bayar,
-				Sisa
+				Sisa,
+				Periode_Tahun_Bulan,
+				Periode_Text
 				)
 			values
 				(
@@ -41,7 +43,9 @@ function f_update_bayar_nonrutin($rsold, $rsnew) {
 				".$_SESSION["nonrutin_Nilai"].",
 				'".date("Y-m-d")."',
 				".$_SESSION["nonrutin_Bayar"].",
-				".$_SESSION["nonrutin_Sisa"]."
+				".$_SESSION["nonrutin_Sisa"].",
+				'".$_SESSION["Tahun_Bulan"]."',
+				'".$_SESSION["Tahun_Bulan_Text"]."'
 				)
 			";
 		Conn()->Execute($q);
