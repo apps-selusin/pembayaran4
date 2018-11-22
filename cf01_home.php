@@ -299,7 +299,7 @@ $_SESSION["Tahun_Bulan_Text"] = $abulan[ew_ExecuteScalar("select Bulan from t93_
 <pre><?php echo "<strong>Uang Masuk</strong>:<br>".number_format(ew_ExecuteScalar("select sum(Bayar) from v04_uang_masuk where Per_Thn_Bln_Byr = '".$_SESSION["Tahun_Bulan"]."'")); ?></pre>
 
 <!-- potensi uang masuk -->
-<pre><?php echo "<strong>Potensi Uang Masuk</strong>:<br>".number_format(ew_ExecuteScalar("select sum(Bayar) from v04_uang_masuk where Per_Thn_Bln_Byr = '".$_SESSION["Tahun_Bulan"]."'")); ?></pre>
+<pre><?php echo "<strong>Potensi Uang Masuk</strong>:<br>".number_format(ew_ExecuteScalar("select sum(Nilai) from v05_potensi")); ?></pre>
 
 <!-- log -->
 <pre><?php $lines=file('log.txt');foreach ($lines as $line_num => $line){echo $line;}?></pre>

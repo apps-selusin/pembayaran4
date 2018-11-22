@@ -589,9 +589,6 @@
     <menu id="10023">
       <phrase id="menutext" value="v 04 uang masuk" />
     </menu>
-    <menu id="10021">
-      <phrase id="menutext" value="v 03 siswa blm byr" />
-    </menu>
     <menu id="10018">
       <phrase id="menutext" value="t 92 periodeold" />
     </menu>
@@ -657,6 +654,9 @@
     </menu>
     <menu id="10019">
       <phrase id="menutext" value="Uang Masuk" />
+    </menu>
+    <menu id="10021">
+      <phrase id="menutext" value="Potensi Uang Masuk" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="Log Aktifitas" />

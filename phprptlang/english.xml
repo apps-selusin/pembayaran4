@@ -407,6 +407,9 @@
     <menu id="19">
       <phrase id="menutext" value="Uang Masuk" />
     </menu>
+    <menu id="20">
+      <phrase id="menutext" value="Potensi Uang Masuk" />
+    </menu>
     <table id="t01_tahunajaran">
       <phrase id="tblcaption" value="t 01 tahunajaran" />
       <field id="id">
@@ -852,6 +855,57 @@
       </field>
       <field id="per_thn_bln_byr_text">
         <phrase id="fldcaption" value="Per Thn Bln Byr Text" />
+      </field>
+    </table>
+    <table id="v05_potensi">
+      <phrase id="tblcaption" value="Potensi Uang Masuk" />
+      <field id="siswanonrutin_id">
+        <phrase id="fldcaption" value="siswanonrutin id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="nonrutin_id">
+        <phrase id="fldcaption" value="nonrutin id" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="sekolah id" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="kelas id" />
+      </field>
+      <field id="nis">
+        <phrase id="fldcaption" value="NIS" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+      <field id="kelas">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="sekolah">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+      <field id="name_exp_12">
+        <phrase id="fldcaption" value="Name exp 12" />
+      </field>
+      <field id="name_exp_13">
+        <phrase id="fldcaption" value="Name exp 13" />
+      </field>
+      <field id="bayar">
+        <phrase id="fldcaption" value="Bayar" />
+      </field>
+      <field id="name_exp_15">
+        <phrase id="fldcaption" value="Name exp 15" />
+      </field>
+      <field id="name_exp_16">
+        <phrase id="fldcaption" value="Name exp 16" />
       </field>
     </table>
   </project>
