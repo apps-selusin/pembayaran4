@@ -2,6 +2,10 @@
 <strong>to do:</strong>
 ------
 
+5:43 PM 11/22/2018
+- tambah field periode_bayar_tahun_bulan
+- tambah field periode_bayar_text
+
 12:12 PM 11/22/2018
 - kerjakan laporan uang masuk
   - baca data dari tabel t07_siswarutinbayar dan t10_siswanonrutinbayar

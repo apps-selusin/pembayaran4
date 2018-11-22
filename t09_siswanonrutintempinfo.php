@@ -1157,9 +1157,11 @@ class ct09_siswanonrutintemp extends cTable {
 		$_SESSION["nonrutin_Nilai"] = $rsold["Nilai"];
 		$_SESSION["nonrutin_Bayar"] = $rsnew["Bayar"];
 		$_SESSION["nonrutin_Sisa"] = $rsnew["Sisa"];
-		$rsnew["Nilai"] = $rsnew["Sisa"];
-		$rsnew["Bayar"] = 0;
-		$rsnew["Sisa"] = 0;
+		if ($_SESSION["nonrutin_Bayar"] != 0) {
+			$rsnew["Nilai"] = $rsnew["Sisa"];
+			$rsnew["Bayar"] = 0;
+			$rsnew["Sisa"] = 0;
+		}
 		return TRUE;
 	}
 
@@ -1167,7 +1169,11 @@ class ct09_siswanonrutintemp extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
-		f_update_bayar_nonrutin($rsold, $rsnew);
+		if ($_SESSION["nonrutin_Bayar"] != 0) {
+			f_update_bayar_nonrutin($rsold, $rsnew);
+		}
+
+		//f_update_bayar_nonrutin($rsold, $rsnew);
 	}
 
 	// Row Update Conflict event
