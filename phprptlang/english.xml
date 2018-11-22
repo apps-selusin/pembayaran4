@@ -399,10 +399,13 @@
       <phrase id="menutext" value="v 01 siswa" />
     </menu>
     <menu id="17">
-      <phrase id="menutext" value="Pembayaran" />
+      <phrase id="menutext" value="Pembayaran (sudah bayar)" />
     </menu>
     <menu id="18">
-      <phrase id="menutext" value="v 03 siswa blm byr" />
+      <phrase id="menutext" value="Pembayaran (belum bayar)" />
+    </menu>
+    <menu id="19">
+      <phrase id="menutext" value="Uang Masuk" />
     </menu>
     <table id="t01_tahunajaran">
       <phrase id="tblcaption" value="t 01 tahunajaran" />
@@ -547,6 +550,12 @@
       <field id="periode_text">
         <phrase id="fldcaption" value="Periode Text" />
       </field>
+      <field id="per_thn_bln_byr">
+        <phrase id="fldcaption" value="Per Thn Bln Byr" />
+      </field>
+      <field id="per_thn_bln_byr_text">
+        <phrase id="fldcaption" value="Per Thn Bln Byr Text" />
+      </field>
     </table>
     <table id="t08_nonrutin">
       <phrase id="tblcaption" value="t 08 nonrutin" />
@@ -621,6 +630,12 @@
       </field>
       <field id="periode_text">
         <phrase id="fldcaption" value="Periode Text" />
+      </field>
+      <field id="per_thn_bln_byr">
+        <phrase id="fldcaption" value="Per Thn Bln Byr" />
+      </field>
+      <field id="per_thn_bln_byr_text">
+        <phrase id="fldcaption" value="Per Thn Bln Byr Text" />
       </field>
     </table>
     <table id="t92_periodeold">
@@ -705,7 +720,7 @@
       </field>
     </table>
     <table id="v02_siswa">
-      <phrase id="tblcaption" value="Pembayaran" />
+      <phrase id="tblcaption" value="Pembayaran (sudah bayar)" />
       <field id="siswarutin_id">
         <phrase id="fldcaption" value="siswarutin id" />
       </field>
@@ -747,7 +762,7 @@
       </field>
     </table>
     <table id="v03_siswa_blm_byr">
-      <phrase id="tblcaption" value="v 03 siswa blm byr" />
+      <phrase id="tblcaption" value="Pembayaran (belum bayar)" />
       <field id="siswarutin_id">
         <phrase id="fldcaption" value="siswarutin id" />
       </field>
@@ -786,6 +801,57 @@
       </field>
       <field id="periode_text">
         <phrase id="fldcaption" value="Periode Text" />
+      </field>
+    </table>
+    <table id="v04_uang_masuk">
+      <phrase id="tblcaption" value="Uang Masuk" />
+      <field id="siswanonrutin_id">
+        <phrase id="fldcaption" value="siswanonrutin id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="nonrutin_id">
+        <phrase id="fldcaption" value="nonrutin id" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="sekolah id" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="kelas id" />
+      </field>
+      <field id="nis">
+        <phrase id="fldcaption" value="NIS" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+      <field id="kelas">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="sekolah">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+      <field id="periode_tahun_bulan">
+        <phrase id="fldcaption" value="Periode Tahun Bulan" />
+      </field>
+      <field id="periode_text">
+        <phrase id="fldcaption" value="Periode Text" />
+      </field>
+      <field id="bayar">
+        <phrase id="fldcaption" value="Bayar" />
+      </field>
+      <field id="per_thn_bln_byr">
+        <phrase id="fldcaption" value="Per Thn Bln Byr" />
+      </field>
+      <field id="per_thn_bln_byr_text">
+        <phrase id="fldcaption" value="Per Thn Bln Byr Text" />
       </field>
     </table>
   </project>

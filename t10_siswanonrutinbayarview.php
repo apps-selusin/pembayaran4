@@ -317,6 +317,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Sisa->SetVisibility();
 		$this->Periode_Tahun_Bulan->SetVisibility();
 		$this->Periode_Text->SetVisibility();
+		$this->Per_Thn_Bln_Byr->SetVisibility();
+		$this->Per_Thn_Bln_Byr_Text->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -540,6 +542,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Sisa->setDbValue($rs->fields('Sisa'));
 		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
 		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Per_Thn_Bln_Byr->setDbValue($rs->fields('Per_Thn_Bln_Byr'));
+		$this->Per_Thn_Bln_Byr_Text->setDbValue($rs->fields('Per_Thn_Bln_Byr_Text'));
 	}
 
 	// Load DbValue from recordset
@@ -554,6 +558,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		$this->Sisa->DbValue = $row['Sisa'];
 		$this->Periode_Tahun_Bulan->DbValue = $row['Periode_Tahun_Bulan'];
 		$this->Periode_Text->DbValue = $row['Periode_Text'];
+		$this->Per_Thn_Bln_Byr->DbValue = $row['Per_Thn_Bln_Byr'];
+		$this->Per_Thn_Bln_Byr_Text->DbValue = $row['Per_Thn_Bln_Byr_Text'];
 	}
 
 	// Render row values based on field settings
@@ -592,6 +598,8 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		// Sisa
 		// Periode_Tahun_Bulan
 		// Periode_Text
+		// Per_Thn_Bln_Byr
+		// Per_Thn_Bln_Byr_Text
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -627,6 +635,14 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 		// Periode_Text
 		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
 		$this->Periode_Text->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->ViewValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+		$this->Per_Thn_Bln_Byr->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->ViewValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+		$this->Per_Thn_Bln_Byr_Text->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -667,6 +683,16 @@ class ct10_siswanonrutinbayar_view extends ct10_siswanonrutinbayar {
 			$this->Periode_Text->LinkCustomAttributes = "";
 			$this->Periode_Text->HrefValue = "";
 			$this->Periode_Text->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr->HrefValue = "";
+			$this->Per_Thn_Bln_Byr->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
+			$this->Per_Thn_Bln_Byr_Text->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -946,6 +972,28 @@ $t10_siswanonrutinbayar_view->ShowMessage();
 <span id="el_t10_siswanonrutinbayar_Periode_Text">
 <span<?php echo $t10_siswanonrutinbayar->Periode_Text->ViewAttributes() ?>>
 <?php echo $t10_siswanonrutinbayar->Periode_Text->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr->Visible) { // Per_Thn_Bln_Byr ?>
+	<tr id="r_Per_Thn_Bln_Byr">
+		<td><span id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->FldCaption() ?></span></td>
+		<td data-name="Per_Thn_Bln_Byr"<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->CellAttributes() ?>>
+<span id="el_t10_siswanonrutinbayar_Per_Thn_Bln_Byr">
+<span<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->Visible) { // Per_Thn_Bln_Byr_Text ?>
+	<tr id="r_Per_Thn_Bln_Byr_Text">
+		<td><span id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->FldCaption() ?></span></td>
+		<td data-name="Per_Thn_Bln_Byr_Text"<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->CellAttributes() ?>>
+<span id="el_t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text">
+<span<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->ViewValue ?></span>
 </span>
 </td>
 	</tr>

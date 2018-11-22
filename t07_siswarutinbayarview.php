@@ -316,6 +316,8 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$this->Bulan->SetVisibility();
 		$this->Tahun->SetVisibility();
 		$this->Periode_Text->SetVisibility();
+		$this->Per_Thn_Bln_Byr->SetVisibility();
+		$this->Per_Thn_Bln_Byr_Text->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -540,6 +542,8 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$this->Bulan->setDbValue($rs->fields('Bulan'));
 		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Per_Thn_Bln_Byr->setDbValue($rs->fields('Per_Thn_Bln_Byr'));
+		$this->Per_Thn_Bln_Byr_Text->setDbValue($rs->fields('Per_Thn_Bln_Byr_Text'));
 	}
 
 	// Load DbValue from recordset
@@ -555,6 +559,8 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		$this->Bulan->DbValue = $row['Bulan'];
 		$this->Tahun->DbValue = $row['Tahun'];
 		$this->Periode_Text->DbValue = $row['Periode_Text'];
+		$this->Per_Thn_Bln_Byr->DbValue = $row['Per_Thn_Bln_Byr'];
+		$this->Per_Thn_Bln_Byr_Text->DbValue = $row['Per_Thn_Bln_Byr_Text'];
 	}
 
 	// Render row values based on field settings
@@ -590,6 +596,8 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		// Bulan
 		// Tahun
 		// Periode_Text
+		// Per_Thn_Bln_Byr
+		// Per_Thn_Bln_Byr_Text
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -718,6 +726,14 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 		}
 		$this->Periode_Text->ViewCustomAttributes = "";
 
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->ViewValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+		$this->Per_Thn_Bln_Byr->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->ViewValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+		$this->Per_Thn_Bln_Byr_Text->ViewCustomAttributes = "";
+
 			// siswarutin_id
 			$this->siswarutin_id->LinkCustomAttributes = "";
 			$this->siswarutin_id->HrefValue = "";
@@ -757,6 +773,16 @@ class ct07_siswarutinbayar_view extends ct07_siswarutinbayar {
 			$this->Periode_Text->LinkCustomAttributes = "";
 			$this->Periode_Text->HrefValue = "";
 			$this->Periode_Text->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr->HrefValue = "";
+			$this->Per_Thn_Bln_Byr->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
+			$this->Per_Thn_Bln_Byr_Text->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1040,6 +1066,28 @@ $t07_siswarutinbayar_view->ShowMessage();
 <span id="el_t07_siswarutinbayar_Periode_Text">
 <span<?php echo $t07_siswarutinbayar->Periode_Text->ViewAttributes() ?>>
 <?php echo $t07_siswarutinbayar->Periode_Text->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t07_siswarutinbayar->Per_Thn_Bln_Byr->Visible) { // Per_Thn_Bln_Byr ?>
+	<tr id="r_Per_Thn_Bln_Byr">
+		<td><span id="elh_t07_siswarutinbayar_Per_Thn_Bln_Byr"><?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr->FldCaption() ?></span></td>
+		<td data-name="Per_Thn_Bln_Byr"<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Per_Thn_Bln_Byr">
+<span<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t07_siswarutinbayar->Per_Thn_Bln_Byr_Text->Visible) { // Per_Thn_Bln_Byr_Text ?>
+	<tr id="r_Per_Thn_Bln_Byr_Text">
+		<td><span id="elh_t07_siswarutinbayar_Per_Thn_Bln_Byr_Text"><?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr_Text->FldCaption() ?></span></td>
+		<td data-name="Per_Thn_Bln_Byr_Text"<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr_Text->CellAttributes() ?>>
+<span id="el_t07_siswarutinbayar_Per_Thn_Bln_Byr_Text">
+<span<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr_Text->ViewAttributes() ?>>
+<?php echo $t07_siswarutinbayar->Per_Thn_Bln_Byr_Text->ViewValue ?></span>
 </span>
 </td>
 	</tr>

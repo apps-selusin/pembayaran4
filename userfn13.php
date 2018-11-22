@@ -35,7 +35,9 @@ function f_update_bayar_nonrutin($rsold, $rsnew) {
 				Bayar,
 				Sisa,
 				Periode_Tahun_Bulan,
-				Periode_Text
+				Periode_Text,
+				Per_Thn_Bln_Byr,
+				Per_Thn_Bln_Byr_text
 				)
 			values
 				(
@@ -44,6 +46,8 @@ function f_update_bayar_nonrutin($rsold, $rsnew) {
 				'".date("Y-m-d")."',
 				".$_SESSION["nonrutin_Bayar"].",
 				".$_SESSION["nonrutin_Sisa"].",
+				'".$_SESSION["Tahun_Bulan"]."',
+				'".$_SESSION["Tahun_Bulan_Text"]."',
 				'".$_SESSION["Tahun_Bulan"]."',
 				'".$_SESSION["Tahun_Bulan_Text"]."'
 				)
@@ -67,7 +71,9 @@ function f_update_bayar_rutin($rsold, $rsnew) {
 				t07_siswarutinbayar
 			set
 				Tanggal_Bayar = '".date("Y-m-d")."',
-				Nilai_Bayar = Nilai
+				Nilai_Bayar = Nilai,
+				Per_Thn_Bln_Byr = '".$_SESSION["Tahun_Bulan"]."',
+				Per_Thn_Bln_Byr_Text = '".$_SESSION["Tahun_Bulan_Text"]."'
 			where
 				Periode_Tahun_Bulan = '".$awal."'
 				and siswarutin_id = ".$rsold["siswarutin_id"]."

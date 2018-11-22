@@ -22,6 +22,8 @@ class ct07_siswarutinbayar extends cTable {
 	var $Bulan;
 	var $Tahun;
 	var $Periode_Text;
+	var $Per_Thn_Bln_Byr;
+	var $Per_Thn_Bln_Byr_Text;
 
 	//
 	// Table class constructor
@@ -112,6 +114,16 @@ class ct07_siswarutinbayar extends cTable {
 		$this->Periode_Text->UsePleaseSelect = TRUE; // Use PleaseSelect by default
 		$this->Periode_Text->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
 		$this->fields['Periode_Text'] = &$this->Periode_Text;
+
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Per_Thn_Bln_Byr', 'Per_Thn_Bln_Byr', '`Per_Thn_Bln_Byr`', '`Per_Thn_Bln_Byr`', 200, -1, FALSE, '`Per_Thn_Bln_Byr`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Per_Thn_Bln_Byr->Sortable = TRUE; // Allow sort
+		$this->fields['Per_Thn_Bln_Byr'] = &$this->Per_Thn_Bln_Byr;
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text = new cField('t07_siswarutinbayar', 't07_siswarutinbayar', 'x_Per_Thn_Bln_Byr_Text', 'Per_Thn_Bln_Byr_Text', '`Per_Thn_Bln_Byr_Text`', '`Per_Thn_Bln_Byr_Text`', 200, -1, FALSE, '`Per_Thn_Bln_Byr_Text`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Per_Thn_Bln_Byr_Text->Sortable = TRUE; // Allow sort
+		$this->fields['Per_Thn_Bln_Byr_Text'] = &$this->Per_Thn_Bln_Byr_Text;
 	}
 
 	// Set Field Visibility
@@ -633,6 +645,8 @@ class ct07_siswarutinbayar extends cTable {
 		$this->Bulan->setDbValue($rs->fields('Bulan'));
 		$this->Tahun->setDbValue($rs->fields('Tahun'));
 		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Per_Thn_Bln_Byr->setDbValue($rs->fields('Per_Thn_Bln_Byr'));
+		$this->Per_Thn_Bln_Byr_Text->setDbValue($rs->fields('Per_Thn_Bln_Byr_Text'));
 	}
 
 	// Render list row values
@@ -652,6 +666,8 @@ class ct07_siswarutinbayar extends cTable {
 		// Bulan
 		// Tahun
 		// Periode_Text
+		// Per_Thn_Bln_Byr
+		// Per_Thn_Bln_Byr_Text
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -778,6 +794,14 @@ class ct07_siswarutinbayar extends cTable {
 		}
 		$this->Periode_Text->ViewCustomAttributes = "";
 
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->ViewValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+		$this->Per_Thn_Bln_Byr->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->ViewValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+		$this->Per_Thn_Bln_Byr_Text->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -822,6 +846,16 @@ class ct07_siswarutinbayar extends cTable {
 		$this->Periode_Text->LinkCustomAttributes = "";
 		$this->Periode_Text->HrefValue = "";
 		$this->Periode_Text->TooltipValue = "";
+
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->LinkCustomAttributes = "";
+		$this->Per_Thn_Bln_Byr->HrefValue = "";
+		$this->Per_Thn_Bln_Byr->TooltipValue = "";
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->LinkCustomAttributes = "";
+		$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
+		$this->Per_Thn_Bln_Byr_Text->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -882,6 +916,18 @@ class ct07_siswarutinbayar extends cTable {
 		$this->Periode_Text->EditAttrs["class"] = "form-control";
 		$this->Periode_Text->EditCustomAttributes = "";
 
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->EditAttrs["class"] = "form-control";
+		$this->Per_Thn_Bln_Byr->EditCustomAttributes = "";
+		$this->Per_Thn_Bln_Byr->EditValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+		$this->Per_Thn_Bln_Byr->PlaceHolder = ew_RemoveHtml($this->Per_Thn_Bln_Byr->FldCaption());
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->EditAttrs["class"] = "form-control";
+		$this->Per_Thn_Bln_Byr_Text->EditCustomAttributes = "";
+		$this->Per_Thn_Bln_Byr_Text->EditValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+		$this->Per_Thn_Bln_Byr_Text->PlaceHolder = ew_RemoveHtml($this->Per_Thn_Bln_Byr_Text->FldCaption());
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -917,6 +963,8 @@ class ct07_siswarutinbayar extends cTable {
 					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
 					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
+					if ($this->Per_Thn_Bln_Byr->Exportable) $Doc->ExportCaption($this->Per_Thn_Bln_Byr);
+					if ($this->Per_Thn_Bln_Byr_Text->Exportable) $Doc->ExportCaption($this->Per_Thn_Bln_Byr_Text);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->siswarutin_id->Exportable) $Doc->ExportCaption($this->siswarutin_id);
@@ -927,6 +975,8 @@ class ct07_siswarutinbayar extends cTable {
 					if ($this->Bulan->Exportable) $Doc->ExportCaption($this->Bulan);
 					if ($this->Tahun->Exportable) $Doc->ExportCaption($this->Tahun);
 					if ($this->Periode_Text->Exportable) $Doc->ExportCaption($this->Periode_Text);
+					if ($this->Per_Thn_Bln_Byr->Exportable) $Doc->ExportCaption($this->Per_Thn_Bln_Byr);
+					if ($this->Per_Thn_Bln_Byr_Text->Exportable) $Doc->ExportCaption($this->Per_Thn_Bln_Byr_Text);
 				}
 				$Doc->EndExportRow();
 			}
@@ -966,6 +1016,8 @@ class ct07_siswarutinbayar extends cTable {
 						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
 						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
+						if ($this->Per_Thn_Bln_Byr->Exportable) $Doc->ExportField($this->Per_Thn_Bln_Byr);
+						if ($this->Per_Thn_Bln_Byr_Text->Exportable) $Doc->ExportField($this->Per_Thn_Bln_Byr_Text);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->siswarutin_id->Exportable) $Doc->ExportField($this->siswarutin_id);
@@ -976,6 +1028,8 @@ class ct07_siswarutinbayar extends cTable {
 						if ($this->Bulan->Exportable) $Doc->ExportField($this->Bulan);
 						if ($this->Tahun->Exportable) $Doc->ExportField($this->Tahun);
 						if ($this->Periode_Text->Exportable) $Doc->ExportField($this->Periode_Text);
+						if ($this->Per_Thn_Bln_Byr->Exportable) $Doc->ExportField($this->Per_Thn_Bln_Byr);
+						if ($this->Per_Thn_Bln_Byr_Text->Exportable) $Doc->ExportField($this->Per_Thn_Bln_Byr_Text);
 					}
 					$Doc->EndExportRow();
 				}

@@ -351,6 +351,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->Sisa->SetVisibility();
 		$this->Periode_Tahun_Bulan->SetVisibility();
 		$this->Periode_Text->SetVisibility();
+		$this->Per_Thn_Bln_Byr->SetVisibility();
+		$this->Per_Thn_Bln_Byr_Text->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -627,6 +629,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->UpdateSort($this->Sisa, $bCtrl); // Sisa
 			$this->UpdateSort($this->Periode_Tahun_Bulan, $bCtrl); // Periode_Tahun_Bulan
 			$this->UpdateSort($this->Periode_Text, $bCtrl); // Periode_Text
+			$this->UpdateSort($this->Per_Thn_Bln_Byr, $bCtrl); // Per_Thn_Bln_Byr
+			$this->UpdateSort($this->Per_Thn_Bln_Byr_Text, $bCtrl); // Per_Thn_Bln_Byr_Text
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -663,6 +667,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 				$this->Sisa->setSort("");
 				$this->Periode_Tahun_Bulan->setSort("");
 				$this->Periode_Text->setSort("");
+				$this->Per_Thn_Bln_Byr->setSort("");
+				$this->Per_Thn_Bln_Byr_Text->setSort("");
 			}
 
 			// Reset start position
@@ -1057,6 +1063,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->Sisa->setDbValue($rs->fields('Sisa'));
 		$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
 		$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+		$this->Per_Thn_Bln_Byr->setDbValue($rs->fields('Per_Thn_Bln_Byr'));
+		$this->Per_Thn_Bln_Byr_Text->setDbValue($rs->fields('Per_Thn_Bln_Byr_Text'));
 	}
 
 	// Load DbValue from recordset
@@ -1071,6 +1079,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		$this->Sisa->DbValue = $row['Sisa'];
 		$this->Periode_Tahun_Bulan->DbValue = $row['Periode_Tahun_Bulan'];
 		$this->Periode_Text->DbValue = $row['Periode_Text'];
+		$this->Per_Thn_Bln_Byr->DbValue = $row['Per_Thn_Bln_Byr'];
+		$this->Per_Thn_Bln_Byr_Text->DbValue = $row['Per_Thn_Bln_Byr_Text'];
 	}
 
 	// Load old record
@@ -1132,6 +1142,8 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		// Sisa
 		// Periode_Tahun_Bulan
 		// Periode_Text
+		// Per_Thn_Bln_Byr
+		// Per_Thn_Bln_Byr_Text
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1167,6 +1179,14 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 		// Periode_Text
 		$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
 		$this->Periode_Text->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr
+		$this->Per_Thn_Bln_Byr->ViewValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+		$this->Per_Thn_Bln_Byr->ViewCustomAttributes = "";
+
+		// Per_Thn_Bln_Byr_Text
+		$this->Per_Thn_Bln_Byr_Text->ViewValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+		$this->Per_Thn_Bln_Byr_Text->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -1207,6 +1227,16 @@ class ct10_siswanonrutinbayar_list extends ct10_siswanonrutinbayar {
 			$this->Periode_Text->LinkCustomAttributes = "";
 			$this->Periode_Text->HrefValue = "";
 			$this->Periode_Text->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr->HrefValue = "";
+			$this->Per_Thn_Bln_Byr->TooltipValue = "";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->LinkCustomAttributes = "";
+			$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
+			$this->Per_Thn_Bln_Byr_Text->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1542,6 +1572,24 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("header", "left");
         </div></div></th>
 	<?php } ?>
 <?php } ?>		
+<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr->Visible) { // Per_Thn_Bln_Byr ?>
+	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Per_Thn_Bln_Byr) == "") { ?>
+		<th data-name="Per_Thn_Bln_Byr"><div id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Per_Thn_Bln_Byr"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Per_Thn_Bln_Byr) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
+<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->Visible) { // Per_Thn_Bln_Byr_Text ?>
+	<?php if ($t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text) == "") { ?>
+		<th data-name="Per_Thn_Bln_Byr_Text"><div id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text"><div class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Per_Thn_Bln_Byr_Text"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_siswanonrutinbayar->SortUrl($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text) ?>',2);"><div id="elh_t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></th>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -1668,6 +1716,22 @@ $t10_siswanonrutinbayar_list->ListOptions->Render("body", "left", $t10_siswanonr
 <span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Periode_Text" class="t10_siswanonrutinbayar_Periode_Text">
 <span<?php echo $t10_siswanonrutinbayar->Periode_Text->ViewAttributes() ?>>
 <?php echo $t10_siswanonrutinbayar->Periode_Text->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr->Visible) { // Per_Thn_Bln_Byr ?>
+		<td data-name="Per_Thn_Bln_Byr"<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->CellAttributes() ?>>
+<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Per_Thn_Bln_Byr" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr">
+<span<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->Visible) { // Per_Thn_Bln_Byr_Text ?>
+		<td data-name="Per_Thn_Bln_Byr_Text"<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->CellAttributes() ?>>
+<span id="el<?php echo $t10_siswanonrutinbayar_list->RowCnt ?>_t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text" class="t10_siswanonrutinbayar_Per_Thn_Bln_Byr_Text">
+<span<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->ViewAttributes() ?>>
+<?php echo $t10_siswanonrutinbayar->Per_Thn_Bln_Byr_Text->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

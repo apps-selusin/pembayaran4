@@ -6,16 +6,16 @@ ob_start();
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "phprptinc/ewmysql.php") ?>
 <?php include_once "phprptinc/ewrfn10.php" ?>
 <?php include_once "phprptinc/ewrusrfn10.php" ?>
-<?php include_once "v03_siswa_blm_byrrptinfo.php" ?>
+<?php include_once "v04_uang_masukrptinfo.php" ?>
 <?php
 
 //
 // Page class
 //
 
-$v03_siswa_blm_byr_rpt = NULL; // Initialize page object first
+$v04_uang_masuk_rpt = NULL; // Initialize page object first
 
-class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
+class crv04_uang_masuk_rpt extends crv04_uang_masuk {
 
 	// Page ID
 	var $PageID = 'rpt';
@@ -24,7 +24,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 	var $ProjectID = "{0BB1DC5C-09DE-419A-9701-F3161918C007}";
 
 	// Page object name
-	var $PageObjName = 'v03_siswa_blm_byr_rpt';
+	var $PageObjName = 'v04_uang_masuk_rpt';
 
 	// Page name
 	function PageName() {
@@ -202,10 +202,10 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (v03_siswa_blm_byr)
-		if (!isset($GLOBALS["v03_siswa_blm_byr"])) {
-			$GLOBALS["v03_siswa_blm_byr"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["v03_siswa_blm_byr"];
+		// Table object (v04_uang_masuk)
+		if (!isset($GLOBALS["v04_uang_masuk"])) {
+			$GLOBALS["v04_uang_masuk"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["v04_uang_masuk"];
 		}
 
 		// Initialize URLs
@@ -220,7 +220,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Table name (for backward compatibility)
 		if (!defined("EWR_TABLE_NAME"))
-			define("EWR_TABLE_NAME", 'v03_siswa_blm_byr', TRUE);
+			define("EWR_TABLE_NAME", 'v04_uang_masuk', TRUE);
 
 		// Start timer
 		$GLOBALS["gsTimer"] = new crTimer();
@@ -241,7 +241,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Filter options
 		$this->FilterOptions = new crListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption fv03_siswa_blm_byrrpt";
+		$this->FilterOptions->TagClassName = "ewFilterOption fv04_uang_masukrpt";
 
 		// Generate report options
 		$this->GenerateOptions = new crListOptions();
@@ -271,6 +271,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$this->Jenis->PlaceHolder = $this->Jenis->FldCaption();
 		$this->Kelas->PlaceHolder = $this->Kelas->FldCaption();
 		$this->Sekolah->PlaceHolder = $this->Sekolah->FldCaption();
+		$this->Per_Thn_Bln_Byr->PlaceHolder = $this->Per_Thn_Bln_Byr->FldCaption();
+		$this->Per_Thn_Bln_Byr_Text->PlaceHolder = $this->Per_Thn_Bln_Byr_Text->FldCaption();
 
 		// Setup export options
 		$this->SetupExportOptions();
@@ -331,7 +333,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = $this->PageUrl() . "export=email";
-		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" id=\"emf_v03_siswa_blm_byr\" href=\"javascript:void(0);\" onclick=\"ewr_EmailDialogShow({lnk:'emf_v03_siswa_blm_byr',hdr:ewLanguage.Phrase('ExportToEmail'),url:'$url',exportid:'$exportid',el:this});\">" . $ReportLanguage->Phrase("ExportToEmail") . "</a>";
+		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" id=\"emf_v04_uang_masuk\" href=\"javascript:void(0);\" onclick=\"ewr_EmailDialogShow({lnk:'emf_v04_uang_masuk',hdr:ewLanguage.Phrase('ExportToEmail'),url:'$url',exportid:'$exportid',el:this});\">" . $ReportLanguage->Phrase("ExportToEmail") . "</a>";
 		$item->Visible = FALSE;
 		$ReportTypes["email"] = $item->Visible ? $ReportLanguage->Phrase("ReportFormEmail") : "";
 		$ReportOptions["ReportTypes"] = $ReportTypes;
@@ -349,10 +351,10 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"fv03_siswa_blm_byrrpt\" href=\"#\">" . $ReportLanguage->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"fv04_uang_masukrpt\" href=\"#\">" . $ReportLanguage->Phrase("SaveCurrentFilter") . "</a>";
 		$item->Visible = TRUE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"fv03_siswa_blm_byrrpt\" href=\"#\">" . $ReportLanguage->Phrase("DeleteFilter") . "</a>";
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"fv04_uang_masukrpt\" href=\"#\">" . $ReportLanguage->Phrase("DeleteFilter") . "</a>";
 		$item->Visible = TRUE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton; // v8
@@ -386,7 +388,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Filter panel button
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = $this->FilterApplied ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-caption=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-toggle=\"button\" data-form=\"fv03_siswa_blm_byrrpt\">" . $ReportLanguage->Phrase("SearchBtn") . "</button>";
+		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-caption=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-toggle=\"button\" data-form=\"fv04_uang_masukrpt\">" . $ReportLanguage->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
 		// Reset filter
@@ -523,12 +525,15 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$this->Sekolah->SetVisibility();
 		$this->Periode_Tahun_Bulan->SetVisibility();
 		$this->Periode_Text->SetVisibility();
+		$this->Bayar->SetVisibility();
+		$this->Per_Thn_Bln_Byr->SetVisibility();
+		$this->Per_Thn_Bln_Byr_Text->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 9;
+		$nDtls = 12;
 		$nGrps = 1;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -541,7 +546,7 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -754,9 +759,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			return;
 		if ($opt == 1) { // Get first row
 				$this->FirstRowData = array();
-				$this->FirstRowData['siswarutin_id'] = ewr_Conv($rs->fields('siswarutin_id'), 3);
+				$this->FirstRowData['siswanonrutin_id'] = ewr_Conv($rs->fields('siswanonrutin_id'), 3);
 				$this->FirstRowData['siswa_id'] = ewr_Conv($rs->fields('siswa_id'), 3);
-				$this->FirstRowData['rutin_id'] = ewr_Conv($rs->fields('rutin_id'), 3);
+				$this->FirstRowData['nonrutin_id'] = ewr_Conv($rs->fields('nonrutin_id'), 3);
 				$this->FirstRowData['sekolah_id'] = ewr_Conv($rs->fields('sekolah_id'), 3);
 				$this->FirstRowData['kelas_id'] = ewr_Conv($rs->fields('kelas_id'), 3);
 				$this->FirstRowData['NIS'] = ewr_Conv($rs->fields('NIS'), 200);
@@ -767,13 +772,16 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 				$this->FirstRowData['Sekolah'] = ewr_Conv($rs->fields('Sekolah'), 200);
 				$this->FirstRowData['Periode_Tahun_Bulan'] = ewr_Conv($rs->fields('Periode_Tahun_Bulan'), 200);
 				$this->FirstRowData['Periode_Text'] = ewr_Conv($rs->fields('Periode_Text'), 200);
+				$this->FirstRowData['Bayar'] = ewr_Conv($rs->fields('Bayar'), 4);
+				$this->FirstRowData['Per_Thn_Bln_Byr'] = ewr_Conv($rs->fields('Per_Thn_Bln_Byr'), 200);
+				$this->FirstRowData['Per_Thn_Bln_Byr_Text'] = ewr_Conv($rs->fields('Per_Thn_Bln_Byr_Text'), 200);
 		} else { // Get next row
 			$rs->MoveNext();
 		}
 		if (!$rs->EOF) {
-			$this->siswarutin_id->setDbValue($rs->fields('siswarutin_id'));
+			$this->siswanonrutin_id->setDbValue($rs->fields('siswanonrutin_id'));
 			$this->siswa_id->setDbValue($rs->fields('siswa_id'));
-			$this->rutin_id->setDbValue($rs->fields('rutin_id'));
+			$this->nonrutin_id->setDbValue($rs->fields('nonrutin_id'));
 			$this->sekolah_id->setDbValue($rs->fields('sekolah_id'));
 			$this->kelas_id->setDbValue($rs->fields('kelas_id'));
 			$this->NIS->setDbValue($rs->fields('NIS'));
@@ -784,6 +792,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->Sekolah->setDbValue($rs->fields('Sekolah'));
 			$this->Periode_Tahun_Bulan->setDbValue($rs->fields('Periode_Tahun_Bulan'));
 			$this->Periode_Text->setDbValue($rs->fields('Periode_Text'));
+			$this->Bayar->setDbValue($rs->fields('Bayar'));
+			$this->Per_Thn_Bln_Byr->setDbValue($rs->fields('Per_Thn_Bln_Byr'));
+			$this->Per_Thn_Bln_Byr_Text->setDbValue($rs->fields('Per_Thn_Bln_Byr_Text'));
 			$this->Val[1] = $this->NIS->CurrentValue;
 			$this->Val[2] = $this->Nama->CurrentValue;
 			$this->Val[3] = $this->Jenis->CurrentValue;
@@ -792,10 +803,13 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->Val[6] = $this->Sekolah->CurrentValue;
 			$this->Val[7] = $this->Periode_Tahun_Bulan->CurrentValue;
 			$this->Val[8] = $this->Periode_Text->CurrentValue;
+			$this->Val[9] = $this->Bayar->CurrentValue;
+			$this->Val[10] = $this->Per_Thn_Bln_Byr->CurrentValue;
+			$this->Val[11] = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
 		} else {
-			$this->siswarutin_id->setDbValue("");
+			$this->siswanonrutin_id->setDbValue("");
 			$this->siswa_id->setDbValue("");
-			$this->rutin_id->setDbValue("");
+			$this->nonrutin_id->setDbValue("");
 			$this->sekolah_id->setDbValue("");
 			$this->kelas_id->setDbValue("");
 			$this->NIS->setDbValue("");
@@ -806,6 +820,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->Sekolah->setDbValue("");
 			$this->Periode_Tahun_Bulan->setDbValue("");
 			$this->Periode_Text->setDbValue("");
+			$this->Bayar->setDbValue("");
+			$this->Per_Thn_Bln_Byr->setDbValue("");
+			$this->Per_Thn_Bln_Byr_Text->setDbValue("");
 		}
 	}
 
@@ -1023,6 +1040,15 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 			// Periode_Text
 			$this->Periode_Text->HrefValue = "";
+
+			// Bayar
+			$this->Bayar->HrefValue = "";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->HrefValue = "";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			} else {
@@ -1061,6 +1087,19 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->Periode_Text->ViewValue = $this->Periode_Text->CurrentValue;
 			$this->Periode_Text->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
+			// Bayar
+			$this->Bayar->ViewValue = $this->Bayar->CurrentValue;
+			$this->Bayar->ViewValue = ewr_FormatNumber($this->Bayar->ViewValue, $this->Bayar->DefaultDecimalPrecision, -1, 0, 0);
+			$this->Bayar->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->ViewValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+			$this->Per_Thn_Bln_Byr->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->ViewValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+			$this->Per_Thn_Bln_Byr_Text->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// NIS
 			$this->NIS->HrefValue = "";
 
@@ -1084,6 +1123,15 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 			// Periode_Text
 			$this->Periode_Text->HrefValue = "";
+
+			// Bayar
+			$this->Bayar->HrefValue = "";
+
+			// Per_Thn_Bln_Byr
+			$this->Per_Thn_Bln_Byr->HrefValue = "";
+
+			// Per_Thn_Bln_Byr_Text
+			$this->Per_Thn_Bln_Byr_Text->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1161,6 +1209,33 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$HrefValue = &$this->Periode_Text->HrefValue;
 			$LinkAttrs = &$this->Periode_Text->LinkAttrs;
 			$this->Cell_Rendered($this->Periode_Text, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Bayar
+			$CurrentValue = $this->Bayar->CurrentValue;
+			$ViewValue = &$this->Bayar->ViewValue;
+			$ViewAttrs = &$this->Bayar->ViewAttrs;
+			$CellAttrs = &$this->Bayar->CellAttrs;
+			$HrefValue = &$this->Bayar->HrefValue;
+			$LinkAttrs = &$this->Bayar->LinkAttrs;
+			$this->Cell_Rendered($this->Bayar, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Per_Thn_Bln_Byr
+			$CurrentValue = $this->Per_Thn_Bln_Byr->CurrentValue;
+			$ViewValue = &$this->Per_Thn_Bln_Byr->ViewValue;
+			$ViewAttrs = &$this->Per_Thn_Bln_Byr->ViewAttrs;
+			$CellAttrs = &$this->Per_Thn_Bln_Byr->CellAttrs;
+			$HrefValue = &$this->Per_Thn_Bln_Byr->HrefValue;
+			$LinkAttrs = &$this->Per_Thn_Bln_Byr->LinkAttrs;
+			$this->Cell_Rendered($this->Per_Thn_Bln_Byr, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Per_Thn_Bln_Byr_Text
+			$CurrentValue = $this->Per_Thn_Bln_Byr_Text->CurrentValue;
+			$ViewValue = &$this->Per_Thn_Bln_Byr_Text->ViewValue;
+			$ViewAttrs = &$this->Per_Thn_Bln_Byr_Text->ViewAttrs;
+			$CellAttrs = &$this->Per_Thn_Bln_Byr_Text->CellAttrs;
+			$HrefValue = &$this->Per_Thn_Bln_Byr_Text->HrefValue;
+			$LinkAttrs = &$this->Per_Thn_Bln_Byr_Text->LinkAttrs;
+			$this->Cell_Rendered($this->Per_Thn_Bln_Byr_Text, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1181,6 +1256,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		if ($this->Sekolah->Visible) $this->DtlColumnCount += 1;
 		if ($this->Periode_Tahun_Bulan->Visible) $this->DtlColumnCount += 1;
 		if ($this->Periode_Text->Visible) $this->DtlColumnCount += 1;
+		if ($this->Bayar->Visible) $this->DtlColumnCount += 1;
+		if ($this->Per_Thn_Bln_Byr->Visible) $this->DtlColumnCount += 1;
+		if ($this->Per_Thn_Bln_Byr_Text->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1227,6 +1305,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->SetSessionFilterValues($this->Jenis->SearchValue, $this->Jenis->SearchOperator, $this->Jenis->SearchCondition, $this->Jenis->SearchValue2, $this->Jenis->SearchOperator2, 'Jenis'); // Field Jenis
 			$this->SetSessionFilterValues($this->Kelas->SearchValue, $this->Kelas->SearchOperator, $this->Kelas->SearchCondition, $this->Kelas->SearchValue2, $this->Kelas->SearchOperator2, 'Kelas'); // Field Kelas
 			$this->SetSessionFilterValues($this->Sekolah->SearchValue, $this->Sekolah->SearchOperator, $this->Sekolah->SearchCondition, $this->Sekolah->SearchValue2, $this->Sekolah->SearchOperator2, 'Sekolah'); // Field Sekolah
+			$this->SetSessionFilterValues($this->Per_Thn_Bln_Byr->SearchValue, $this->Per_Thn_Bln_Byr->SearchOperator, $this->Per_Thn_Bln_Byr->SearchCondition, $this->Per_Thn_Bln_Byr->SearchValue2, $this->Per_Thn_Bln_Byr->SearchOperator2, 'Per_Thn_Bln_Byr'); // Field Per_Thn_Bln_Byr
+			$this->SetSessionFilterValues($this->Per_Thn_Bln_Byr_Text->SearchValue, $this->Per_Thn_Bln_Byr_Text->SearchOperator, $this->Per_Thn_Bln_Byr_Text->SearchCondition, $this->Per_Thn_Bln_Byr_Text->SearchValue2, $this->Per_Thn_Bln_Byr_Text->SearchOperator2, 'Per_Thn_Bln_Byr_Text'); // Field Per_Thn_Bln_Byr_Text
 
 			//$bSetupFilter = TRUE; // No need to set up, just use default
 		} else {
@@ -1256,6 +1336,16 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			if ($this->GetFilterValues($this->Sekolah)) {
 				$bSetupFilter = TRUE;
 			}
+
+			// Field Per_Thn_Bln_Byr
+			if ($this->GetFilterValues($this->Per_Thn_Bln_Byr)) {
+				$bSetupFilter = TRUE;
+			}
+
+			// Field Per_Thn_Bln_Byr_Text
+			if ($this->GetFilterValues($this->Per_Thn_Bln_Byr_Text)) {
+				$bSetupFilter = TRUE;
+			}
 			if (!$this->ValidateForm()) {
 				$this->setFailureMessage($gsFormError);
 				return $sFilter;
@@ -1269,6 +1359,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->GetSessionFilterValues($this->Jenis); // Field Jenis
 			$this->GetSessionFilterValues($this->Kelas); // Field Kelas
 			$this->GetSessionFilterValues($this->Sekolah); // Field Sekolah
+			$this->GetSessionFilterValues($this->Per_Thn_Bln_Byr); // Field Per_Thn_Bln_Byr
+			$this->GetSessionFilterValues($this->Per_Thn_Bln_Byr_Text); // Field Per_Thn_Bln_Byr_Text
 		}
 
 		// Call page filter validated event
@@ -1280,6 +1372,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$this->BuildExtendedFilter($this->Jenis, $sFilter, FALSE, TRUE); // Field Jenis
 		$this->BuildExtendedFilter($this->Kelas, $sFilter, FALSE, TRUE); // Field Kelas
 		$this->BuildExtendedFilter($this->Sekolah, $sFilter, FALSE, TRUE); // Field Sekolah
+		$this->BuildExtendedFilter($this->Per_Thn_Bln_Byr, $sFilter, FALSE, TRUE); // Field Per_Thn_Bln_Byr
+		$this->BuildExtendedFilter($this->Per_Thn_Bln_Byr_Text, $sFilter, FALSE, TRUE); // Field Per_Thn_Bln_Byr_Text
 
 		// Save parms to session
 		$this->SetSessionFilterValues($this->NIS->SearchValue, $this->NIS->SearchOperator, $this->NIS->SearchCondition, $this->NIS->SearchValue2, $this->NIS->SearchOperator2, 'NIS'); // Field NIS
@@ -1287,6 +1381,8 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		$this->SetSessionFilterValues($this->Jenis->SearchValue, $this->Jenis->SearchOperator, $this->Jenis->SearchCondition, $this->Jenis->SearchValue2, $this->Jenis->SearchOperator2, 'Jenis'); // Field Jenis
 		$this->SetSessionFilterValues($this->Kelas->SearchValue, $this->Kelas->SearchOperator, $this->Kelas->SearchCondition, $this->Kelas->SearchValue2, $this->Kelas->SearchOperator2, 'Kelas'); // Field Kelas
 		$this->SetSessionFilterValues($this->Sekolah->SearchValue, $this->Sekolah->SearchOperator, $this->Sekolah->SearchCondition, $this->Sekolah->SearchValue2, $this->Sekolah->SearchOperator2, 'Sekolah'); // Field Sekolah
+		$this->SetSessionFilterValues($this->Per_Thn_Bln_Byr->SearchValue, $this->Per_Thn_Bln_Byr->SearchOperator, $this->Per_Thn_Bln_Byr->SearchCondition, $this->Per_Thn_Bln_Byr->SearchValue2, $this->Per_Thn_Bln_Byr->SearchOperator2, 'Per_Thn_Bln_Byr'); // Field Per_Thn_Bln_Byr
+		$this->SetSessionFilterValues($this->Per_Thn_Bln_Byr_Text->SearchValue, $this->Per_Thn_Bln_Byr_Text->SearchOperator, $this->Per_Thn_Bln_Byr_Text->SearchCondition, $this->Per_Thn_Bln_Byr_Text->SearchValue2, $this->Per_Thn_Bln_Byr_Text->SearchOperator2, 'Per_Thn_Bln_Byr_Text'); // Field Per_Thn_Bln_Byr_Text
 
 		// Setup filter
 		if ($bSetupFilter) {
@@ -1490,18 +1586,18 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 	// Get dropdown value from session
 	function GetSessionDropDownValue(&$fld) {
 		$parm = substr($fld->FldVar, 2);
-		$this->GetSessionValue($fld->DropDownValue, 'sv_v03_siswa_blm_byr_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator, 'so_v03_siswa_blm_byr_' . $parm);
+		$this->GetSessionValue($fld->DropDownValue, 'sv_v04_uang_masuk_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_v04_uang_masuk_' . $parm);
 	}
 
 	// Get filter values from session
 	function GetSessionFilterValues(&$fld) {
 		$parm = substr($fld->FldVar, 2);
-		$this->GetSessionValue($fld->SearchValue, 'sv_v03_siswa_blm_byr_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator, 'so_v03_siswa_blm_byr_' . $parm);
-		$this->GetSessionValue($fld->SearchCondition, 'sc_v03_siswa_blm_byr_' . $parm);
-		$this->GetSessionValue($fld->SearchValue2, 'sv2_v03_siswa_blm_byr_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator2, 'so2_v03_siswa_blm_byr_' . $parm);
+		$this->GetSessionValue($fld->SearchValue, 'sv_v04_uang_masuk_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_v04_uang_masuk_' . $parm);
+		$this->GetSessionValue($fld->SearchCondition, 'sc_v04_uang_masuk_' . $parm);
+		$this->GetSessionValue($fld->SearchValue2, 'sv2_v04_uang_masuk_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator2, 'so2_v04_uang_masuk_' . $parm);
 	}
 
 	// Get value from session
@@ -1512,17 +1608,17 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 	// Set dropdown value to session
 	function SetSessionDropDownValue($sv, $so, $parm) {
-		$_SESSION['sv_v03_siswa_blm_byr_' . $parm] = $sv;
-		$_SESSION['so_v03_siswa_blm_byr_' . $parm] = $so;
+		$_SESSION['sv_v04_uang_masuk_' . $parm] = $sv;
+		$_SESSION['so_v04_uang_masuk_' . $parm] = $so;
 	}
 
 	// Set filter values to session
 	function SetSessionFilterValues($sv1, $so1, $sc, $sv2, $so2, $parm) {
-		$_SESSION['sv_v03_siswa_blm_byr_' . $parm] = $sv1;
-		$_SESSION['so_v03_siswa_blm_byr_' . $parm] = $so1;
-		$_SESSION['sc_v03_siswa_blm_byr_' . $parm] = $sc;
-		$_SESSION['sv2_v03_siswa_blm_byr_' . $parm] = $sv2;
-		$_SESSION['so2_v03_siswa_blm_byr_' . $parm] = $so2;
+		$_SESSION['sv_v04_uang_masuk_' . $parm] = $sv1;
+		$_SESSION['so_v04_uang_masuk_' . $parm] = $so1;
+		$_SESSION['sc_v04_uang_masuk_' . $parm] = $sc;
+		$_SESSION['sv2_v04_uang_masuk_' . $parm] = $sv2;
+		$_SESSION['so2_v04_uang_masuk_' . $parm] = $so2;
 	}
 
 	// Check if has Session filter values
@@ -1572,17 +1668,17 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 	// Clear selection stored in session
 	function ClearSessionSelection($parm) {
-		$_SESSION["sel_v03_siswa_blm_byr_$parm"] = "";
-		$_SESSION["rf_v03_siswa_blm_byr_$parm"] = "";
-		$_SESSION["rt_v03_siswa_blm_byr_$parm"] = "";
+		$_SESSION["sel_v04_uang_masuk_$parm"] = "";
+		$_SESSION["rf_v04_uang_masuk_$parm"] = "";
+		$_SESSION["rt_v04_uang_masuk_$parm"] = "";
 	}
 
 	// Load selection from session
 	function LoadSelectionFromSession($parm) {
 		$fld = &$this->FieldByParm($parm);
-		$fld->SelectionList = @$_SESSION["sel_v03_siswa_blm_byr_$parm"];
-		$fld->RangeFrom = @$_SESSION["rf_v03_siswa_blm_byr_$parm"];
-		$fld->RangeTo = @$_SESSION["rt_v03_siswa_blm_byr_$parm"];
+		$fld->SelectionList = @$_SESSION["sel_v04_uang_masuk_$parm"];
+		$fld->RangeFrom = @$_SESSION["rf_v04_uang_masuk_$parm"];
+		$fld->RangeTo = @$_SESSION["rt_v04_uang_masuk_$parm"];
 	}
 
 	// Load default value for filters
@@ -1621,6 +1717,14 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		// Field Sekolah
 		$this->SetDefaultExtFilter($this->Sekolah, "LIKE", NULL, 'AND', "=", NULL);
 		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Sekolah);
+
+		// Field Per_Thn_Bln_Byr
+		$this->SetDefaultExtFilter($this->Per_Thn_Bln_Byr, "LIKE", NULL, 'AND', "=", NULL);
+		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Per_Thn_Bln_Byr);
+
+		// Field Per_Thn_Bln_Byr_Text
+		$this->SetDefaultExtFilter($this->Per_Thn_Bln_Byr_Text, "LIKE", NULL, 'AND', "=", NULL);
+		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->Per_Thn_Bln_Byr_Text);
 		/**
 		* Set up default values for popup filters
 		*/
@@ -1647,6 +1751,14 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 
 		// Check Sekolah text filter
 		if ($this->TextFilterApplied($this->Sekolah))
+			return TRUE;
+
+		// Check Per_Thn_Bln_Byr text filter
+		if ($this->TextFilterApplied($this->Per_Thn_Bln_Byr))
+			return TRUE;
+
+		// Check Per_Thn_Bln_Byr_Text text filter
+		if ($this->TextFilterApplied($this->Per_Thn_Bln_Byr_Text))
 			return TRUE;
 		return FALSE;
 	}
@@ -1717,6 +1829,30 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
 		if ($sFilter <> "")
 			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Sekolah->FldCaption() . "</span>" . $sFilter . "</div>";
+
+		// Field Per_Thn_Bln_Byr
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildExtendedFilter($this->Per_Thn_Bln_Byr, $sExtWrk);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Per_Thn_Bln_Byr->FldCaption() . "</span>" . $sFilter . "</div>";
+
+		// Field Per_Thn_Bln_Byr_Text
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildExtendedFilter($this->Per_Thn_Bln_Byr_Text, $sExtWrk);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Per_Thn_Bln_Byr_Text->FldCaption() . "</span>" . $sFilter . "</div>";
 		$divstyle = "";
 		$divdataclass = "";
 
@@ -1809,6 +1945,34 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$sFilterList .= $sWrk;
 		}
 
+		// Field Per_Thn_Bln_Byr
+		$sWrk = "";
+		if ($this->Per_Thn_Bln_Byr->SearchValue <> "" || $this->Per_Thn_Bln_Byr->SearchValue2 <> "") {
+			$sWrk = "\"sv_Per_Thn_Bln_Byr\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr->SearchValue) . "\"," .
+				"\"so_Per_Thn_Bln_Byr\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr->SearchOperator) . "\"," .
+				"\"sc_Per_Thn_Bln_Byr\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr->SearchCondition) . "\"," .
+				"\"sv2_Per_Thn_Bln_Byr\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr->SearchValue2) . "\"," .
+				"\"so2_Per_Thn_Bln_Byr\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr->SearchOperator2) . "\"";
+		}
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Field Per_Thn_Bln_Byr_Text
+		$sWrk = "";
+		if ($this->Per_Thn_Bln_Byr_Text->SearchValue <> "" || $this->Per_Thn_Bln_Byr_Text->SearchValue2 <> "") {
+			$sWrk = "\"sv_Per_Thn_Bln_Byr_Text\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr_Text->SearchValue) . "\"," .
+				"\"so_Per_Thn_Bln_Byr_Text\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr_Text->SearchOperator) . "\"," .
+				"\"sc_Per_Thn_Bln_Byr_Text\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr_Text->SearchCondition) . "\"," .
+				"\"sv2_Per_Thn_Bln_Byr_Text\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr_Text->SearchValue2) . "\"," .
+				"\"so2_Per_Thn_Bln_Byr_Text\":\"" . ewr_JsEncode2($this->Per_Thn_Bln_Byr_Text->SearchOperator2) . "\"";
+		}
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
 		// Return filter list in json
 		if ($sFilterList <> "")
 			return "{" . $sFilterList . "}";
@@ -1890,6 +2054,30 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 		if (!$bRestoreFilter) { // Clear filter
 			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Sekolah");
 		}
+
+		// Field Per_Thn_Bln_Byr
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_Per_Thn_Bln_Byr", $filter) || array_key_exists("so_Per_Thn_Bln_Byr", $filter) ||
+			array_key_exists("sc_Per_Thn_Bln_Byr", $filter) ||
+			array_key_exists("sv2_Per_Thn_Bln_Byr", $filter) || array_key_exists("so2_Per_Thn_Bln_Byr", $filter)) {
+			$this->SetSessionFilterValues(@$filter["sv_Per_Thn_Bln_Byr"], @$filter["so_Per_Thn_Bln_Byr"], @$filter["sc_Per_Thn_Bln_Byr"], @$filter["sv2_Per_Thn_Bln_Byr"], @$filter["so2_Per_Thn_Bln_Byr"], "Per_Thn_Bln_Byr");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Per_Thn_Bln_Byr");
+		}
+
+		// Field Per_Thn_Bln_Byr_Text
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_Per_Thn_Bln_Byr_Text", $filter) || array_key_exists("so_Per_Thn_Bln_Byr_Text", $filter) ||
+			array_key_exists("sc_Per_Thn_Bln_Byr_Text", $filter) ||
+			array_key_exists("sv2_Per_Thn_Bln_Byr_Text", $filter) || array_key_exists("so2_Per_Thn_Bln_Byr_Text", $filter)) {
+			$this->SetSessionFilterValues(@$filter["sv_Per_Thn_Bln_Byr_Text"], @$filter["so_Per_Thn_Bln_Byr_Text"], @$filter["sc_Per_Thn_Bln_Byr_Text"], @$filter["sv2_Per_Thn_Bln_Byr_Text"], @$filter["so2_Per_Thn_Bln_Byr_Text"], "Per_Thn_Bln_Byr_Text");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionFilterValues("", "=", "AND", "", "=", "Per_Thn_Bln_Byr_Text");
+		}
 		return TRUE;
 	}
 
@@ -1927,6 +2115,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->Sekolah->setSort("");
 			$this->Periode_Tahun_Bulan->setSort("");
 			$this->Periode_Text->setSort("");
+			$this->Bayar->setSort("");
+			$this->Per_Thn_Bln_Byr->setSort("");
+			$this->Per_Thn_Bln_Byr_Text->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -1940,6 +2131,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 			$this->UpdateSort($this->Sekolah, $bCtrl); // Sekolah
 			$this->UpdateSort($this->Periode_Tahun_Bulan, $bCtrl); // Periode_Tahun_Bulan
 			$this->UpdateSort($this->Periode_Text, $bCtrl); // Periode_Text
+			$this->UpdateSort($this->Bayar, $bCtrl); // Bayar
+			$this->UpdateSort($this->Per_Thn_Bln_Byr, $bCtrl); // Per_Thn_Bln_Byr
+			$this->UpdateSort($this->Per_Thn_Bln_Byr_Text, $bCtrl); // Per_Thn_Bln_Byr_Text
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2109,9 +2303,9 @@ class crv03_siswa_blm_byr_rpt extends crv03_siswa_blm_byr {
 <?php
 
 // Create page object
-if (!isset($v03_siswa_blm_byr_rpt)) $v03_siswa_blm_byr_rpt = new crv03_siswa_blm_byr_rpt();
+if (!isset($v04_uang_masuk_rpt)) $v04_uang_masuk_rpt = new crv04_uang_masuk_rpt();
 if (isset($Page)) $OldPage = $Page;
-$Page = &$v03_siswa_blm_byr_rpt;
+$Page = &$v04_uang_masuk_rpt;
 
 // Page init
 $Page->Page_Init();
@@ -2131,21 +2325,21 @@ $Page->Page_Render();
 <script type="text/javascript">
 
 // Create page object
-var v03_siswa_blm_byr_rpt = new ewr_Page("v03_siswa_blm_byr_rpt");
+var v04_uang_masuk_rpt = new ewr_Page("v04_uang_masuk_rpt");
 
 // Page properties
-v03_siswa_blm_byr_rpt.PageID = "rpt"; // Page ID
-var EWR_PAGE_ID = v03_siswa_blm_byr_rpt.PageID;
+v04_uang_masuk_rpt.PageID = "rpt"; // Page ID
+var EWR_PAGE_ID = v04_uang_masuk_rpt.PageID;
 
 // Extend page with Chart_Rendering function
-v03_siswa_blm_byr_rpt.Chart_Rendering = 
+v04_uang_masuk_rpt.Chart_Rendering = 
  function(chart, chartid) { // DO NOT CHANGE THIS LINE!
 
  	//alert(chartid);
  }
 
 // Extend page with Chart_Rendered function
-v03_siswa_blm_byr_rpt.Chart_Rendered = 
+v04_uang_masuk_rpt.Chart_Rendered = 
  function(chart, chartid) { // DO NOT CHANGE THIS LINE!
 
  	//alert(chartid);
@@ -2156,10 +2350,10 @@ v03_siswa_blm_byr_rpt.Chart_Rendered =
 <script type="text/javascript">
 
 // Form object
-var CurrentForm = fv03_siswa_blm_byrrpt = new ewr_Form("fv03_siswa_blm_byrrpt");
+var CurrentForm = fv04_uang_masukrpt = new ewr_Form("fv04_uang_masukrpt");
 
 // Validate method
-fv03_siswa_blm_byrrpt.Validate = function() {
+fv04_uang_masukrpt.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -2171,16 +2365,16 @@ fv03_siswa_blm_byrrpt.Validate = function() {
 }
 
 // Form_CustomValidate method
-fv03_siswa_blm_byrrpt.Form_CustomValidate = 
+fv04_uang_masukrpt.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
  	return true;
  }
 <?php if (EWR_CLIENT_VALIDATE) { ?>
-fv03_siswa_blm_byrrpt.ValidateRequired = true; // Uses JavaScript validation
+fv04_uang_masukrpt.ValidateRequired = true; // Uses JavaScript validation
 <?php } else { ?>
-fv03_siswa_blm_byrrpt.ValidateRequired = false; // No JavaScript validation
+fv04_uang_masukrpt.ValidateRequired = false; // No JavaScript validation
 <?php } ?>
 
 // Use Ajax
@@ -2242,9 +2436,9 @@ if (!$Page->DrillDownInPanel) {
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
 <!-- Search form (begin) -->
-<form name="fv03_siswa_blm_byrrpt" id="fv03_siswa_blm_byrrpt" class="form-inline ewForm ewExtFilterForm" action="<?php echo ewr_CurrentPage() ?>">
+<form name="fv04_uang_masukrpt" id="fv04_uang_masukrpt" class="form-inline ewForm ewExtFilterForm" action="<?php echo ewr_CurrentPage() ?>">
 <?php $SearchPanelClass = ($Page->Filter <> "") ? " in" : " in"; ?>
-<div id="fv03_siswa_blm_byrrpt_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<div id="fv04_uang_masukrpt_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <div id="r_1" class="ewRow">
 <div id="c_NIS" class="ewCell form-group">
@@ -2252,7 +2446,7 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_NIS" id="so_NIS" value="LIKE"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->NIS->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_NIS" id="sv_NIS" name="sv_NIS" size="30" maxlength="100" placeholder="<?php echo $Page->NIS->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->NIS->SearchValue) ?>"<?php echo $Page->NIS->EditAttributes() ?>>
+<input type="text" data-table="v04_uang_masuk" data-field="x_NIS" id="sv_NIS" name="sv_NIS" size="30" maxlength="100" placeholder="<?php echo $Page->NIS->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->NIS->SearchValue) ?>"<?php echo $Page->NIS->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -2262,7 +2456,7 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Nama" id="so_Nama" value="LIKE"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->Nama->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Nama" id="sv_Nama" name="sv_Nama" size="30" maxlength="100" placeholder="<?php echo $Page->Nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Nama->SearchValue) ?>"<?php echo $Page->Nama->EditAttributes() ?>>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Nama" id="sv_Nama" name="sv_Nama" size="30" maxlength="100" placeholder="<?php echo $Page->Nama->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Nama->SearchValue) ?>"<?php echo $Page->Nama->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -2272,7 +2466,7 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Jenis" id="so_Jenis" value="LIKE"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->Jenis->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Jenis" id="sv_Jenis" name="sv_Jenis" size="30" maxlength="50" placeholder="<?php echo $Page->Jenis->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Jenis->SearchValue) ?>"<?php echo $Page->Jenis->EditAttributes() ?>>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Jenis" id="sv_Jenis" name="sv_Jenis" size="30" maxlength="50" placeholder="<?php echo $Page->Jenis->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Jenis->SearchValue) ?>"<?php echo $Page->Jenis->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -2282,7 +2476,7 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Kelas" id="so_Kelas" value="LIKE"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->Kelas->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Kelas" id="sv_Kelas" name="sv_Kelas" size="30" maxlength="100" placeholder="<?php echo $Page->Kelas->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Kelas->SearchValue) ?>"<?php echo $Page->Kelas->EditAttributes() ?>>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Kelas" id="sv_Kelas" name="sv_Kelas" size="30" maxlength="100" placeholder="<?php echo $Page->Kelas->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Kelas->SearchValue) ?>"<?php echo $Page->Kelas->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -2292,7 +2486,27 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Sekolah" id="so_Sekolah" value="LIKE"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->Sekolah->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="v03_siswa_blm_byr" data-field="x_Sekolah" id="sv_Sekolah" name="sv_Sekolah" size="30" maxlength="100" placeholder="<?php echo $Page->Sekolah->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Sekolah->SearchValue) ?>"<?php echo $Page->Sekolah->EditAttributes() ?>>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Sekolah" id="sv_Sekolah" name="sv_Sekolah" size="30" maxlength="100" placeholder="<?php echo $Page->Sekolah->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Sekolah->SearchValue) ?>"<?php echo $Page->Sekolah->EditAttributes() ?>>
+</span>
+</div>
+</div>
+<div id="r_6" class="ewRow">
+<div id="c_Per_Thn_Bln_Byr" class="ewCell form-group">
+	<label for="sv_Per_Thn_Bln_Byr" class="ewSearchCaption ewLabel"><?php echo $Page->Per_Thn_Bln_Byr->FldCaption() ?></label>
+	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Per_Thn_Bln_Byr" id="so_Per_Thn_Bln_Byr" value="LIKE"></span>
+	<span class="control-group ewSearchField">
+<?php ewr_PrependClass($Page->Per_Thn_Bln_Byr->EditAttrs["class"], "form-control"); // PR8 ?>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Per_Thn_Bln_Byr" id="sv_Per_Thn_Bln_Byr" name="sv_Per_Thn_Bln_Byr" size="30" maxlength="6" placeholder="<?php echo $Page->Per_Thn_Bln_Byr->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Per_Thn_Bln_Byr->SearchValue) ?>"<?php echo $Page->Per_Thn_Bln_Byr->EditAttributes() ?>>
+</span>
+</div>
+</div>
+<div id="r_7" class="ewRow">
+<div id="c_Per_Thn_Bln_Byr_Text" class="ewCell form-group">
+	<label for="sv_Per_Thn_Bln_Byr_Text" class="ewSearchCaption ewLabel"><?php echo $Page->Per_Thn_Bln_Byr_Text->FldCaption() ?></label>
+	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("LIKE"); ?><input type="hidden" name="so_Per_Thn_Bln_Byr_Text" id="so_Per_Thn_Bln_Byr_Text" value="LIKE"></span>
+	<span class="control-group ewSearchField">
+<?php ewr_PrependClass($Page->Per_Thn_Bln_Byr_Text->EditAttrs["class"], "form-control"); // PR8 ?>
+<input type="text" data-table="v04_uang_masuk" data-field="x_Per_Thn_Bln_Byr_Text" id="sv_Per_Thn_Bln_Byr_Text" name="sv_Per_Thn_Bln_Byr_Text" size="30" maxlength="14" placeholder="<?php echo $Page->Per_Thn_Bln_Byr_Text->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->Per_Thn_Bln_Byr_Text->SearchValue) ?>"<?php echo $Page->Per_Thn_Bln_Byr_Text->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -2301,8 +2515,8 @@ if (!$Page->DrillDownInPanel) {
 </div>
 </form>
 <script type="text/javascript">
-fv03_siswa_blm_byrrpt.Init();
-fv03_siswa_blm_byrrpt.FilterList = <?php echo $Page->GetFilterList() ?>;
+fv04_uang_masukrpt.Init();
+fv04_uang_masukrpt.FilterList = <?php echo $Page->GetFilterList() ?>;
 </script>
 <!-- Search form (end) -->
 <?php } ?>
@@ -2356,15 +2570,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	<tr class="ewTableHeader">
 <?php if ($Page->NIS->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="NIS"><div class="v03_siswa_blm_byr_NIS"><span class="ewTableHeaderCaption"><?php echo $Page->NIS->FldCaption() ?></span></div></td>
+	<td data-field="NIS"><div class="v04_uang_masuk_NIS"><span class="ewTableHeaderCaption"><?php echo $Page->NIS->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="NIS">
 <?php if ($Page->SortUrl($Page->NIS) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_NIS">
+		<div class="ewTableHeaderBtn v04_uang_masuk_NIS">
 			<span class="ewTableHeaderCaption"><?php echo $Page->NIS->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_NIS" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->NIS) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_NIS" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->NIS) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->NIS->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->NIS->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->NIS->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2374,15 +2588,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Nama->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Nama"><div class="v03_siswa_blm_byr_Nama"><span class="ewTableHeaderCaption"><?php echo $Page->Nama->FldCaption() ?></span></div></td>
+	<td data-field="Nama"><div class="v04_uang_masuk_Nama"><span class="ewTableHeaderCaption"><?php echo $Page->Nama->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Nama">
 <?php if ($Page->SortUrl($Page->Nama) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Nama">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Nama">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Nama->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Nama) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Nama) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Nama->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2392,15 +2606,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Jenis->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Jenis"><div class="v03_siswa_blm_byr_Jenis"><span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span></div></td>
+	<td data-field="Jenis"><div class="v04_uang_masuk_Jenis"><span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Jenis">
 <?php if ($Page->SortUrl($Page->Jenis) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Jenis">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Jenis">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Jenis" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Jenis) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Jenis" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Jenis) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Jenis->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Jenis->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Jenis->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2410,15 +2624,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Nilai->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Nilai"><div class="v03_siswa_blm_byr_Nilai"><span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span></div></td>
+	<td data-field="Nilai"><div class="v04_uang_masuk_Nilai"><span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Nilai">
 <?php if ($Page->SortUrl($Page->Nilai) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Nilai">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Nilai">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Nilai" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Nilai) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Nilai" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Nilai) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Nilai->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Nilai->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Nilai->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2428,15 +2642,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Kelas->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Kelas"><div class="v03_siswa_blm_byr_Kelas"><span class="ewTableHeaderCaption"><?php echo $Page->Kelas->FldCaption() ?></span></div></td>
+	<td data-field="Kelas"><div class="v04_uang_masuk_Kelas"><span class="ewTableHeaderCaption"><?php echo $Page->Kelas->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Kelas">
 <?php if ($Page->SortUrl($Page->Kelas) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Kelas">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Kelas">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Kelas->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Kelas" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Kelas) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Kelas" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Kelas) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Kelas->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Kelas->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Kelas->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2446,15 +2660,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Sekolah->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Sekolah"><div class="v03_siswa_blm_byr_Sekolah"><span class="ewTableHeaderCaption"><?php echo $Page->Sekolah->FldCaption() ?></span></div></td>
+	<td data-field="Sekolah"><div class="v04_uang_masuk_Sekolah"><span class="ewTableHeaderCaption"><?php echo $Page->Sekolah->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Sekolah">
 <?php if ($Page->SortUrl($Page->Sekolah) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Sekolah">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Sekolah">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Sekolah->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Sekolah" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Sekolah) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Sekolah" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Sekolah) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Sekolah->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Sekolah->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Sekolah->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2464,15 +2678,15 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Periode_Tahun_Bulan->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Periode_Tahun_Bulan"><div class="v03_siswa_blm_byr_Periode_Tahun_Bulan"><span class="ewTableHeaderCaption"><?php echo $Page->Periode_Tahun_Bulan->FldCaption() ?></span></div></td>
+	<td data-field="Periode_Tahun_Bulan"><div class="v04_uang_masuk_Periode_Tahun_Bulan"><span class="ewTableHeaderCaption"><?php echo $Page->Periode_Tahun_Bulan->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Periode_Tahun_Bulan">
 <?php if ($Page->SortUrl($Page->Periode_Tahun_Bulan) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Periode_Tahun_Bulan">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Periode_Tahun_Bulan">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Tahun_Bulan->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Periode_Tahun_Bulan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Periode_Tahun_Bulan) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Periode_Tahun_Bulan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Periode_Tahun_Bulan) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Tahun_Bulan->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Periode_Tahun_Bulan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Periode_Tahun_Bulan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
@@ -2482,17 +2696,71 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Periode_Text->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="Periode_Text"><div class="v03_siswa_blm_byr_Periode_Text"><span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span></div></td>
+	<td data-field="Periode_Text"><div class="v04_uang_masuk_Periode_Text"><span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span></div></td>
 <?php } else { ?>
 	<td data-field="Periode_Text">
 <?php if ($Page->SortUrl($Page->Periode_Text) == "") { ?>
-		<div class="ewTableHeaderBtn v03_siswa_blm_byr_Periode_Text">
+		<div class="ewTableHeaderBtn v04_uang_masuk_Periode_Text">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span>
 		</div>
 <?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer v03_siswa_blm_byr_Periode_Text" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Periode_Text) ?>',2);">
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Periode_Text" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Periode_Text) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Periode_Text->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Periode_Text->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Periode_Text->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->Bayar->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Bayar"><div class="v04_uang_masuk_Bayar"><span class="ewTableHeaderCaption"><?php echo $Page->Bayar->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Bayar">
+<?php if ($Page->SortUrl($Page->Bayar) == "") { ?>
+		<div class="ewTableHeaderBtn v04_uang_masuk_Bayar">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Bayar->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Bayar" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Bayar) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Bayar->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Bayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Bayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->Per_Thn_Bln_Byr->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Per_Thn_Bln_Byr"><div class="v04_uang_masuk_Per_Thn_Bln_Byr"><span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Per_Thn_Bln_Byr">
+<?php if ($Page->SortUrl($Page->Per_Thn_Bln_Byr) == "") { ?>
+		<div class="ewTableHeaderBtn v04_uang_masuk_Per_Thn_Bln_Byr">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Per_Thn_Bln_Byr" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Per_Thn_Bln_Byr) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Per_Thn_Bln_Byr->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Per_Thn_Bln_Byr->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->Per_Thn_Bln_Byr_Text->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Per_Thn_Bln_Byr_Text"><div class="v04_uang_masuk_Per_Thn_Bln_Byr_Text"><span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr_Text->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Per_Thn_Bln_Byr_Text">
+<?php if ($Page->SortUrl($Page->Per_Thn_Bln_Byr_Text) == "") { ?>
+		<div class="ewTableHeaderBtn v04_uang_masuk_Per_Thn_Bln_Byr_Text">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr_Text->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer v04_uang_masuk_Per_Thn_Bln_Byr_Text" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Per_Thn_Bln_Byr_Text) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Per_Thn_Bln_Byr_Text->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Per_Thn_Bln_Byr_Text->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Per_Thn_Bln_Byr_Text->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2518,35 +2786,47 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->NIS->Visible) { ?>
 		<td data-field="NIS"<?php echo $Page->NIS->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_NIS"<?php echo $Page->NIS->ViewAttributes() ?>><?php echo $Page->NIS->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_NIS"<?php echo $Page->NIS->ViewAttributes() ?>><?php echo $Page->NIS->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Nama->Visible) { ?>
 		<td data-field="Nama"<?php echo $Page->Nama->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Nama"<?php echo $Page->Nama->ViewAttributes() ?>><?php echo $Page->Nama->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Nama"<?php echo $Page->Nama->ViewAttributes() ?>><?php echo $Page->Nama->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Jenis->Visible) { ?>
 		<td data-field="Jenis"<?php echo $Page->Jenis->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Jenis"<?php echo $Page->Jenis->ViewAttributes() ?>><?php echo $Page->Jenis->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Jenis"<?php echo $Page->Jenis->ViewAttributes() ?>><?php echo $Page->Jenis->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Nilai->Visible) { ?>
 		<td data-field="Nilai"<?php echo $Page->Nilai->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Nilai"<?php echo $Page->Nilai->ViewAttributes() ?>><?php echo $Page->Nilai->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Nilai"<?php echo $Page->Nilai->ViewAttributes() ?>><?php echo $Page->Nilai->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Kelas->Visible) { ?>
 		<td data-field="Kelas"<?php echo $Page->Kelas->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Kelas"<?php echo $Page->Kelas->ViewAttributes() ?>><?php echo $Page->Kelas->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Kelas"<?php echo $Page->Kelas->ViewAttributes() ?>><?php echo $Page->Kelas->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Sekolah->Visible) { ?>
 		<td data-field="Sekolah"<?php echo $Page->Sekolah->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Sekolah"<?php echo $Page->Sekolah->ViewAttributes() ?>><?php echo $Page->Sekolah->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Sekolah"<?php echo $Page->Sekolah->ViewAttributes() ?>><?php echo $Page->Sekolah->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Periode_Tahun_Bulan->Visible) { ?>
 		<td data-field="Periode_Tahun_Bulan"<?php echo $Page->Periode_Tahun_Bulan->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Periode_Tahun_Bulan"<?php echo $Page->Periode_Tahun_Bulan->ViewAttributes() ?>><?php echo $Page->Periode_Tahun_Bulan->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Periode_Tahun_Bulan"<?php echo $Page->Periode_Tahun_Bulan->ViewAttributes() ?>><?php echo $Page->Periode_Tahun_Bulan->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Periode_Text->Visible) { ?>
 		<td data-field="Periode_Text"<?php echo $Page->Periode_Text->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v03_siswa_blm_byr_Periode_Text"<?php echo $Page->Periode_Text->ViewAttributes() ?>><?php echo $Page->Periode_Text->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Periode_Text"<?php echo $Page->Periode_Text->ViewAttributes() ?>><?php echo $Page->Periode_Text->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Bayar->Visible) { ?>
+		<td data-field="Bayar"<?php echo $Page->Bayar->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Bayar"<?php echo $Page->Bayar->ViewAttributes() ?>><?php echo $Page->Bayar->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Per_Thn_Bln_Byr->Visible) { ?>
+		<td data-field="Per_Thn_Bln_Byr"<?php echo $Page->Per_Thn_Bln_Byr->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Per_Thn_Bln_Byr"<?php echo $Page->Per_Thn_Bln_Byr->ViewAttributes() ?>><?php echo $Page->Per_Thn_Bln_Byr->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Per_Thn_Bln_Byr_Text->Visible) { ?>
+		<td data-field="Per_Thn_Bln_Byr_Text"<?php echo $Page->Per_Thn_Bln_Byr_Text->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->RecCount ?>_<?php echo $Page->RecCount ?>_v04_uang_masuk_Per_Thn_Bln_Byr_Text"<?php echo $Page->Per_Thn_Bln_Byr_Text->ViewAttributes() ?>><?php echo $Page->Per_Thn_Bln_Byr_Text->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
@@ -2584,7 +2864,7 @@ while ($rs && !$rs->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page->ShowH
 <?php } ?>
 <?php if ($Page->Export == "" && !($Page->DrillDown && $Page->TotalGrps > 0)) { ?>
 <div class="panel-footer ewGridLowerPanel">
-<?php include "v03_siswa_blm_byrrptpager.php" ?>
+<?php include "v04_uang_masukrptpager.php" ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
