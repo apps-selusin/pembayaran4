@@ -6528,7 +6528,8 @@ function Database_Connecting(&$info) {
 		$info["user"] = "root"; // sesuaikan dengan username database di komputer localhost
 		$info["pass"] = "admin"; // sesuaikan dengan password database di komputer localhost
 		$info["db"] = "db_pembayaran4"; // sesuaikan dengan nama database di komputer localhost
-		$info["port"] = "3306";
+		$lines=file('dbport.txt');foreach ($lines as $line_num => $line){$port = $line;}
+		$info["port"] = $port; //$info["port"] = "3306";
 	} elseif (ewr_CurrentHost () == "pembayaran4.nma-indonesia.com") { // setting koneksi database untuk komputer server
 		$info["host"] = "mysql.idhostinger.com";  // sesuaikan dengan ip address atau hostname komputer server
 		$info["user"] = "u945388674_pemb4"; // sesuaikan dengan username database di komputer server

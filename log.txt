@@ -2,6 +2,44 @@
 <strong>to do:</strong>
 ------
 
+2:32 PM 12/5/2018
+- pembayaran
+  - cetak bukti pembayaran
+  - operator hanya input data, tidak berhak edit data
+  - hanya level akses yang lebih tinggi dari operator yang bisa edit data
+
+- siswa
+  - input data siswa ke database
+
+- setup - periode
+  - apabila dirasa setup periode membuat rancu :: lebih baik dihilangkan
+  - istilah periode terkesan rancu dengan istilah ajaran
+
+- laporan uang masuk
+  - dibutuhkan inputan range tanggal untuk laporan uang masuk
+
+- laporan pembayaran yang sudah bayar dan yang belum bayar 
+  - dibuatkan combo extend search per sekolah
+                                      kelas
+                                      siswa
+  - per sekolah :
+    yang tampil data semua kelas dan sub total per kelas
+
+  - per kelas :
+    yang tampil semua siswa dalam kelas tersebut dan sub total per siswa
+
+  - per siswa :
+    yang tampil breakdown pembayaran rutin dan pembayaran non rutin
+
+- uang masuk atau uang kas tiap kelas per jenis pembayaran rutin
+
+- setiap laporan :: ditambahkan input range tanggal periode
+
+- history pembayaran, bisa diview dan dicetak sebagai bukti pembayaran
+
+
+
+
 
 
 

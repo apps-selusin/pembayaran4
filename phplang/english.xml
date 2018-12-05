@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/11/22" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/12/5" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,26 +583,11 @@
   <project>
     <phrase id="bodytitle" value="PEMBAYARAN" />
     <phrase id="footertext" value="&amp;copy;2018 Selaras Solusindo. All rights reserved." />
-    <menu id="10022">
-      <phrase id="menutext" value="v 02 siswa" />
-    </menu>
-    <menu id="10023">
-      <phrase id="menutext" value="v 04 uang masuk" />
-    </menu>
-    <menu id="10018">
-      <phrase id="menutext" value="t 92 periodeold" />
-    </menu>
     <menu id="21">
       <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10">
       <phrase id="menutext" value="Pembayaran" />
-    </menu>
-    <menu id="9">
-      <phrase id="menutext" value="Rutin" />
-    </menu>
-    <menu id="24">
-      <phrase id="menutext" value="Non-Rutin" />
     </menu>
     <menu id="19">
       <phrase id="menutext" value="Setup" />
@@ -622,18 +607,6 @@
     <menu id="4">
       <phrase id="menutext" value="Siswa" />
     </menu>
-    <menu id="6">
-      <phrase id="menutext" value="Pembayaran Rutin" />
-    </menu>
-    <menu id="7">
-      <phrase id="menutext" value="Rincian Pembayaran Rutin" />
-    </menu>
-    <menu id="23">
-      <phrase id="menutext" value="Pembayaran Non-Rutin" />
-    </menu>
-    <menu id="25">
-      <phrase id="menutext" value="Rincian Pembayaran Non-Rutin" />
-    </menu>
     <menu id="5">
       <phrase id="menutext" value="Pembayaran Rutin" />
     </menu>
@@ -646,20 +619,23 @@
     <menu id="20">
       <phrase id="menutext" value="Laporan" />
     </menu>
-    <menu id="10017">
-      <phrase id="menutext" value="Pembayaran (sudah bayar)" />
+    <menu id="10021">
+      <phrase id="menutext" value="Pembayaran (Sudah Bayar)" />
     </menu>
-    <menu id="10020">
-      <phrase id="menutext" value="Pembayaran (belum bayar)" />
+    <menu id="10022">
+      <phrase id="menutext" value="Pembayaran (Belum Bayar)" />
     </menu>
     <menu id="10019">
       <phrase id="menutext" value="Uang Masuk" />
     </menu>
-    <menu id="10021">
+    <menu id="10020">
       <phrase id="menutext" value="Potensi Uang Masuk" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="Log Aktifitas" />
+    </menu>
+    <menu id="10018">
+      <phrase id="menutext" value="Pembayaran (belum bayar)" />
     </menu>
     <menu id="10001">
       <phrase id="menutext" value="t 01 tahunajaran" />
@@ -708,6 +684,9 @@
     </menu>
     <menu id="10016">
       <phrase id="menutext" value="v 01 siswa" />
+    </menu>
+    <menu id="10017">
+      <phrase id="menutext" value="Pembayaran (sudah bayar)" />
     </menu>
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
@@ -1160,6 +1139,57 @@
       </field>
       <field id="per_thn_bln_byr_text">
         <phrase id="fldcaption" value="Per Thn Bln Byr Text" />
+      </field>
+    </table>
+    <table id="v05_potensi">
+      <phrase id="tblcaption" value="v 05 potensi" />
+      <field id="siswanonrutin_id">
+        <phrase id="fldcaption" value="siswanonrutin id" />
+      </field>
+      <field id="siswa_id">
+        <phrase id="fldcaption" value="siswa id" />
+      </field>
+      <field id="nonrutin_id">
+        <phrase id="fldcaption" value="nonrutin id" />
+      </field>
+      <field id="sekolah_id">
+        <phrase id="fldcaption" value="sekolah id" />
+      </field>
+      <field id="kelas_id">
+        <phrase id="fldcaption" value="kelas id" />
+      </field>
+      <field id="nis">
+        <phrase id="fldcaption" value="NIS" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="jenis">
+        <phrase id="fldcaption" value="Jenis" />
+      </field>
+      <field id="nilai">
+        <phrase id="fldcaption" value="Nilai" />
+      </field>
+      <field id="kelas">
+        <phrase id="fldcaption" value="Kelas" />
+      </field>
+      <field id="sekolah">
+        <phrase id="fldcaption" value="Sekolah" />
+      </field>
+      <field id="name_exp_12">
+        <phrase id="fldcaption" value="Name exp 12" />
+      </field>
+      <field id="name_exp_13">
+        <phrase id="fldcaption" value="Name exp 13" />
+      </field>
+      <field id="bayar">
+        <phrase id="fldcaption" value="Bayar" />
+      </field>
+      <field id="name_exp_15">
+        <phrase id="fldcaption" value="Name exp 15" />
+      </field>
+      <field id="name_exp_16">
+        <phrase id="fldcaption" value="Name exp 16" />
       </field>
     </table>
   </project>

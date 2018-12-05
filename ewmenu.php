@@ -16,10 +16,10 @@ $RootMenu->AddMenuItem(5, "mi_t05_rutin", $Language->MenuPhrase("5", "MenuText")
 $RootMenu->AddMenuItem(22, "mi_t08_nonrutin", $Language->MenuPhrase("22", "MenuText"), "t08_nonrutinlist.php", 19, "", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(27, "mi_cf02_tutupbuku_php", $Language->MenuPhrase("27", "MenuText"), "cf02_tutupbuku.php", -1, "", TRUE, FALSE, TRUE);
 $RootMenu->AddMenuItem(20, "mci_Laporan", $Language->MenuPhrase("20", "MenuText"), "", -1, "", TRUE, FALSE, TRUE);
-$RootMenu->AddMenuItem(10017, "mri_v025fsiswa", $Language->MenuPhrase("10017", "MenuText"), "v02_siswarpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
-$RootMenu->AddMenuItem(10020, "mri_v035fsiswa5fblm5fbyr", $Language->MenuPhrase("10020", "MenuText"), "v03_siswa_blm_byrrpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10021, "mri_r015fsudahbayar", $Language->MenuPhrase("10021", "MenuText"), "r01_sudahbayarsmry.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10022, "mri_r025fbelumbayar", $Language->MenuPhrase("10022", "MenuText"), "r02_belumbayarsmry.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(10019, "mri_v045fuang5fmasuk", $Language->MenuPhrase("10019", "MenuText"), "v04_uang_masukrpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
-$RootMenu->AddMenuItem(10021, "mri_v055fpotensi", $Language->MenuPhrase("10021", "MenuText"), "v05_potensirpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
+$RootMenu->AddMenuItem(10020, "mri_v055fpotensi", $Language->MenuPhrase("10020", "MenuText"), "v05_potensirpt.php", 20, "{0BB1DC5C-09DE-419A-9701-F3161918C007}", TRUE, FALSE, FALSE);
 $RootMenu->AddMenuItem(8, "mi_t99_audittrail", $Language->MenuPhrase("8", "MenuText"), "t99_audittraillist.php", 20, "", TRUE, FALSE, FALSE);
 $RootMenu->Render();
 ?>

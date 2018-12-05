@@ -41,7 +41,7 @@ if (!defined("EW_USE_ADODB"))
 	define("EW_USE_ADODB", FALSE, TRUE); // Use ADOdb
 if (!defined("EW_USE_MYSQLI"))
 	define('EW_USE_MYSQLI', extension_loaded("mysqli"), TRUE); // Use MySQLi
-$EWR_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3306, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
+$EWR_CONN["DB"] = array("conn" => NULL, "id" => "DB", "type" => "MYSQL", "host" => "localhost", "port" => 3307, "user" => "root", "pass" => "admin", "db" => "db_pembayaran4", "qs" => "`", "qe" => "`");
 $EWR_CONN[0] = &$EWR_CONN["DB"];
 
 // Set up database error function
@@ -79,7 +79,7 @@ define("EWR_SESSION_TIMEOUT_COUNTDOWN", 60, TRUE); // Session timeout count down
 // General
 $EWR_ROOT_RELATIVE_PATH = "."; // Relative path of app root
 define("EWR_UNFORMAT_YEAR", 50, TRUE); // Unformat year
-define("EWR_RANDOM_KEY", '682HKoZRUfX7zU8j', TRUE); // Random key for encryption
+define("EWR_RANDOM_KEY", 'X0OD4dizKa6lK3LI', TRUE); // Random key for encryption
 define("EWR_PROJECT_STYLESHEET_FILENAME", "phprptcss/pembayaran4_prj.css", TRUE); // Project stylesheet file name
 define("EWR_CHART_WIDTH", 550, TRUE);
 define("EWR_CHART_HEIGHT", 440, TRUE);
