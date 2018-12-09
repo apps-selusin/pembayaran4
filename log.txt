@@ -37,6 +37,11 @@
 
 - history pembayaran, bisa diview dan dicetak sebagai bukti pembayaran
 
+- proses pembayaran, saat input NIS atau NAMA :: bisa langsung muncul ke menu pembayaran,
+  tidak perlu klik icon MASTER/DETAIL
+
+- tombol SAVE di menu pembayaran -> diubah menjadi CETAK
+
 
 
 
@@ -48,6 +53,9 @@
 -----
 <strong>done:</strong>
 -----
+
+3:10 PM 12/5/2018
+- hilangkan istilah periode
 
 5:43 PM 11/22/2018
 - tambah field periode_bayar_tahun_bulan

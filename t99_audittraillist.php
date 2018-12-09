@@ -1273,7 +1273,7 @@ class ct99_audittrail_list extends ct99_audittrail {
 
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
+		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : "";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft99_audittraillistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
@@ -1744,6 +1744,9 @@ ft99_audittraillist.ValidateRequired = false;
 // Form object for search
 
 var CurrentSearchForm = ft99_audittraillistsrch = new ew_Form("ft99_audittraillistsrch");
+
+// Init search panel as collapsed
+if (ft99_audittraillistsrch) ft99_audittraillistsrch.InitSearchPanel = true;
 </script>
 <script type="text/javascript">
 
@@ -1798,7 +1801,7 @@ $t99_audittrail_list->RenderOtherOptions();
 ?>
 <?php if ($t99_audittrail->Export == "" && $t99_audittrail->CurrentAction == "") { ?>
 <form name="ft99_audittraillistsrch" id="ft99_audittraillistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t99_audittrail_list->SearchWhere <> "") ? " in" : " in"; ?>
+<?php $SearchPanelClass = ($t99_audittrail_list->SearchWhere <> "") ? " in" : ""; ?>
 <div id="ft99_audittraillistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="t99_audittrail">

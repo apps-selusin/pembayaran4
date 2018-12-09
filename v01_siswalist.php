@@ -1304,7 +1304,7 @@ class cv01_siswa_list extends cv01_siswa {
 
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
+		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : "";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fv01_siswalistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
@@ -1960,7 +1960,7 @@ $v01_siswa_list->RenderOtherOptions();
 ?>
 <?php if ($v01_siswa->Export == "" && $v01_siswa->CurrentAction == "") { ?>
 <form name="fv01_siswalistsrch" id="fv01_siswalistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($v01_siswa_list->SearchWhere <> "") ? " in" : " in"; ?>
+<?php $SearchPanelClass = ($v01_siswa_list->SearchWhere <> "") ? " in" : ""; ?>
 <div id="fv01_siswalistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="v01_siswa">

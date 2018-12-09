@@ -1211,7 +1211,7 @@ class ct03_kelas_list extends ct03_kelas {
 
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
+		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : "";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft03_kelaslistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
@@ -1768,6 +1768,9 @@ ft03_kelaslistsrch.ValidateRequired = false; // No JavaScript validation
 
 // Dynamic selection lists
 ft03_kelaslistsrch.Lists["x_sekolah_id"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Sekolah","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_sekolah"};
+
+// Init search panel as collapsed
+if (ft03_kelaslistsrch) ft03_kelaslistsrch.InitSearchPanel = true;
 </script>
 <script type="text/javascript">
 
@@ -1822,7 +1825,7 @@ $t03_kelas_list->RenderOtherOptions();
 ?>
 <?php if ($t03_kelas->Export == "" && $t03_kelas->CurrentAction == "") { ?>
 <form name="ft03_kelaslistsrch" id="ft03_kelaslistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t03_kelas_list->SearchWhere <> "") ? " in" : " in"; ?>
+<?php $SearchPanelClass = ($t03_kelas_list->SearchWhere <> "") ? " in" : ""; ?>
 <div id="ft03_kelaslistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="t03_kelas">

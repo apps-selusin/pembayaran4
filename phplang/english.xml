@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/12/5" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/12/6" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -583,6 +583,39 @@
   <project>
     <phrase id="bodytitle" value="PEMBAYARAN" />
     <phrase id="footertext" value="&amp;copy;2018 Selaras Solusindo. All rights reserved." />
+    <menu id="10023">
+      <phrase id="menutext" value="Pembayaran Rutin" />
+    </menu>
+    <menu id="10024">
+      <phrase id="menutext" value="Rutin" />
+    </menu>
+    <menu id="10025">
+      <phrase id="menutext" value="Rincian Pembayaran Rutin" />
+    </menu>
+    <menu id="10026">
+      <phrase id="menutext" value="Pembayaran Non-Rutin" />
+    </menu>
+    <menu id="10027">
+      <phrase id="menutext" value="Non-Rutin" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="Rincian Pembayaran Non-Rutin" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="t 92 periodeold" />
+    </menu>
+    <menu id="10030">
+      <phrase id="menutext" value="v 02 siswa" />
+    </menu>
+    <menu id="10031">
+      <phrase id="menutext" value="v 03 siswa blm byr" />
+    </menu>
+    <menu id="10032">
+      <phrase id="menutext" value="v 04 uang masuk" />
+    </menu>
+    <menu id="10033">
+      <phrase id="menutext" value="v 05 potensi" />
+    </menu>
     <menu id="21">
       <phrase id="menutext" value="Home" />
     </menu>

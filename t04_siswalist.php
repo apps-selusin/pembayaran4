@@ -1418,7 +1418,7 @@ class ct04_siswa_list extends ct04_siswa {
 
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
+		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : "";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft04_siswalistsrch\">" . $Language->Phrase("SearchBtn") . "</button>";
 		$item->Visible = TRUE;
 
@@ -2013,6 +2013,9 @@ ft04_siswalistsrch.ValidateRequired = false; // No JavaScript validation
 <?php } ?>
 
 // Dynamic selection lists
+// Init search panel as collapsed
+
+if (ft04_siswalistsrch) ft04_siswalistsrch.InitSearchPanel = true;
 </script>
 <script type="text/javascript">
 
@@ -2067,7 +2070,7 @@ $t04_siswa_list->RenderOtherOptions();
 ?>
 <?php if ($t04_siswa->Export == "" && $t04_siswa->CurrentAction == "") { ?>
 <form name="ft04_siswalistsrch" id="ft04_siswalistsrch" class="form-inline ewForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t04_siswa_list->SearchWhere <> "") ? " in" : " in"; ?>
+<?php $SearchPanelClass = ($t04_siswa_list->SearchWhere <> "") ? " in" : ""; ?>
 <div id="ft04_siswalistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="t04_siswa">
